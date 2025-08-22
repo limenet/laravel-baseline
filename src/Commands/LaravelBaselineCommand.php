@@ -173,7 +173,10 @@ class LaravelBaselineCommand extends Command
 
     private function usesLaravelTelescope(): CheckResult
     {
-        return $this->checkComposerPackages('laravel/telescope') ? CheckResult::PASS : CheckResult::FAIL;
+        return $this->checkComposerPackages('laravel/telescope')
+                && $this->hasPostUpdateScript('telescope:publish')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     private function usesLimenetPintConfig(): CheckResult
