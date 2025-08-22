@@ -32,6 +32,7 @@ class LaravelBaselineCommand extends Command
             $this->hasEncryptedEnvFile(...),
             $this->isCiLintComplete(...),
             $this->isLaravelVersionMaintained(...),
+            $this->doesNotUseIgnition(...),
             $this->usesIdeHelpers(...),
             $this->usesLarastan(...),
             $this->usesLaravelBoost(...),
@@ -163,6 +164,11 @@ class LaravelBaselineCommand extends Command
         }
 
         return CheckResult::PASS;
+    }
+
+    private function doesNotUseIgnition(): CheckResult
+    {
+        return $this->checkComposerPackages('spatie/laravel-ignition') ? CheckResult::PASS : CheckResult::FAIL;
     }
 
     private function usesLaravelTelescope(): CheckResult
