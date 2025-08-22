@@ -137,7 +137,7 @@ class LaravelBaselineCommand extends Command
 
     private function usesLaravelBoost(): CheckResult
     {
-        return $this->checkComposerPackages('laravel-boost') ? CheckResult::PASS : CheckResult::FAIL;
+        return $this->checkComposerPackages('laravel/boost') ? CheckResult::PASS : CheckResult::FAIL;
     }
 
     private function usesLaravelHorizon(): CheckResult
