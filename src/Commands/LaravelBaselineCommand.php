@@ -53,6 +53,7 @@ class LaravelBaselineCommand extends Command
 
             if (in_array($nameRaw, config('baseline.excludes', []), true)) {
                 $results[] = sprintf('⚪ %s (excluded)', $name);
+
                 continue;
             }
 
