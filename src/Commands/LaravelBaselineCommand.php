@@ -27,6 +27,7 @@ class LaravelBaselineCommand extends Command
         $this->newLine(2);
 
         foreach ([
+            $this->bumpsComposer(...),
             $this->hasCompleteRectorConfiguration(...),
             $this->hasEncryptedEnvFile(...),
             $this->isCiLintComplete(...),
@@ -122,6 +123,13 @@ class LaravelBaselineCommand extends Command
         return $this->checkComposerPackages('barryvdh/laravel-ide-helper')
                 && $this->hasPostUpdateScript('ide-helper:generate')
                 && $this->hasPostUpdateScript('ide-helper:meta')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
+    }
+
+    private function bumpsComposer(): CheckResult
+    {
+        return $this->hasPostUpdateScript('composer bump')
             ? CheckResult::PASS
             : CheckResult::FAIL;
     }
