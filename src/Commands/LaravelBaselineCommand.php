@@ -28,6 +28,7 @@ class LaravelBaselineCommand extends Command
 
         foreach ([
             $this->bumpsComposer(...),
+            $this->callsBaseline(...),
             $this->hasCompleteRectorConfiguration(...),
             $this->hasEncryptedEnvFile(...),
             $this->isCiLintComplete(...),
@@ -183,6 +184,13 @@ class LaravelBaselineCommand extends Command
     {
         return $this->checkComposerPackages('limenet/laravel-pint-config')
                 && $this->hasPostUpdateScript('laravel-pint-config:publish')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
+    }
+
+    private function callsBaseline(): CheckResult
+    {
+        return $this->hasPostUpdateScript('limenet:laravel-baseline')
             ? CheckResult::PASS
             : CheckResult::FAIL;
     }
