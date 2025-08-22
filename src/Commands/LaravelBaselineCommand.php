@@ -181,7 +181,10 @@ class LaravelBaselineCommand extends Command
 
     private function usesLimenetPintConfig(): CheckResult
     {
-        return $this->checkComposerPackages('limenet/laravel-pint-config') ? CheckResult::PASS : CheckResult::FAIL;
+        return $this->checkComposerPackages('limenet/laravel-pint-config')
+                && $this->hasPostUpdateScript('laravel-pint-config:publish')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     private function usesPredis(): CheckResult
