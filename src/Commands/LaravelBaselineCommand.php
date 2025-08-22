@@ -48,8 +48,15 @@ class LaravelBaselineCommand extends Command
             $this->usesSpatieBackup(...),
             $this->usesSpatieHealth(...),
         ] as $check) {
+            $nameRaw = (new \ReflectionFunction($check))->getName();
+            $name = str($nameRaw)->ucsplit()->implode(' ');
+
+            if (in_array($nameRaw, config('baseline.excludes', []), true)) {
+                $results[] = sprintf('⚪ %s (excluded)', $name);
+                continue;
+            }
+
             $result = $check();
-            $name = str((new \ReflectionFunction($check))->getName())->ucsplit()->implode(' ');
 
             $results[] = sprintf('%s %s', $result->icon(), $name);
 
