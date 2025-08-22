@@ -5,8 +5,8 @@ namespace Limenet\LaravelBaseline\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Limenet\LaravelBaseline\Enums\CheckResult;
-use Limenet\LaravelBaseline\Rector\RectorVisitorHasCall;
 use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
+use Limenet\LaravelBaseline\Rector\RectorVisitorHasCall;
 use Limenet\LaravelBaseline\Rector\RectorVisitorNamedArgument;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
@@ -243,7 +243,7 @@ class LaravelBaselineCommand extends Command
             new RectorVisitorNamedArgument($this, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn', 'strictBooleans']),
             new RectorVisitorHasCall($this, 'withPhpSets'),
             new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
-         ];
+        ];
 
         foreach ($visitors as $visitor) {
             $traverser->addVisitor($visitor);
