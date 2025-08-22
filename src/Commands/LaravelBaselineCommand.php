@@ -5,6 +5,11 @@ namespace Limenet\LaravelBaseline\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Rector\RectorVisitorHasCall;
+use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
+use Limenet\LaravelBaseline\Rector\RectorVisitorNamedArgument;
+use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
 
 class LaravelBaselineCommand extends Command
@@ -22,7 +27,9 @@ class LaravelBaselineCommand extends Command
         $this->newLine(2);
 
         foreach ([
+            $this->hasCompleteRectorConfiguration(...),
             $this->hasEncryptedEnvFile(...),
+            $this->isCiLintComplete(...),
             $this->isLaravelVersionMaintained(...),
             $this->usesIdeHelpers(...),
             $this->usesLarastan(...),
@@ -37,7 +44,6 @@ class LaravelBaselineCommand extends Command
             $this->usesRector(...),
             $this->usesSpatieBackup(...),
             $this->usesSpatieHealth(...),
-            $this->isCiLintComplete(...),
         ] as $check) {
             $result = $check();
             $name = str((new \ReflectionFunction($check))->getName())->ucsplit()->implode(' ');
@@ -106,18 +112,18 @@ class LaravelBaselineCommand extends Command
     private function usesPest(): CheckResult
     {
         return $this->checkComposerPackages(['pestphp/pest', 'pestphp/pest-plugin-laravel'])
-        && ! $this->checkComposerPackages(['pestphp/pest-plugin-drift', 'spatie/phpunit-watcher'])
-        ? CheckResult::PASS
-        : CheckResult::FAIL;
+                && ! $this->checkComposerPackages(['pestphp/pest-plugin-drift', 'spatie/phpunit-watcher'])
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     private function usesIdeHelpers(): CheckResult
     {
         return $this->checkComposerPackages('barryvdh/laravel-ide-helper')
-         && $this->hasPostUpdateScript('ide-helper:generate')
-          && $this->hasPostUpdateScript('ide-helper:meta')
-           ? CheckResult::PASS
-           : CheckResult::FAIL;
+                && $this->hasPostUpdateScript('ide-helper:generate')
+                && $this->hasPostUpdateScript('ide-helper:meta')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     private function usesLaravelBoost(): CheckResult
@@ -203,15 +209,54 @@ class LaravelBaselineCommand extends Command
             ->ignoreDotFiles(false)
             ->name('.env.*.encrypted')
             ->depth('== 0')
-            ->hasResults() ? CheckResult::PASS : CheckResult::FAIL;
+            ->hasResults()
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     private function isCiLintComplete(): CheckResult
     {
         return $this->checkComposerScript('ci-lint', 'pint')
-          && $this->checkComposerScript('ci-lint', 'phpstan')
-           && $this->checkComposerScript('ci-lint', 'rector')
+                && $this->checkComposerScript('ci-lint', 'phpstan')
+                && $this->checkComposerScript('ci-lint', 'rector')
             ? CheckResult::PASS
             : CheckResult::FAIL;
+    }
+
+    private function hasCompleteRectorConfiguration(): CheckResult
+    {
+        $rectorConfigFile = base_path('rector.php');
+
+        if (! file_exists($rectorConfigFile)) {
+            return CheckResult::FAIL;
+        }
+
+        $code = file_get_contents($rectorConfigFile);
+
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
+        $ast = $parser->parse($code);
+
+        $traverser = new NodeTraverser;
+
+        $visitors = [
+            new RectorVisitorNamedArgument($this, 'withComposerBased', ['phpunit', 'symfony', 'laravel']),
+            new RectorVisitorNamedArgument($this, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn', 'strictBooleans']),
+            new RectorVisitorHasCall($this, 'withPhpSets'),
+            new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
+         ];
+
+        foreach ($visitors as $visitor) {
+            $traverser->addVisitor($visitor);
+        }
+
+        $traverser->traverse($ast);
+
+        foreach ($visitors as $visitor) {
+            if (! $visitor->wasFound()) {
+                return CheckResult::FAIL;
+            }
+        }
+
+        return CheckResult::PASS;
     }
 }
