@@ -168,7 +168,7 @@ class LaravelBaselineCommand extends Command
 
     private function doesNotUseIgnition(): CheckResult
     {
-        return $this->checkComposerPackages('spatie/laravel-ignition') ? CheckResult::PASS : CheckResult::FAIL;
+        return $this->checkComposerPackages('spatie/laravel-ignition') ? CheckResult::FAIL : CheckResult::PASS;
     }
 
     private function usesLaravelTelescope(): CheckResult
