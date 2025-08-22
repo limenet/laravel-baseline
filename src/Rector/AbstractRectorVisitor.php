@@ -13,7 +13,7 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
     public function __construct(
         protected Command $command,
         protected string $methodName,
-        protected array $payload = []
+        protected array $payload = [],
     ) {}
 
     public function wasFound(): bool
