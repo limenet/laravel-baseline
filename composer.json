@@ -1,24 +1,25 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "limenet/laravel-baseline",
+    "description": "This is my package laravel-baseline",
     "keywords": [
-        ":vendor_name",
+        "Linus Metzler",
         "laravel",
-        ":package_slug"
+        "laravel-baseline"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/limenet/laravel-baseline",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Linus Metzler",
+            "email": "hi@linusmetzler.me",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.3",
+        "illuminate/contracts": "^10.0||^11.0||^12.0",
         "spatie/laravel-package-tools": "^1.16",
-        "illuminate/contracts": "^10.0||^11.0||^12.0"
+        "symfony/finder": "^6.0 || ^7.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
@@ -30,18 +31,17 @@
         "pestphp/pest-plugin-laravel": "^2.0||^3.0",
         "phpstan/extension-installer": "^1.3",
         "phpstan/phpstan-deprecation-rules": "^1.1||^2.0",
-        "phpstan/phpstan-phpunit": "^1.3||^2.0",
-        "spatie/laravel-ray": "^1.35"
+        "phpstan/phpstan-phpunit": "^1.3||^2.0"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "Limenet\\LaravelBaseline\\": "src/",
+            "Limenet\\LaravelBaseline\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "Limenet\\LaravelBaseline\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -63,10 +63,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Limenet\\LaravelBaseline\\LaravelBaselineServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "LaravelBaseline": "Limenet\\LaravelBaseline\\Facades\\LaravelBaseline"
             }
         }
     },
