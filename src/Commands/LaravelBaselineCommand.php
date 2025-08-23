@@ -22,6 +22,7 @@ class LaravelBaselineCommand extends Command
     {
         $errorCount = 0;
         $results = [];
+        $errors = [];
 
         $this->info('Checking baseline...');
         $this->newLine(2);
@@ -59,18 +60,26 @@ class LaravelBaselineCommand extends Command
 
             $result = $check();
 
-            $results[] = sprintf('%s %s', $result->icon(), $name);
+            $line=sprintf('%s %s', $result->icon(), $name);
+            $results[] = $line;
 
             if ($result->isError()) {
+                $errors[] = $line;
                 $errorCount++;
             }
         }
 
         $this->newLine(2);
 
+        if($this->getOutput()->isVerbose()){
         foreach ($results as $result) {
-            $this->line($result);
-        }
+             $this->line($result);
+        }}
+
+        if($this->getOutput()->isQuiet()){
+        foreach ($errors as $error) {
+             $this->line($error);
+        }}
 
         return $errorCount === 0 ? Command::SUCCESS : Command::FAILURE;
     }
@@ -84,7 +93,9 @@ class LaravelBaselineCommand extends Command
     {
         $composer = $this->getComposer();
         $packages = is_string($packages) ? [$packages] : $packages;
-        $this->comment('Composer check: '.implode(', ', $packages));
+
+        if($this->getOutput()->isVeryVerbose()) $this->comment('Composer check: '.implode(', ', $packages));
+
         foreach ($packages as $package) {
             if (! $composer->hasPackage($package)) {
                 return false;
@@ -99,7 +110,7 @@ class LaravelBaselineCommand extends Command
         $composer = base_path('composer.json');
         $composerJson = json_decode(file_get_contents($composer), true);
 
-        $this->comment('Composer script check: '.$scriptName.' for '.$match);
+        if($this->getOutput()->isVeryVerbose()) $this->comment('Composer script check: '.$scriptName.' for '.$match);
 
         foreach ($composerJson['scripts'][$scriptName] ?? [] as $script) {
             if (str($script)->contains($match)) {
