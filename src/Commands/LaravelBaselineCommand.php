@@ -85,11 +85,13 @@ class LaravelBaselineCommand extends Command
 
         if ($errorCount !== 0) {
             $this->error("Baseline check failed with {$errorCount} error(s). Run with -v or -vv for more details.");
+
             return Command::FAILURE;
         }
 
         $this->info('Baseline check passed!');
-            return Command::SUCCESS;
+
+        return Command::SUCCESS;
     }
 
     private function getComposer(): Composer
