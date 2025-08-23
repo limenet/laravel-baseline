@@ -31,7 +31,7 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
             return null;
         }
 
-        if ($this->getOutput()->isVeryVerbose()) {
+        if ($this->command->getOutput()->isVeryVerbose()) {
             $this->command->comment('Rector check: '.$this->methodName.'('.implode(', ', $this->payload).')');
         }
 
