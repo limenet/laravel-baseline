@@ -25,7 +25,6 @@ class LaravelBaselineCommand extends Command
         $errors = [];
 
         $this->info('Checking baseline...');
-        $this->newLine(2);
 
         foreach ([
             $this->bumpsComposer(...),
@@ -69,15 +68,17 @@ class LaravelBaselineCommand extends Command
             }
         }
 
-        $this->newLine(2);
-
         if ($this->getOutput()->isVerbose()) {
+            $this->newLine(2);
+
             foreach ($results as $result) {
                 $this->line($result);
             }
         }
 
         if ($this->getOutput()->isQuiet()) {
+            $this->newLine(2);
+
             foreach ($errors as $error) {
                 $this->line($error);
             }
