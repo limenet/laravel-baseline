@@ -1,4 +1,4 @@
-# This is my package laravel-baseline
+# Laravel Baseline
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/limenet/laravel-baseline.svg?style=flat-square)](https://packagist.org/packages/limenet/laravel-baseline)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/limenet/laravel-baseline/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/limenet/laravel-baseline/actions?query=workflow%3Arun-tests+branch%3Amain)

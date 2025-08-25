@@ -1,6 +1,6 @@
 {
     "name": "limenet/laravel-baseline",
-    "description": "This is my package laravel-baseline",
+    "description": "A highly opinionated Laravel baseline.",
     "keywords": [
         "Linus Metzler",
         "laravel",
