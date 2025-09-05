@@ -1,0 +1,5 @@
+services:
+    -
+        class: Limenet\LaravelBaseline\PhpStan\Rules\EnforceWithoutRelationsOnJobsRule
+        tags:
+            - phpstan.rules.rule

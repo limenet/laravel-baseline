@@ -18,7 +18,8 @@
     "require": {
         "php": "^8.2",
         "ext-simplexml": "*",
-        "illuminate/contracts": "^10.0||^11.0||^12.0",
+        "laravel/framework": "^10.0||^11.0||^12.0",
+        "phpstan/phpstan": "^1.0||^2.0",
         "spatie/laravel-package-tools": "^1.16",
         "symfony/finder": "^6.0 || ^7.0",
         "symfony/yaml": "^6.0 || ^7.0"
@@ -71,6 +72,11 @@
             "aliases": {
                 "LaravelBaseline": "Limenet\\LaravelBaseline\\Facades\\LaravelBaseline"
             }
+        },
+        "phpstan": {
+            "includes": [
+                "extension.neon"
+            ]
         }
     },
     "minimum-stability": "dev",
