@@ -29,6 +29,7 @@ class LaravelBaselineCommand extends Command
             $this->bumpsComposer(...),
             $this->callsBaseline(...),
             $this->callsSentryHook(...),
+            $this->checkPhpunit(...),
             $this->hasCompleteRectorConfiguration(...),
             $this->hasEncryptedEnvFile(...),
             $this->isCiLintComplete(...),
@@ -334,6 +335,71 @@ class LaravelBaselineCommand extends Command
                 && $this->checkComposerScript('ci-lint', 'php artisan insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null')
             ? CheckResult::PASS
             : CheckResult::FAIL;
+    }
+
+    private function checkPhpunit(): CheckResult
+    {
+        $xmlFile = base_path('/phpunit.xml');
+
+        if (! file_exists($xmlFile)) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('PHPUnit XML file not found');
+            }
+
+            throw new \RuntimeException;
+        }
+
+        $xml = simplexml_load_file($xmlFile);
+
+        if ($xml === false) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('Could not parse PHPUnit XML file');
+            }
+
+            throw new \RuntimeException;
+        }
+
+        if (
+            ($xml->coverage->report->cobertura ?? null) === null
+            || (string) $xml->coverage->report->cobertura->attributes()['outputFile'] !== 'cobertura.xml'
+        ) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('Cobertura missing / incorrectly configured');
+            }
+
+            return CheckResult::FAIL;
+        }
+        if (
+            ($xml->logging->junit ?? null) === null
+            || (string) $xml->logging->junit->attributes()['outputFile'] !== 'report.xml'
+        ) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('JUnit missing / incorrectly configured');
+            }
+
+            return CheckResult::FAIL;
+        }
+
+        $appKeyFound = false;
+
+        foreach ($xml->php->server as $server) {
+            $attrs = $server->attributes();
+            if ((string) $attrs['name'] === 'APP_KEY' && str_starts_with($attrs['value'], 'base64:')) {
+                $appKeyFound = true;
+                break;
+            }
+        }
+
+        if (! $appKeyFound) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('APP_KEY not defined in <php><server>');
+            }
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+
     }
 
     private function hasCompleteRectorConfiguration(): CheckResult
