@@ -258,10 +258,11 @@ class LaravelBaselineCommand extends Command
         if (! $this->checkComposerPackages('sentry/sentry-laravel')) {
             return CheckResult::WARN;
         }
+
         $data = $this->getGitlabCiData();
 
         if (
-            $data['release']['extends'][0] !== '.release'
+            ($data['release']['extends'][0] ?? null) !== '.release'
              || ! str_starts_with($data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? '', 'https://sentry.io/api/hooks/release/builtin/')
         ) {
             if ($this->getOutput()->isVeryVerbose()) {
