@@ -382,8 +382,8 @@ class LaravelBaselineCommand extends Command
 
         $appKeyFound = false;
 
-        foreach ($xml->php->server as $server) {
-            $attrs = $server->attributes();
+        foreach ($xml->php->env as $env) {
+            $attrs = $env->attributes();
             if ((string) $attrs['name'] === 'APP_KEY' && str_starts_with($attrs['value'], 'base64:')) {
                 $appKeyFound = true;
                 break;
