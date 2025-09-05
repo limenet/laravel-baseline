@@ -11,6 +11,7 @@ use Limenet\LaravelBaseline\Rector\RectorVisitorNamedArgument;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Yaml;
 
 class LaravelBaselineCommand extends Command
 {
@@ -27,6 +28,7 @@ class LaravelBaselineCommand extends Command
         foreach ([
             $this->bumpsComposer(...),
             $this->callsBaseline(...),
+            $this->callsSentryHook(...),
             $this->hasCompleteRectorConfiguration(...),
             $this->hasEncryptedEnvFile(...),
             $this->isCiLintComplete(...),
@@ -222,6 +224,37 @@ class LaravelBaselineCommand extends Command
         return $this->hasPostUpdateScript('limenet:laravel-baseline')
             ? CheckResult::PASS
             : CheckResult::FAIL;
+    }
+
+    private function callsSentryHook(): CheckResult
+    {
+        if (! $this->checkComposerPackages('sentry/sentry-laravel')) {
+            return CheckResult::WARN;
+        }
+
+        $ciFile = base_path('/.gitlab-ci.yml');
+
+        if (! file_exists($ciFile)) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('Gitlab CI file not found');
+            }
+
+            return CheckResult::FAIL;
+        }
+
+        $data = Yaml::parseFile($ciFile);
+        if (
+            $data['release']['extends'][0] !== '.release'
+             || ! str_starts_with($data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? '', 'https://sentry.io/api/hooks/release/builtin/')
+        ) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('Could not find correctly configured Sentry release hook in .gitlab-ci.yml');
+            }
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
     }
 
     private function usesPredis(): CheckResult
