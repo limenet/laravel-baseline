@@ -34,6 +34,7 @@ class LaravelBaselineCommand extends Command
             $this->isCiLintComplete(...),
             $this->isLaravelVersionMaintained(...),
             $this->doesNotUseIgnition(...),
+            $this->hasCiJobs(...),
             $this->usesIdeHelpers(...),
             $this->usesLarastan(...),
             $this->usesLaravelBoost(...),
@@ -229,23 +230,35 @@ class LaravelBaselineCommand extends Command
             : CheckResult::FAIL;
     }
 
+    private function hasCiJobs(): CheckResult
+    {
+        $data = $this->getGitlabCiData();
+        $jobs = [
+            'build' => '.build',
+            'php' => '.lint_php',
+            'js' => '.lint_js',
+            'test' => '.test',
+        ];
+        foreach ($jobs as $jobName => $extends) {
+            if (($data[$jobName] !== ['extends' => [$extends]])) {
+                if ($this->getOutput()->isVeryVerbose()) {
+                    $this->comment("Could not find job $jobName extending $extends in .gitlab-ci.yml");
+                }
+
+                return CheckResult::FAIL;
+            }
+        }
+
+        return CheckResult::PASS;
+    }
+
     private function callsSentryHook(): CheckResult
     {
         if (! $this->checkComposerPackages('sentry/sentry-laravel')) {
             return CheckResult::WARN;
         }
+        $data = $this->getGitlabCiData();
 
-        $ciFile = base_path('/.gitlab-ci.yml');
-
-        if (! file_exists($ciFile)) {
-            if ($this->getOutput()->isVeryVerbose()) {
-                $this->comment('Gitlab CI file not found');
-            }
-
-            return CheckResult::FAIL;
-        }
-
-        $data = Yaml::parseFile($ciFile);
         if (
             $data['release']['extends'][0] !== '.release'
              || ! str_starts_with($data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? '', 'https://sentry.io/api/hooks/release/builtin/')
@@ -358,5 +371,23 @@ class LaravelBaselineCommand extends Command
         }
 
         return CheckResult::PASS;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getGitlabCiData(): array
+    {
+        $ciFile = base_path('/.gitlab-ci.yml');
+
+        if (! file_exists($ciFile)) {
+            if ($this->getOutput()->isVeryVerbose()) {
+                $this->comment('Gitlab CI file not found');
+            }
+
+            throw new \RuntimeException;
+        }
+
+        return Yaml::parseFile($ciFile);
     }
 }
