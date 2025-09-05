@@ -97,6 +97,9 @@ class LaravelBaselineCommand extends Command
         return app(Composer::class)->setWorkingPath(base_path());
     }
 
+    /**
+     * @param  string|list<string>  $packages
+     */
     private function checkComposerPackages(string|array $packages): bool
     {
         $composer = $this->getComposer();
@@ -118,7 +121,7 @@ class LaravelBaselineCommand extends Command
     private function checkComposerScript(string $scriptName, string $match): bool
     {
         $composer = base_path('composer.json');
-        $composerJson = json_decode(file_get_contents($composer), true);
+        $composerJson = json_decode(file_get_contents($composer) ?: throw new \RuntimeException, true);
 
         if ($this->getOutput()->isVeryVerbose()) {
             $this->comment('Composer script check: '.$scriptName.' for '.$match);
@@ -328,10 +331,10 @@ class LaravelBaselineCommand extends Command
             return CheckResult::FAIL;
         }
 
-        $code = file_get_contents($rectorConfigFile);
+        $code = file_get_contents($rectorConfigFile) ?: throw new \RuntimeException;
 
         $parser = (new ParserFactory)->createForNewestSupportedVersion();
-        $ast = $parser->parse($code);
+        $ast = $parser->parse($code) ?: throw new \RuntimeException;
 
         $traverser = new NodeTraverser;
 

@@ -10,6 +10,9 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
 {
     private bool $found = false;
 
+    /**
+     * @param  string[]  $payload
+     */
     public function __construct(
         protected Command $command,
         protected string $methodName,
