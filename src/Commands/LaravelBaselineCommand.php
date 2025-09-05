@@ -440,7 +440,7 @@ class LaravelBaselineCommand extends Command
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string,mixed>
      */
     private function getGitlabCiData(): array
     {
