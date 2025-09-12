@@ -332,7 +332,7 @@ class LaravelBaselineCommand extends Command
         return $this->checkComposerScript('ci-lint', 'pint')
                 && $this->checkComposerScript('ci-lint', 'phpstan')
                 && $this->checkComposerScript('ci-lint', 'rector')
-                && $this->checkComposerScript('ci-lint', 'artisan insights --no-interaction')
+                && $this->checkComposerScript('ci-lint', 'artisan insights --summary --no-interaction')
                 && $this->checkComposerScript('ci-lint', 'php artisan insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null')
             ? CheckResult::PASS
             : CheckResult::FAIL;
