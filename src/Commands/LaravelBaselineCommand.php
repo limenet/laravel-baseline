@@ -329,7 +329,7 @@ class LaravelBaselineCommand extends Command
 
     private function isCiLintComplete(): CheckResult
     {
-        return $this->checkComposerScript('ci-lint', 'pint')
+        return $this->checkComposerScript('ci-lint', 'pint --parallel')
                 && $this->checkComposerScript('ci-lint', 'phpstan')
                 && $this->checkComposerScript('ci-lint', 'rector')
                 && $this->checkComposerScript('ci-lint', 'artisan insights --summary --no-interaction')
