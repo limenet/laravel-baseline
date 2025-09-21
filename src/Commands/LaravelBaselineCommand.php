@@ -241,7 +241,7 @@ class LaravelBaselineCommand extends Command
             'test' => '.test',
         ];
         foreach ($jobs as $jobName => $extends) {
-            if (($data[$jobName] !== ['extends' => [$extends]])) {
+            if (($data[$jobName] ?? null) !== ['extends' => [$extends]]) {
                 if ($this->getOutput()->isVeryVerbose()) {
                     $this->comment("Could not find job $jobName extending $extends in .gitlab-ci.yml");
                 }
