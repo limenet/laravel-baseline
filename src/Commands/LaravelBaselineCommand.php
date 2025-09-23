@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
+use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
 use Limenet\LaravelBaseline\Rector\RectorVisitorHasCall;
@@ -41,6 +42,7 @@ class LaravelBaselineCommand extends Command
             $this->usesLaravelBoost(...),
             $this->usesLaravelHorizon(...),
             $this->usesLaravelPennant(...),
+            $this->usesLaravelPulse(...),
             $this->usesLaravelTelescope(...),
             $this->usesLimenetPintConfig(...),
             $this->usesPest(...),
@@ -203,6 +205,19 @@ class LaravelBaselineCommand extends Command
         return CheckResult::PASS;
     }
 
+    private function usesLaravelPulse(): CheckResult
+    {
+        if (! $this->checkComposerPackages('laravel/pulse')) {
+            return CheckResult::WARN;
+        }
+
+        if (! $this->hasScheduleEntry('pulse:trim')) {
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
     private function doesNotUseIgnition(): CheckResult
     {
         return $this->checkComposerPackages('spatie/laravel-ignition') ? CheckResult::FAIL : CheckResult::PASS;
@@ -212,6 +227,7 @@ class LaravelBaselineCommand extends Command
     {
         return $this->checkComposerPackages('laravel/telescope')
                 && $this->hasPostUpdateScript('telescope:publish')
+                && $this->hasScheduleEntry('telescope:prune')
             ? CheckResult::PASS
             : CheckResult::FAIL;
     }
@@ -282,12 +298,26 @@ class LaravelBaselineCommand extends Command
 
     private function usesSpatieHealth(): CheckResult
     {
-        return $this->checkComposerPackages('spatie/laravel-health') ? CheckResult::PASS : CheckResult::WARN;
+        if (! $this->checkComposerPackages('spatie/laravel-health')) {
+            return CheckResult::WARN;
+        }
+
+        return $this->hasScheduleEntry('health:check')
+                && $this->hasScheduleEntry('health:schedule-check-heartbeat')
+                ? CheckResult::PASS
+                : CheckResult::FAIL;
     }
 
     private function usesSpatieBackup(): CheckResult
     {
-        return $this->checkComposerPackages('spatie/laravel-backup') ? CheckResult::PASS : CheckResult::WARN;
+        if (! $this->checkComposerPackages('spatie/laravel-backup')) {
+            return CheckResult::WARN;
+        }
+
+        return $this->hasScheduleEntry('backup:run')
+                && $this->hasScheduleEntry('backup:clean')
+                ? CheckResult::PASS
+                : CheckResult::FAIL;
     }
 
     private function usesRector(): CheckResult
@@ -456,5 +486,20 @@ class LaravelBaselineCommand extends Command
         }
 
         return Yaml::parseFile($ciFile);
+    }
+
+    private function hasScheduleEntry(string $command): bool
+    {
+        if ($this->getOutput()->isVeryVerbose()) {
+            $this->comment('Schedule check: '.$command);
+        }
+
+        foreach (Schedule::events() as $event) {
+            if (str_contains($event->command ?? '', $command)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
