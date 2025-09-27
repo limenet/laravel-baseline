@@ -26,11 +26,11 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-        if (! $node instanceof Node\Expr\MethodCall) {
+        if (!$node instanceof Node\Expr\MethodCall) {
             return null;
         }
 
-        if (! $node->name instanceof Node\Identifier || $node->name->toString() !== $this->methodName) {
+        if (!$node->name instanceof Node\Identifier || $node->name->toString() !== $this->methodName) {
             return null;
         }
 

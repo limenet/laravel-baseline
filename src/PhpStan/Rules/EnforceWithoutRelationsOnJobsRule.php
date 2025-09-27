@@ -32,7 +32,7 @@ final class EnforceWithoutRelationsOnJobsRule implements Rule
     private const WITHOUT_RELATIONS = WithoutRelations::class;
 
     public function __construct(
-        private ReflectionProvider $reflectionProvider
+        private ReflectionProvider $reflectionProvider,
     ) {}
 
     public function getNodeType(): string
@@ -52,7 +52,7 @@ final class EnforceWithoutRelationsOnJobsRule implements Rule
         }
 
         $classReflection = $scope->getClassReflection();
-        if (! $classReflection instanceof ClassReflection) {
+        if (!$classReflection instanceof ClassReflection) {
             return [];
         }
 
@@ -61,7 +61,7 @@ final class EnforceWithoutRelationsOnJobsRule implements Rule
             return []; // class-level attribute present → skip all parameters
         }
 
-        if (! $this->classImplementsShouldQueue($classReflection)) {
+        if (!$this->classImplementsShouldQueue($classReflection)) {
             return [];
         }
 
@@ -84,7 +84,7 @@ final class EnforceWithoutRelationsOnJobsRule implements Rule
             $errors[] = RuleErrorBuilder::message(sprintf(
                 'Queued job constructor parameter %s (%s) must be marked with #[WithoutRelations] to avoid serializing loaded relations.',
                 $paramName,
-                $modelClass
+                $modelClass,
             ))
                 ->identifier('laravel.withoutRelations.missing')
                 ->tip('Add: #[\\'.self::WITHOUT_RELATIONS.'] before the parameter (e.g. #[WithoutRelations] public User $user).')
@@ -148,7 +148,7 @@ final class EnforceWithoutRelationsOnJobsRule implements Rule
 
     private function isModelClass(string $fqcn): bool
     {
-        if (! $this->reflectionProvider->hasClass($fqcn)) {
+        if (!$this->reflectionProvider->hasClass($fqcn)) {
             return false;
         }
 
