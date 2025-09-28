@@ -16,6 +16,10 @@ final class EnforceWithoutRelationsOnJobsRuleTest extends RuleTestCase
 {
     public function test_reports_missing_without_relations_on_model_params_in_jobs(): void
     {
+        if (str_starts_with(\Illuminate\Foundation\Application::VERSION, '10.')) {
+            $this->markTestSkipped('EnforceWithoutRelationsOnJobsRuleTest is skipped on Laravel 10.');
+        }
+
         $this->analyse(
             [__DIR__.'/Fixtures/CreateReport.php'],
             [
