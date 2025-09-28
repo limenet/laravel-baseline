@@ -11,13 +11,9 @@ class LaravelBaselineCommand extends Command
 
     public $description = 'Checks the project against a highly opinionated set of coding standards.';
 
-    public function handle(): int
+    public function handle(Checker $checker): int
     {
         $errorCount = 0;
-        $results = [];
-        $errors = [];
-
-        $checker = new Checker($this);
 
         foreach ([
             $checker->bumpsComposer(...),
@@ -50,32 +46,27 @@ class LaravelBaselineCommand extends Command
             $name = str($nameRaw)->ucsplit()->implode(' ');
 
             if (in_array($nameRaw, config('baseline.excludes', []), true)) {
-                $results[] = sprintf('⚪ %s (excluded)', $name);
+                $this->line(sprintf('⚪ %s (excluded)', $name));
 
                 continue;
             }
 
+            $checker->resetComments();
             $result = $check();
+            $comments = $checker->getComments();
 
-            $line = sprintf('%s %s', $result->icon(), $name);
-            $results[] = $line;
+            $errorCount += $result->isError() ? 1 : 0;
 
-            if ($result->isError()) {
-                $errors[] = $line;
-                $errorCount++;
+            if ($result->isError() || $this->getOutput()->isVerbose()) {
+                $this->line(sprintf('%s %s', $result->icon(), $name));
             }
-        }
 
-        if ($this->getOutput()->isVerbose()) {
-            foreach ($results as $result) {
-                $this->line($result);
+            if ($result->isError() || $this->getOutput()->isVeryVerbose()) {
+                foreach ($comments as $comment) {
+                    $this->comment($comment);
+                }
             }
-        }
 
-        if ($this->getOutput()->isQuiet()) {
-            foreach ($errors as $error) {
-                $this->line($error);
-            }
         }
 
         if ($errorCount !== 0) {

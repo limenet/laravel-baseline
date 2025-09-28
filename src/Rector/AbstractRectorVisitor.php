@@ -2,7 +2,7 @@
 
 namespace Limenet\LaravelBaseline\Rector;
 
-use Illuminate\Console\Command;
+use Limenet\LaravelBaseline\Checks\Checker;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -14,7 +14,7 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
      * @param  string[]  $payload
      */
     public function __construct(
-        protected Command $command,
+        protected Checker $checker,
         protected string $methodName,
         protected array $payload = [],
     ) {}
@@ -34,9 +34,7 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
             return null;
         }
 
-        if ($this->command->getOutput()->isVeryVerbose()) {
-            $this->command->comment('Rector check: '.$this->methodName.'('.implode(', ', $this->payload).')');
-        }
+        $this->checker->addComment('Rector check: '.$this->methodName.'('.implode(', ', $this->payload).')');
 
         $this->found = $this->checkMethod($node);
 

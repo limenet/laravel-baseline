@@ -4,7 +4,6 @@ namespace Limenet\LaravelBaseline\Checks;
 
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Schedule;
-use Limenet\LaravelBaseline\Commands\LaravelBaselineCommand;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
 use Limenet\LaravelBaseline\Rector\RectorVisitorHasCall;
@@ -14,11 +13,12 @@ use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-readonly class Checker
+class Checker
 {
-    public function __construct(
-        private LaravelBaselineCommand $command,
-    ) {}
+    /**
+     * @var string[]
+     */
+    private array $comments;
 
     public function usesPest(): CheckResult
     {
@@ -128,9 +128,7 @@ readonly class Checker
         ];
         foreach ($jobs as $jobName => $extends) {
             if (($data[$jobName] ?? null) !== ['extends' => [$extends]]) {
-                if ($this->command->getOutput()->isVeryVerbose()) {
-                    $this->command->comment("Could not find job $jobName extending $extends in .gitlab-ci.yml");
-                }
+                $this->addComment("Could not find job $jobName extending $extends in .gitlab-ci.yml");
 
                 return CheckResult::FAIL;
             }
@@ -151,9 +149,7 @@ readonly class Checker
             ($data['release']['extends'][0] ?? null) !== '.release'
             || !str_starts_with($data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? '', 'https://sentry.io/api/hooks/release/builtin/')
         ) {
-            if ($this->command->getOutput()->isVeryVerbose()) {
-                $this->command->comment('Could not find correctly configured Sentry release hook in .gitlab-ci.yml');
-            }
+            $this->addComment('Could not find correctly configured Sentry release hook in .gitlab-ci.yml');
 
             return CheckResult::FAIL;
         }
@@ -243,30 +239,24 @@ readonly class Checker
         $xmlFile = base_path('/phpunit.xml');
 
         if (!file_exists($xmlFile)) {
-            if ($this->command->getOutput()->isVeryVerbose()) {
-                $this->command->comment('PHPUnit XML file not found');
-            }
+            $this->addComment('PHPUnit XML file not found');
 
-            throw new \RuntimeException();
+            return CheckResult::FAIL;
         }
 
         $xml = simplexml_load_string(file_get_contents($xmlFile) ?: '');
 
         if ($xml === false) {
-            if ($this->command->getOutput()->isVeryVerbose()) {
-                $this->command->comment('Could not parse PHPUnit XML file');
-            }
+            $this->addComment('Could not parse PHPUnit XML file');
 
-            throw new \RuntimeException();
+            return CheckResult::FAIL;
         }
 
         if (
             ($xml->coverage->report->cobertura ?? null) === null
             || (string) $xml->coverage->report->cobertura->attributes()['outputFile'] !== 'cobertura.xml'
         ) {
-            if ($this->command->getOutput()->isVeryVerbose()) {
-                $this->command->comment('Cobertura missing / incorrectly configured');
-            }
+            $this->addComment('Cobertura missing / incorrectly configured');
 
             return CheckResult::FAIL;
         }
@@ -274,9 +264,7 @@ readonly class Checker
             ($xml->logging->junit ?? null) === null
             || (string) $xml->logging->junit->attributes()['outputFile'] !== 'report.xml'
         ) {
-            if ($this->command->getOutput()->isVeryVerbose()) {
-                $this->command->comment('JUnit missing / incorrectly configured');
-            }
+            $this->addComment('JUnit missing / incorrectly configured');
 
             return CheckResult::FAIL;
         }
@@ -292,9 +280,7 @@ readonly class Checker
         }
 
         if (!$appKeyFound) {
-            if ($this->command->getOutput()->isVeryVerbose()) {
-                $this->command->comment('APP_KEY not defined in <php><server>');
-            }
+            $this->addComment('APP_KEY not defined in <php><server>');
 
             return CheckResult::FAIL;
         }
@@ -319,10 +305,10 @@ readonly class Checker
         $traverser = new NodeTraverser();
 
         $visitors = [
-            new RectorVisitorNamedArgument($this->command, 'withComposerBased', ['phpunit', 'symfony', 'laravel']),
-            new RectorVisitorNamedArgument($this->command, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn', 'strictBooleans']),
-            new RectorVisitorHasCall($this->command, 'withPhpSets'),
-            new RectorVisitorClassFetch($this->command, 'withSetProviders', ['LaravelSetProvider']),
+            new RectorVisitorNamedArgument($this, 'withComposerBased', ['phpunit', 'symfony', 'laravel']),
+            new RectorVisitorNamedArgument($this, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn', 'strictBooleans']),
+            new RectorVisitorHasCall($this, 'withPhpSets'),
+            new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
         ];
 
         foreach ($visitors as $visitor) {
@@ -340,6 +326,22 @@ readonly class Checker
         return CheckResult::PASS;
     }
 
+    /** @return string[] */
+    public function getComments(): array
+    {
+        return $this->comments;
+    }
+
+    public function resetComments(): void
+    {
+        $this->comments = [];
+    }
+
+    public function addComment(string $comment): void
+    {
+        $this->comments[] = $comment;
+    }
+
     private function getComposer(): Composer
     {
         return app(Composer::class)->setWorkingPath(base_path());
@@ -353,9 +355,7 @@ readonly class Checker
         $composer = $this->getComposer();
         $packages = is_string($packages) ? [$packages] : $packages;
 
-        if ($this->command->getOutput()->isVeryVerbose()) {
-            $this->command->comment('Composer check: '.implode(', ', $packages));
-        }
+        $this->addComment('Composer check: '.implode(', ', $packages));
 
         foreach ($packages as $package) {
             if (!$composer->hasPackage($package)) {
@@ -375,9 +375,7 @@ readonly class Checker
             flags: JSON_THROW_ON_ERROR,
         );
 
-        if ($this->command->getOutput()->isVeryVerbose()) {
-            $this->command->comment('Composer script check: '.$scriptName.' for '.$match);
-        }
+        $this->addComment('Composer script check: '.$scriptName.' for '.$match);
 
         foreach ($composerJson['scripts'][$scriptName] ?? [] as $script) {
             if (str($script)->contains($match)) {
@@ -406,9 +404,7 @@ readonly class Checker
         $ciFile = base_path('/.gitlab-ci.yml');
 
         if (!file_exists($ciFile)) {
-            if ($this->command->getOutput()->isVeryVerbose()) {
-                $this->command->comment('Gitlab CI file not found');
-            }
+            $this->addComment('Gitlab CI file not found');
 
             throw new \RuntimeException();
         }
@@ -418,9 +414,7 @@ readonly class Checker
 
     private function hasScheduleEntry(string $command): bool
     {
-        if ($this->command->getOutput()->isVeryVerbose()) {
-            $this->command->comment('Schedule check: '.$command);
-        }
+        $this->addComment('Schedule check: '.$command);
 
         foreach (Schedule::events() as $event) {
             if (str_contains($event->command ?? '', $command)) {
