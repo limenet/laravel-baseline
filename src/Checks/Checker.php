@@ -5,6 +5,7 @@ namespace Limenet\LaravelBaseline\Checks;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Rector\RectorVisitorArrayArgument;
 use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
 use Limenet\LaravelBaseline\Rector\RectorVisitorHasCall;
 use Limenet\LaravelBaseline\Rector\RectorVisitorNamedArgument;
@@ -307,8 +308,10 @@ class Checker
         $visitors = [
             new RectorVisitorNamedArgument($this, 'withComposerBased', ['phpunit', 'symfony', 'laravel']),
             new RectorVisitorNamedArgument($this, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn', 'strictBooleans']),
+            new RectorVisitorNamedArgument($this, 'withImportNames', ['!importShortClasses']),
             new RectorVisitorHasCall($this, 'withPhpSets'),
             new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
+            new RectorVisitorArrayArgument($this, 'withRules', ['AddGenericReturnTypeToRelationsRector']),
         ];
 
         foreach ($visitors as $visitor) {

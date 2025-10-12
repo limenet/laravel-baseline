@@ -548,6 +548,7 @@ it('hasCompleteRectorConfiguration fails when file missing and passes when confi
 <?php
 use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
+use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
 return static function (RectorConfig $config): void {
     $config
         ->withComposerBased(phpunit: true, symfony: true, laravel: true)
@@ -561,7 +562,11 @@ return static function (RectorConfig $config): void {
             earlyReturn: true,
             strictBooleans: true
         )
-        ->withPhpSets();
+        ->withPhpSets()
+        ->withImportNames(importShortClasses: false)
+        ->withRules([
+            AddGenericReturnTypeToRelationsRector::class,
+        ]);
 
     $config->withSetProviders(LaravelSetProvider::class);
 };

@@ -19,10 +19,16 @@ class RectorVisitorNamedArgument extends AbstractRectorVisitor
 
         $errors = 0;
         foreach ($this->payload as $name) {
-            if (($args[$name] ?? null) !== 'true') {
-                $errors++;
+            $expected = 'true';
+
+            if (str_starts_with($name, '!')) {
+                $name = substr($name, 1);
+                $expected = 'false';
             }
 
+            if (($args[$name] ?? null) !== $expected) {
+                $errors++;
+            }
         }
 
         return $errors === 0;

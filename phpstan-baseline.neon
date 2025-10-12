@@ -4,6 +4,18 @@ parameters:
 			message: '#^Access to an undefined property PhpParser\\Node\\Arg\|PhpParser\\Node\\VariadicPlaceholder\:\:\$value\.$#'
 			identifier: property.notFound
 			count: 1
+			path: src/Rector/RectorVisitorArrayArgument.php
+
+		-
+			message: '#^Call to an undefined method PhpParser\\Node\\Expr\|PhpParser\\Node\\Name\:\:toString\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Rector/RectorVisitorArrayArgument.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\\Arg\|PhpParser\\Node\\VariadicPlaceholder\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
 			path: src/Rector/RectorVisitorClassFetch.php
 
 		-
