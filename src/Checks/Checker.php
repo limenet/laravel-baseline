@@ -322,7 +322,7 @@ class Checker
 
         foreach ($visitors as $visitor) {
             if (!$visitor->wasFound()) {
-                $this->addComment(sprintf('Rector check: %s did not find call to %s', class_basename($visitor), $visitor->methodName));
+                $this->addComment(sprintf('Rector check: %s did not find call to %s (or had other failures, see above)', class_basename($visitor), $visitor->methodName));
 
                 return CheckResult::FAIL;
             }
