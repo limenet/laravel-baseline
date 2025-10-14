@@ -14,9 +14,9 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
      * @param  string[]  $payload
      */
     public function __construct(
-        protected Checker $checker,
-        protected string $methodName,
-        protected array $payload = [],
+        protected readonly Checker $checker,
+        public readonly string $methodName,
+        public readonly array $payload = [],
     ) {}
 
     public function wasFound(): bool

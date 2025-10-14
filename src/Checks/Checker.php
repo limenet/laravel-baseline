@@ -322,6 +322,8 @@ class Checker
 
         foreach ($visitors as $visitor) {
             if (!$visitor->wasFound()) {
+                $this->addComment(sprintf('Rector check: %s did not find call to %s', $visitor::class, $visitor->methodName));
+
                 return CheckResult::FAIL;
             }
         }
