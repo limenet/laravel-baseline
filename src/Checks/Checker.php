@@ -86,7 +86,12 @@ class Checker
             return CheckResult::FAIL;
         }
 
-        // TODO: check phpunit.xml for PULSE_ENABLED = false
+        if (!$this->checkPhpunitEnvVar('PULSE_ENABLED', 'false')) {
+            $this->addComment('PULSE_ENABLED not set to false in phpunit.xml');
+
+            return CheckResult::FAIL;
+        }
+
         return CheckResult::PASS;
     }
 
@@ -97,12 +102,25 @@ class Checker
 
     public function usesLaravelTelescope(): CheckResult
     {
-        // TODO: check phpunit.xml for TELESCOPE_ENABLED = false
-        return $this->checkComposerPackages('laravel/telescope')
-        && $this->hasPostUpdateScript('telescope:publish')
-        && $this->hasScheduleEntry('telescope:prune')
-            ? CheckResult::PASS
-            : CheckResult::FAIL;
+        if (!$this->checkComposerPackages('laravel/telescope')) {
+            return CheckResult::FAIL;
+        }
+
+        if (!$this->hasPostUpdateScript('telescope:publish')) {
+            return CheckResult::FAIL;
+        }
+
+        if (!$this->hasScheduleEntry('telescope:prune')) {
+            return CheckResult::FAIL;
+        }
+
+        if (!$this->checkPhpunitEnvVar('TELESCOPE_ENABLED', 'false')) {
+            $this->addComment('TELESCOPE_ENABLED not set to false in phpunit.xml');
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
     }
 
     public function usesLimenetPintConfig(): CheckResult
@@ -436,6 +454,30 @@ class Checker
 
         foreach (Schedule::events() as $event) {
             if (str_contains($event->command ?? '', $command)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function checkPhpunitEnvVar(string $name, string $expectedValue): bool
+    {
+        $xmlFile = base_path('/phpunit.xml');
+
+        if (!file_exists($xmlFile)) {
+            return false;
+        }
+
+        $xml = simplexml_load_string(file_get_contents($xmlFile) ?: '');
+
+        if ($xml === false) {
+            return false;
+        }
+
+        foreach ($xml->php->env as $env) {
+            $attrs = $env->attributes();
+            if ((string) $attrs['name'] === $name && (string) $attrs['value'] === $expectedValue) {
                 return true;
             }
         }

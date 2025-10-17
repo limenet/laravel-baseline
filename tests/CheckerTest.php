@@ -195,9 +195,40 @@ it('usesLaravelPulse checks scheduled pulse:trim', function (): void {
     $checker = new Checker(makeCommand());
     expect($checker->usesLaravelPulse())->toBe(CheckResult::FAIL);
 
-    // PASS when scheduled
+    // FAIL when scheduled but phpunit.xml missing PULSE_ENABLED = false
     bindFakeComposer(['laravel/pulse' => true]);
-    $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
+    $phpunitXml = <<<'XML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <phpunit>
+        <php>
+            <env name="APP_KEY" value="base64:test"/>
+        </php>
+    </phpunit>
+    XML;
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    Schedule::command('pulse:trim');
+    $checker = new Checker(makeCommand());
+    expect($checker->usesLaravelPulse())->toBe(CheckResult::FAIL);
+
+    // PASS when scheduled and phpunit.xml has PULSE_ENABLED = false
+    bindFakeComposer(['laravel/pulse' => true]);
+    $phpunitXml = <<<'XML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <phpunit>
+        <php>
+            <env name="APP_KEY" value="base64:test"/>
+            <env name="PULSE_ENABLED" value="false"/>
+        </php>
+    </phpunit>
+    XML;
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
 
     Schedule::command('pulse:trim');
     $checker = new Checker(makeCommand());
@@ -241,9 +272,40 @@ it('usesLaravelTelescope requires package, post-update script and schedule', fun
     $checker = new Checker(makeCommand());
     expect($checker->usesLaravelTelescope())->toBe(CheckResult::FAIL);
 
-    // With script and schedule -> PASS
+    // With script and schedule but missing phpunit.xml TELESCOPE_ENABLED -> FAIL
     bindFakeComposer(['laravel/telescope' => true]);
-    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+    $phpunitXml = <<<'XML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <phpunit>
+        <php>
+            <env name="APP_KEY" value="base64:test"/>
+        </php>
+    </phpunit>
+    XML;
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    Schedule::command('telescope:prune');
+    $checker = new Checker(makeCommand());
+    expect($checker->usesLaravelTelescope())->toBe(CheckResult::FAIL);
+
+    // With script, schedule and phpunit.xml TELESCOPE_ENABLED = false -> PASS
+    bindFakeComposer(['laravel/telescope' => true]);
+    $phpunitXml = <<<'XML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <phpunit>
+        <php>
+            <env name="APP_KEY" value="base64:test"/>
+            <env name="TELESCOPE_ENABLED" value="false"/>
+        </php>
+    </phpunit>
+    XML;
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        'phpunit.xml' => $phpunitXml,
+    ]);
 
     Schedule::command('telescope:prune');
     $checker = new Checker(makeCommand());
@@ -465,7 +527,6 @@ it('isCiLintComplete checks ci-lint composer script contents', function (): void
 
     expect((new Checker(makeCommand()))->isCiLintComplete())->toBe(CheckResult::FAIL);
 });
-
 
 it('checkPhpunit fails when cobertura or junit or APP_KEY is missing', function (): void {
     bindFakeComposer([]);
