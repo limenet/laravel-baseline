@@ -466,29 +466,6 @@ it('isCiLintComplete checks ci-lint composer script contents', function (): void
     expect((new Checker(makeCommand()))->isCiLintComplete())->toBe(CheckResult::FAIL);
 });
 
-it('checkPhpunit passes when cobertura, junit and APP_KEY are configured', function (): void {
-    bindFakeComposer([]);
-    $xml = <<<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit>
-  <coverage>
-    <report>
-      <cobertura outputFile="cobertura.xml" />
-    </report>
-  </coverage>
-  <logging>
-    <junit outputFile="report.xml" />
-  </logging>
-  <php>
-    <env name="APP_KEY" value="base64:xxx" />
-  </php>
-</phpunit>
-XML;
-
-    $this->withTempBasePath(['phpunit.xml' => $xml, 'composer.json' => json_encode(['name' => 'tmp'])]);
-
-    expect((new Checker(makeCommand()))->checkPhpunit())->toBe(CheckResult::PASS);
-});
 
 it('checkPhpunit fails when cobertura or junit or APP_KEY is missing', function (): void {
     bindFakeComposer([]);
@@ -504,6 +481,198 @@ XML;
     $this->withTempBasePath(['phpunit.xml' => $xmlMissing, 'composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect((new Checker(makeCommand()))->checkPhpunit())->toBe(CheckResult::FAIL);
+});
+
+it('checkPhpunit passes when cobertura, junit and APP_KEY are configured', function (): void {
+    bindFakeComposer([]);
+    $phpunitXml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <coverage>
+        <report>
+            <cobertura outputFile="cobertura.xml"/>
+        </report>
+    </coverage>
+    <logging>
+        <junit outputFile="report.xml"/>
+    </logging>
+    <php>
+        <env name="APP_KEY" value="base64:somekey"/>
+    </php>
+    <source>
+        <include>
+            <directory suffix=".php">./app</directory>
+        </include>
+    </source>
+</phpunit>
+XML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->checkPhpunit())->toBe(CheckResult::PASS);
+});
+
+it('checkPhpunit fails when phpunit.xml is missing', function (): void {
+    bindFakeComposer([]);
+    $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->checkPhpunit())->toBe(CheckResult::FAIL);
+});
+
+it('checkPhpunit fails when cobertura is missing', function (): void {
+    bindFakeComposer([]);
+    $phpunitXml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <logging>
+        <junit outputFile="report.xml"/>
+    </logging>
+    <php>
+        <env name="APP_KEY" value="base64:somekey"/>
+    </php>
+    <source>
+        <include>
+            <directory suffix=".php">./app</directory>
+        </include>
+    </source>
+</phpunit>
+XML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->checkPhpunit())->toBe(CheckResult::FAIL);
+});
+
+it('checkPhpunit fails when junit is missing', function (): void {
+    bindFakeComposer([]);
+    $phpunitXml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <coverage>
+        <report>
+            <cobertura outputFile="cobertura.xml"/>
+        </report>
+    </coverage>
+    <php>
+        <env name="APP_KEY" value="base64:somekey"/>
+    </php>
+    <source>
+        <include>
+            <directory suffix=".php">./app</directory>
+        </include>
+    </source>
+</phpunit>
+XML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->checkPhpunit())->toBe(CheckResult::FAIL);
+});
+
+it('checkPhpunit fails when APP_KEY is missing', function (): void {
+    bindFakeComposer([]);
+    $phpunitXml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <coverage>
+        <report>
+            <cobertura outputFile="cobertura.xml"/>
+        </report>
+    </coverage>
+    <logging>
+        <junit outputFile="report.xml"/>
+    </logging>
+    <php>
+    </php>
+    <source>
+        <include>
+            <directory suffix=".php">./app</directory>
+        </include>
+    </source>
+</phpunit>
+XML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->checkPhpunit())->toBe(CheckResult::FAIL);
+});
+
+it('checkPhpunit fails when source configuration is missing', function (): void {
+    bindFakeComposer([]);
+    $phpunitXml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <coverage>
+        <report>
+            <cobertura outputFile="cobertura.xml"/>
+        </report>
+    </coverage>
+    <logging>
+        <junit outputFile="report.xml"/>
+    </logging>
+    <php>
+        <env name="APP_KEY" value="base64:somekey"/>
+    </php>
+</phpunit>
+XML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->checkPhpunit())->toBe(CheckResult::FAIL);
+});
+
+it('checkPhpunit fails when source directory is incorrect', function (): void {
+    bindFakeComposer([]);
+    $phpunitXml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <coverage>
+        <report>
+            <cobertura outputFile="cobertura.xml"/>
+        </report>
+    </coverage>
+    <logging>
+        <junit outputFile="report.xml"/>
+    </logging>
+    <php>
+        <env name="APP_KEY" value="base64:somekey"/>
+    </php>
+    <source>
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+    </source>
+</phpunit>
+XML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'phpunit.xml' => $phpunitXml,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->checkPhpunit())->toBe(CheckResult::FAIL);
 });
 
 it('checkPhpunit throws on invalid XML', function (): void {

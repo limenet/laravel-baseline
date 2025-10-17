@@ -286,6 +286,17 @@ class Checker
             return CheckResult::FAIL;
         }
 
+        // Check for source configuration
+        if (
+            ($xml->source->include->directory ?? null) === null
+            || (string) $xml->source->include->directory !== './app'
+            || (string) $xml->source->include->directory->attributes()['suffix'] !== '.php'
+        ) {
+            $this->addComment('<source> configuration missing / incorrectly configured');
+
+            return CheckResult::FAIL;
+        }
+
         return CheckResult::PASS;
 
     }
