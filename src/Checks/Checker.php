@@ -86,6 +86,7 @@ class Checker
             return CheckResult::FAIL;
         }
 
+        // TODO: check phpunit.xml for PULSE_ENABLED = false
         return CheckResult::PASS;
     }
 
@@ -96,6 +97,7 @@ class Checker
 
     public function usesLaravelTelescope(): CheckResult
     {
+        // TODO: check phpunit.xml for TELESCOPE_ENABLED = false
         return $this->checkComposerPackages('laravel/telescope')
         && $this->hasPostUpdateScript('telescope:publish')
         && $this->hasScheduleEntry('telescope:prune')
