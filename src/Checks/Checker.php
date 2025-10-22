@@ -343,6 +343,7 @@ class Checker
             new RectorVisitorHasCall($this, 'withPhpSets'),
             new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
             new RectorVisitorArrayArgument($this, 'withRules', ['AddGenericReturnTypeToRelationsRector']),
+            new RectorVisitorArrayArgument($this, 'withSkip', ['FunctionLikeToFirstClassCallableRector']),
         ];
 
         foreach ($visitors as $visitor) {
