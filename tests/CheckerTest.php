@@ -790,7 +790,6 @@ return static function (RectorConfig $config): void {
             privatization: true,
             instanceOf: true,
             earlyReturn: true,
-            strictBooleans: true
         )
         ->withPhpSets()
         ->withImportNames(importShortClasses: false)

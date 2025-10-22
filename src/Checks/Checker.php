@@ -338,7 +338,7 @@ class Checker
 
         $visitors = [
             new RectorVisitorNamedArgument($this, 'withComposerBased', ['phpunit', 'symfony', 'laravel']),
-            new RectorVisitorNamedArgument($this, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn', 'strictBooleans']),
+            new RectorVisitorNamedArgument($this, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn']),
             new RectorVisitorNamedArgument($this, 'withImportNames', ['!importShortClasses']),
             new RectorVisitorHasCall($this, 'withPhpSets'),
             new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
