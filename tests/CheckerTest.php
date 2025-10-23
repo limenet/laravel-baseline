@@ -794,6 +794,7 @@ return static function (RectorConfig $config): void {
             earlyReturn: true,
         )
         ->withPhpSets()
+        ->withAttributesSets()
         ->withImportNames(importShortClasses: false)
         ->withRules([
             AddGenericReturnTypeToRelationsRector::class,

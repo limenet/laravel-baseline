@@ -341,6 +341,7 @@ class Checker
             new RectorVisitorNamedArgument($this, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn']),
             new RectorVisitorNamedArgument($this, 'withImportNames', ['!importShortClasses']),
             new RectorVisitorHasCall($this, 'withPhpSets'),
+            new RectorVisitorHasCall($this, 'withAttributesSets'),
             new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
             new RectorVisitorArrayArgument($this, 'withRules', ['AddGenericReturnTypeToRelationsRector']),
             new RectorVisitorArrayArgument($this, 'withSkip', ['FunctionLikeToFirstClassCallableRector']),
