@@ -20,6 +20,7 @@ class LaravelBaselineCommand extends Command
             $checker->callsBaseline(...),
             $checker->callsSentryHook(...),
             $checker->checkPhpunit(...),
+            $checker->ddevHasPcovPackage(...),
             $checker->hasCompleteRectorConfiguration(...),
             $checker->hasEncryptedEnvFile(...),
             $checker->isCiLintComplete(...),
