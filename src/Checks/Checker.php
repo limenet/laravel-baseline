@@ -472,7 +472,7 @@ class Checker
         if (!in_array($pcovPackage, $extraPackages, true)) {
             $this->addComment(sprintf(
                 'pcov package not found in webimage_extra_packages. Expected: %s',
-                $pcovPackage
+                $pcovPackage,
             ));
 
             return CheckResult::FAIL;
