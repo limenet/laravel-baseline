@@ -47,33 +47,23 @@ class Checker
 
     public function usesLaravelBoost(): CheckResult
     {
-        return $this->checkComposerPackages('laravel/boost') ? CheckResult::PASS : CheckResult::WARN;
+        return $this->checkPackagePresence('laravel/boost');
     }
 
     public function usesLaravelHorizon(): CheckResult
     {
-        if (!$this->checkComposerPackages('laravel/horizon')) {
-            return CheckResult::WARN;
-        }
-
-        if (!$this->hasPostDeployScript('horizon:terminate')) {
-            return CheckResult::FAIL;
-        }
-
-        return CheckResult::PASS;
+        return $this->checkPackageWithPostDeploy(
+            'laravel/horizon',
+            'horizon:terminate',
+        );
     }
 
     public function usesLaravelPennant(): CheckResult
     {
-        if (!$this->checkComposerPackages('laravel/pennant')) {
-            return CheckResult::WARN;
-        }
-
-        if (!$this->hasPostDeployScript('pennant:purge')) {
-            return CheckResult::FAIL;
-        }
-
-        return CheckResult::PASS;
+        return $this->checkPackageWithPostDeploy(
+            'laravel/pennant',
+            'pennant:purge',
+        );
     }
 
     public function usesLaravelPulse(): CheckResult
@@ -97,7 +87,11 @@ class Checker
 
     public function doesNotUseIgnition(): CheckResult
     {
-        return $this->checkComposerPackages('spatie/laravel-ignition') ? CheckResult::FAIL : CheckResult::PASS;
+        return $this->checkPackagePresence(
+            'spatie/laravel-ignition',
+            CheckResult::FAIL,
+            CheckResult::PASS,
+        );
     }
 
     public function usesLaravelTelescope(): CheckResult
@@ -180,51 +174,55 @@ class Checker
 
     public function usesPredis(): CheckResult
     {
-        return $this->checkComposerPackages('predis/predis') ? CheckResult::PASS : CheckResult::WARN;
+        return $this->checkPackagePresence('predis/predis');
     }
 
     public function usesSpatieHealth(): CheckResult
     {
-        if (!$this->checkComposerPackages('spatie/laravel-health')) {
-            return CheckResult::WARN;
-        }
-
-        return $this->hasScheduleEntry('health:check')
-        && $this->hasScheduleEntry('health:schedule-check-heartbeat')
-            ? CheckResult::PASS
-            : CheckResult::FAIL;
+        return $this->checkPackageWithSchedule(
+            'spatie/laravel-health',
+            ['health:check', 'health:schedule-check-heartbeat'],
+        );
     }
 
     public function usesSpatieBackup(): CheckResult
     {
-        if (!$this->checkComposerPackages('spatie/laravel-backup')) {
-            return CheckResult::WARN;
-        }
-
-        return $this->hasScheduleEntry('backup:run')
-        && $this->hasScheduleEntry('backup:clean')
-            ? CheckResult::PASS
-            : CheckResult::FAIL;
+        return $this->checkPackageWithSchedule(
+            'spatie/laravel-backup',
+            ['backup:run', 'backup:clean'],
+        );
     }
 
     public function usesRector(): CheckResult
     {
-        return $this->checkComposerPackages(['rector/rector', 'driftingly/rector-laravel']) ? CheckResult::PASS : CheckResult::WARN;
+        return $this->checkPackagePresence([
+            'rector/rector',
+            'driftingly/rector-laravel',
+        ]);
     }
 
     public function usesLarastan(): CheckResult
     {
-        return $this->checkComposerPackages('larastan/larastan') ? CheckResult::PASS : CheckResult::FAIL;
+        return $this->checkPackagePresence(
+            'larastan/larastan',
+            ifAbsent: CheckResult::FAIL,
+        );
     }
 
     public function usesPhpstanExtensions(): CheckResult
     {
-        return $this->checkComposerPackages(['phpstan/phpstan-deprecation-rules', 'phpstan/phpstan-strict-rules']) ? CheckResult::PASS : CheckResult::FAIL;
+        return $this->checkPackagePresence(
+            ['phpstan/phpstan-deprecation-rules', 'phpstan/phpstan-strict-rules'],
+            ifAbsent: CheckResult::FAIL,
+        );
     }
 
     public function usesPhpInsights(): CheckResult
     {
-        return $this->checkComposerPackages('nunomaduro/phpinsights') ? CheckResult::PASS : CheckResult::FAIL;
+        return $this->checkPackagePresence(
+            'nunomaduro/phpinsights',
+            ifAbsent: CheckResult::FAIL,
+        );
     }
 
     public function isLaravelVersionMaintained(): CheckResult
@@ -257,15 +255,13 @@ class Checker
 
     public function checkPhpunit(): CheckResult
     {
-        $xmlFile = base_path('/phpunit.xml');
+        $xml = $this->getPhpunitXml();
 
-        if (!file_exists($xmlFile)) {
+        if ($xml === null) {
             $this->addComment('PHPUnit XML file not found');
 
             return CheckResult::FAIL;
         }
-
-        $xml = simplexml_load_string(file_get_contents($xmlFile) ?: '');
 
         if ($xml === false) {
             $this->addComment('Could not parse PHPUnit XML file');
@@ -408,15 +404,11 @@ class Checker
             return CheckResult::FAIL;
         }
 
-        $ddevConfigFile = base_path('.ddev/config.yaml');
+        $ddevConfig = $this->getDdevConfig();
 
-        if (!file_exists($ddevConfigFile)) {
-            $this->addComment('.ddev/config.yaml not found');
-
+        if ($ddevConfig === null) {
             return CheckResult::FAIL;
         }
-
-        $ddevConfig = Yaml::parseFile($ddevConfigFile);
 
         $ddevPhpVersion = $ddevConfig['php_version'] ?? null;
 
@@ -442,15 +434,11 @@ class Checker
 
     public function ddevHasPcovPackage(): CheckResult
     {
-        $ddevConfigFile = base_path('.ddev/config.yaml');
+        $ddevConfig = $this->getDdevConfig();
 
-        if (!file_exists($ddevConfigFile)) {
-            $this->addComment('.ddev/config.yaml not found');
-
+        if ($ddevConfig === null) {
             return CheckResult::FAIL;
         }
-
-        $ddevConfig = Yaml::parseFile($ddevConfigFile);
 
         $extraPackages = $ddevConfig['webimage_extra_packages'] ?? null;
 
@@ -520,6 +508,19 @@ class Checker
         $this->comments[] = $comment;
     }
 
+    /**
+     * Helper to simplify package presence checks
+     *
+     * @param  string|list<string>  $packages
+     */
+    private function checkPackagePresence(
+        string|array $packages,
+        CheckResult $ifPresent = CheckResult::PASS,
+        CheckResult $ifAbsent = CheckResult::WARN,
+    ): CheckResult {
+        return $this->checkComposerPackages($packages) ? $ifPresent : $ifAbsent;
+    }
+
     private function getComposer(): Composer
     {
         return app(Composer::class)->setWorkingPath(base_path());
@@ -546,12 +547,11 @@ class Checker
 
     private function checkComposerScript(string $scriptName, string $match): bool
     {
-        $composer = base_path('composer.json');
-        $composerJson = json_decode(
-            file_get_contents($composer) ?: throw new \RuntimeException(),
-            true,
-            flags: JSON_THROW_ON_ERROR,
-        );
+        $composerJson = $this->getComposerJson();
+
+        if ($composerJson === null) {
+            return false;
+        }
 
         $this->addComment('Composer script check: '.$scriptName.' for '.$match);
 
@@ -603,17 +603,64 @@ class Checker
         return false;
     }
 
-    private function checkPhpunitEnvVar(string $name, string $expectedValue): bool
+    /**
+     * Checks if a package is installed and has a required post-deploy script
+     */
+    private function checkPackageWithPostDeploy(
+        string $package,
+        string $postDeployCommand,
+    ): CheckResult {
+        if (!$this->checkComposerPackages($package)) {
+            return CheckResult::WARN;
+        }
+
+        if (!$this->hasPostDeployScript($postDeployCommand)) {
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
+    /**
+     * Checks if a package is installed and has required schedule entries
+     *
+     * @param  string|list<string>  $scheduleCommands
+     */
+    private function checkPackageWithSchedule(
+        string $package,
+        string|array $scheduleCommands,
+    ): CheckResult {
+        if (!$this->checkComposerPackages($package)) {
+            return CheckResult::WARN;
+        }
+
+        $commands = is_string($scheduleCommands) ? [$scheduleCommands] : $scheduleCommands;
+
+        foreach ($commands as $command) {
+            if (!$this->hasScheduleEntry($command)) {
+                return CheckResult::FAIL;
+            }
+        }
+
+        return CheckResult::PASS;
+    }
+
+    private function getPhpunitXml(): \SimpleXMLElement|false|null
     {
         $xmlFile = base_path('/phpunit.xml');
 
         if (!file_exists($xmlFile)) {
-            return false;
+            return null;
         }
 
-        $xml = simplexml_load_string(file_get_contents($xmlFile) ?: '');
+        return simplexml_load_string(file_get_contents($xmlFile) ?: '');
+    }
 
-        if ($xml === false) {
+    private function checkPhpunitEnvVar(string $name, string $expectedValue): bool
+    {
+        $xml = $this->getPhpunitXml();
+
+        if ($xml === null || $xml === false) {
             return false;
         }
 
@@ -627,7 +674,10 @@ class Checker
         return false;
     }
 
-    private function getComposerPhpVersion(): ?string
+    /**
+     * @return array<string,mixed>|null
+     */
+    private function getComposerJson(): ?array
     {
         $composerFile = base_path('composer.json');
 
@@ -637,11 +687,36 @@ class Checker
             return null;
         }
 
-        $composerJson = json_decode(
+        return json_decode(
             file_get_contents($composerFile) ?: throw new \RuntimeException(),
             true,
             flags: JSON_THROW_ON_ERROR,
         );
+    }
+
+    /**
+     * @return array<string,mixed>|null
+     */
+    private function getDdevConfig(): ?array
+    {
+        $ddevConfigFile = base_path('.ddev/config.yaml');
+
+        if (!file_exists($ddevConfigFile)) {
+            $this->addComment('.ddev/config.yaml not found');
+
+            return null;
+        }
+
+        return Yaml::parseFile($ddevConfigFile);
+    }
+
+    private function getComposerPhpVersion(): ?string
+    {
+        $composerJson = $this->getComposerJson();
+
+        if ($composerJson === null) {
+            return null;
+        }
 
         $phpConstraint = $composerJson['require']['php'] ?? null;
 
