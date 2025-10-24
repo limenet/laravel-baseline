@@ -364,6 +364,82 @@ class Checker
         return CheckResult::PASS;
     }
 
+    public function phpVersionMatchesCi(): CheckResult
+    {
+        $composerPhpVersion = $this->getComposerPhpVersion();
+
+        if ($composerPhpVersion === null) {
+            return CheckResult::FAIL;
+        }
+
+        try {
+            $ciData = $this->getGitlabCiData();
+        } catch (\RuntimeException) {
+            return CheckResult::FAIL;
+        }
+
+        $ciPhpVersion = $ciData['variables']['PHP_VERSION'] ?? null;
+
+        if ($ciPhpVersion === null) {
+            $this->addComment('PHP_VERSION not found in .gitlab-ci.yml variables');
+
+            return CheckResult::FAIL;
+        }
+
+        // Ensure CI PHP version matches the composer constraint (both should be in format X.Y)
+        if ($composerPhpVersion !== $ciPhpVersion) {
+            $this->addComment(sprintf(
+                'PHP version mismatch: composer.json requires ^%s but .gitlab-ci.yml uses %s',
+                $composerPhpVersion,
+                $ciPhpVersion,
+            ));
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
+    public function phpVersionMatchesDdev(): CheckResult
+    {
+        $composerPhpVersion = $this->getComposerPhpVersion();
+
+        if ($composerPhpVersion === null) {
+            return CheckResult::FAIL;
+        }
+
+        $ddevConfigFile = base_path('.ddev/config.yaml');
+
+        if (!file_exists($ddevConfigFile)) {
+            $this->addComment('.ddev/config.yaml not found');
+
+            return CheckResult::FAIL;
+        }
+
+        $ddevConfig = Yaml::parseFile($ddevConfigFile);
+
+        $ddevPhpVersion = $ddevConfig['php_version'] ?? null;
+
+        if ($ddevPhpVersion === null) {
+            $this->addComment('php_version not found in .ddev/config.yaml');
+
+            return CheckResult::FAIL;
+        }
+
+        // Ensure DDEV PHP version matches the composer constraint (both should be in format X.Y)
+        if ($composerPhpVersion !== $ddevPhpVersion) {
+            $this->addComment(sprintf(
+                'PHP version mismatch: composer.json requires ^%s but .ddev/config.yaml uses %s',
+                $composerPhpVersion,
+                $ddevPhpVersion,
+            ));
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
     /** @return string[] */
     public function getComments(): array
     {
@@ -485,5 +561,39 @@ class Checker
         }
 
         return false;
+    }
+
+    private function getComposerPhpVersion(): ?string
+    {
+        $composerFile = base_path('composer.json');
+
+        if (!file_exists($composerFile)) {
+            $this->addComment('composer.json not found');
+
+            return null;
+        }
+
+        $composerJson = json_decode(
+            file_get_contents($composerFile) ?: throw new \RuntimeException(),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+
+        $phpConstraint = $composerJson['require']['php'] ?? null;
+
+        if ($phpConstraint === null) {
+            $this->addComment('PHP constraint not found in composer.json');
+
+            return null;
+        }
+
+        // Extract the minimum version from the constraint (e.g., "^8.2" -> "8.2")
+        if (!preg_match('/\^?(\d+\.\d+)/', $phpConstraint, $matches)) {
+            $this->addComment('Could not parse PHP constraint: '.$phpConstraint);
+
+            return null;
+        }
+
+        return $matches[1];
     }
 }

@@ -26,6 +26,8 @@ class LaravelBaselineCommand extends Command
             $checker->isLaravelVersionMaintained(...),
             $checker->doesNotUseIgnition(...),
             $checker->hasCiJobs(...),
+            $checker->phpVersionMatchesCi(...),
+            $checker->phpVersionMatchesDdev(...),
             $checker->usesIdeHelpers(...),
             $checker->usesLarastan(...),
             $checker->usesLaravelBoost(...),

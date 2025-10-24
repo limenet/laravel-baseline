@@ -810,3 +810,243 @@ PHP;
 
     expect((new Checker(makeCommand()))->hasCompleteRectorConfiguration())->toBe(CheckResult::PASS);
 });
+
+it('phpVersionMatchesCi passes when composer PHP constraint matches CI PHP_VERSION', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+    $gitlabCi = <<<'YML'
+variables:
+  PHP_VERSION: "8.2"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.gitlab-ci.yml' => $gitlabCi,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::PASS);
+});
+
+it('phpVersionMatchesCi fails when composer PHP constraint does not match CI PHP_VERSION', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+    $gitlabCi = <<<'YML'
+variables:
+  PHP_VERSION: "8.3"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.gitlab-ci.yml' => $gitlabCi,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesCi fails when composer.json is missing', function (): void {
+    bindFakeComposer([]);
+    $gitlabCi = <<<'YML'
+variables:
+  PHP_VERSION: "8.2"
+YML;
+
+    $this->withTempBasePath(['.gitlab-ci.yml' => $gitlabCi]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesCi fails when PHP constraint is missing from composer.json', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => []];
+    $gitlabCi = <<<'YML'
+variables:
+  PHP_VERSION: "8.2"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.gitlab-ci.yml' => $gitlabCi,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesCi fails when .gitlab-ci.yml is missing', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesCi fails when PHP_VERSION is missing from .gitlab-ci.yml', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+    $gitlabCi = <<<'YML'
+variables:
+  OTHER_VAR: "value"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.gitlab-ci.yml' => $gitlabCi,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesCi handles PHP constraint without caret', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '8.2']];
+    $gitlabCi = <<<'YML'
+variables:
+  PHP_VERSION: "8.2"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.gitlab-ci.yml' => $gitlabCi,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::PASS);
+});
+
+it('phpVersionMatchesCi works with different PHP versions', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.3']];
+    $gitlabCi = <<<'YML'
+variables:
+  PHP_VERSION: "8.3"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.gitlab-ci.yml' => $gitlabCi,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesCi())->toBe(CheckResult::PASS);
+});
+
+it('phpVersionMatchesDdev passes when composer PHP constraint matches DDEV php_version', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+    $ddevConfig = <<<'YML'
+name: test-project
+type: php
+docroot: public
+php_version: "8.2"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::PASS);
+});
+
+it('phpVersionMatchesDdev fails when composer PHP constraint does not match DDEV php_version', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+    $ddevConfig = <<<'YML'
+name: test-project
+type: php
+docroot: public
+php_version: "8.3"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesDdev fails when composer.json is missing', function (): void {
+    bindFakeComposer([]);
+    $ddevConfig = <<<'YML'
+name: test-project
+php_version: "8.2"
+YML;
+
+    $this->withTempBasePath(['.ddev/config.yaml' => $ddevConfig]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesDdev fails when PHP constraint is missing from composer.json', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => []];
+    $ddevConfig = <<<'YML'
+name: test-project
+php_version: "8.2"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesDdev fails when .ddev/config.yaml is missing', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesDdev fails when php_version is missing from .ddev/config.yaml', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+    $ddevConfig = <<<'YML'
+name: test-project
+type: php
+docroot: public
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::FAIL);
+});
+
+it('phpVersionMatchesDdev handles PHP constraint without caret', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '8.2']];
+    $ddevConfig = <<<'YML'
+name: test-project
+php_version: "8.2"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::PASS);
+});
+
+it('phpVersionMatchesDdev works with different PHP versions', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.3']];
+    $ddevConfig = <<<'YML'
+name: test-project
+type: php
+php_version: "8.3"
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->phpVersionMatchesDdev())->toBe(CheckResult::PASS);
+});
