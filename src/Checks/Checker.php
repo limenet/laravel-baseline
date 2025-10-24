@@ -77,7 +77,7 @@ class Checker
         }
 
         if (!$this->checkPhpunitEnvVar('PULSE_ENABLED', 'false')) {
-            $this->addComment('PULSE_ENABLED not set to false in phpunit.xml');
+            $this->addComment('Missing or incorrect environment variable in phpunit.xml: Add <env name="PULSE_ENABLED" value="false"/> to <php> section');
 
             return CheckResult::FAIL;
         }
@@ -109,7 +109,7 @@ class Checker
         }
 
         if (!$this->checkPhpunitEnvVar('TELESCOPE_ENABLED', 'false')) {
-            $this->addComment('TELESCOPE_ENABLED not set to false in phpunit.xml');
+            $this->addComment('Missing or incorrect environment variable in phpunit.xml: Add <env name="TELESCOPE_ENABLED" value="false"/> to <php> section');
 
             return CheckResult::FAIL;
         }
@@ -143,7 +143,7 @@ class Checker
         ];
         foreach ($jobs as $jobName => $extends) {
             if (($data[$jobName] ?? null) !== ['extends' => [$extends]]) {
-                $this->addComment("Could not find job $jobName extending $extends in .gitlab-ci.yml");
+                $this->addComment("Missing or misconfigured CI job in .gitlab-ci.yml: Add job '$jobName' with 'extends: [$extends]'");
 
                 return CheckResult::FAIL;
             }
@@ -164,7 +164,7 @@ class Checker
             ($data['release']['extends'][0] ?? null) !== '.release'
             || !str_starts_with($data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? '', 'https://sentry.io/api/hooks/release/builtin/')
         ) {
-            $this->addComment('Could not find correctly configured Sentry release hook in .gitlab-ci.yml');
+            $this->addComment('Sentry release hook missing or misconfigured in .gitlab-ci.yml: Job "release" must extend ".release" and set SENTRY_RELEASE_WEBHOOK variable to a valid Sentry webhook URL');
 
             return CheckResult::FAIL;
         }
@@ -258,13 +258,13 @@ class Checker
         $xml = $this->getPhpunitXml();
 
         if ($xml === null) {
-            $this->addComment('PHPUnit XML file not found');
+            $this->addComment('PHPUnit configuration missing: Create phpunit.xml in project root');
 
             return CheckResult::FAIL;
         }
 
         if ($xml === false) {
-            $this->addComment('Could not parse PHPUnit XML file');
+            $this->addComment('PHPUnit configuration invalid: Check phpunit.xml for XML syntax errors');
 
             return CheckResult::FAIL;
         }
@@ -273,7 +273,7 @@ class Checker
             ($xml->coverage->report->cobertura ?? null) === null
             || (string) $xml->coverage->report->cobertura->attributes()['outputFile'] !== 'cobertura.xml'
         ) {
-            $this->addComment('Cobertura missing / incorrectly configured');
+            $this->addComment('Cobertura coverage report missing or misconfigured in phpunit.xml: Add <cobertura outputFile="cobertura.xml"/> under <coverage><report>');
 
             return CheckResult::FAIL;
         }
@@ -281,7 +281,7 @@ class Checker
             ($xml->logging->junit ?? null) === null
             || (string) $xml->logging->junit->attributes()['outputFile'] !== 'report.xml'
         ) {
-            $this->addComment('JUnit missing / incorrectly configured');
+            $this->addComment('JUnit report missing or misconfigured in phpunit.xml: Add <junit outputFile="report.xml"/> under <logging>');
 
             return CheckResult::FAIL;
         }
@@ -297,7 +297,7 @@ class Checker
         }
 
         if (!$appKeyFound) {
-            $this->addComment('APP_KEY not defined in <php><server>');
+            $this->addComment('APP_KEY missing in phpunit.xml: Add <env name="APP_KEY" value="base64:..."/> to <php> section (generate with "php artisan key:generate")');
 
             return CheckResult::FAIL;
         }
@@ -308,7 +308,7 @@ class Checker
             || (string) $xml->source->include->directory !== './app'
             || (string) $xml->source->include->directory->attributes()['suffix'] !== '.php'
         ) {
-            $this->addComment('<source> configuration missing / incorrectly configured');
+            $this->addComment('Coverage source configuration missing or incorrect in phpunit.xml: Add <source><include><directory suffix=".php">./app</directory></include></source>');
 
             return CheckResult::FAIL;
         }
@@ -351,7 +351,7 @@ class Checker
 
         foreach ($visitors as $visitor) {
             if (!$visitor->wasFound()) {
-                $this->addComment(sprintf('Rector check: %s did not find call to %s (or had other failures, see above)', class_basename($visitor), $visitor->methodName));
+                $this->addComment(sprintf('Rector configuration incomplete: Missing or incorrect call to %s() in rector.php (check: %s)', $visitor->methodName, class_basename($visitor)));
 
                 return CheckResult::FAIL;
             }
@@ -377,7 +377,7 @@ class Checker
         $ciPhpVersion = $ciData['variables']['PHP_VERSION'] ?? null;
 
         if ($ciPhpVersion === null) {
-            $this->addComment('PHP_VERSION not found in .gitlab-ci.yml variables');
+            $this->addComment('Missing PHP_VERSION variable in .gitlab-ci.yml: Add "PHP_VERSION" to the variables section');
 
             return CheckResult::FAIL;
         }
@@ -413,7 +413,7 @@ class Checker
         $ddevPhpVersion = $ddevConfig['php_version'] ?? null;
 
         if ($ddevPhpVersion === null) {
-            $this->addComment('php_version not found in .ddev/config.yaml');
+            $this->addComment('DDEV configuration missing php_version: Add "php_version" to .ddev/config.yaml');
 
             return CheckResult::FAIL;
         }
@@ -443,13 +443,13 @@ class Checker
         $extraPackages = $ddevConfig['webimage_extra_packages'] ?? null;
 
         if ($extraPackages === null) {
-            $this->addComment('webimage_extra_packages not found in .ddev/config.yaml');
+            $this->addComment('DDEV missing pcov package configuration: Add "webimage_extra_packages" to .ddev/config.yaml');
 
             return CheckResult::FAIL;
         }
 
         if (!is_array($extraPackages)) {
-            $this->addComment('webimage_extra_packages is not an array in .ddev/config.yaml');
+            $this->addComment('DDEV configuration error: "webimage_extra_packages" must be an array in .ddev/config.yaml');
 
             return CheckResult::FAIL;
         }
@@ -459,7 +459,7 @@ class Checker
 
         if (!in_array($pcovPackage, $extraPackages, true)) {
             $this->addComment(sprintf(
-                'pcov package not found in webimage_extra_packages. Expected: %s',
+                'DDEV missing pcov package: Add "%s" to webimage_extra_packages in .ddev/config.yaml',
                 $pcovPackage,
             ));
 
@@ -470,7 +470,7 @@ class Checker
         $customIniFile = base_path('.ddev/php/90-custom.ini');
 
         if (!file_exists($customIniFile)) {
-            $this->addComment('.ddev/php/90-custom.ini not found');
+            $this->addComment('DDEV PHP configuration missing: Create .ddev/php/90-custom.ini with [PHP] section and opcache.jit=disable');
 
             return CheckResult::FAIL;
         }
@@ -478,13 +478,13 @@ class Checker
         $iniContent = file_get_contents($customIniFile) ?: '';
 
         if (!str_starts_with(trim($iniContent), '[PHP]')) {
-            $this->addComment('.ddev/php/90-custom.ini does not start with [PHP]');
+            $this->addComment('DDEV PHP configuration invalid: .ddev/php/90-custom.ini must start with [PHP] section');
 
             return CheckResult::FAIL;
         }
 
         if (!str_contains($iniContent, 'opcache.jit=disable')) {
-            $this->addComment('.ddev/php/90-custom.ini does not contain opcache.jit=disable');
+            $this->addComment('DDEV PHP configuration incomplete: Add "opcache.jit=disable" to .ddev/php/90-custom.ini');
 
             return CheckResult::FAIL;
         }
@@ -582,7 +582,7 @@ class Checker
         $ciFile = base_path('/.gitlab-ci.yml');
 
         if (!file_exists($ciFile)) {
-            $this->addComment('Gitlab CI file not found');
+            $this->addComment('GitLab CI configuration missing: Create .gitlab-ci.yml in project root');
 
             throw new \RuntimeException();
         }
@@ -682,7 +682,7 @@ class Checker
         $composerFile = base_path('composer.json');
 
         if (!file_exists($composerFile)) {
-            $this->addComment('composer.json not found');
+            $this->addComment('Composer configuration missing: composer.json not found in project root');
 
             return null;
         }
@@ -702,7 +702,7 @@ class Checker
         $ddevConfigFile = base_path('.ddev/config.yaml');
 
         if (!file_exists($ddevConfigFile)) {
-            $this->addComment('.ddev/config.yaml not found');
+            $this->addComment('DDEV configuration missing: .ddev/config.yaml not found');
 
             return null;
         }
@@ -721,14 +721,14 @@ class Checker
         $phpConstraint = $composerJson['require']['php'] ?? null;
 
         if ($phpConstraint === null) {
-            $this->addComment('PHP constraint not found in composer.json');
+            $this->addComment('PHP version not defined: Add "php" requirement to composer.json');
 
             return null;
         }
 
         // Extract the minimum version from the constraint (e.g., "^8.2" -> "8.2")
         if (!preg_match('/\^?(\d+\.\d+)/', $phpConstraint, $matches)) {
-            $this->addComment('Could not parse PHP constraint: '.$phpConstraint);
+            $this->addComment('PHP version format invalid in composer.json: Use format "^X.Y" (e.g., "^8.4"), found: '.$phpConstraint);
 
             return null;
         }
