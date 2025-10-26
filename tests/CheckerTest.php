@@ -442,14 +442,23 @@ it('usesSpatieBackup requires scheduled backup tasks', function (): void {
     expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::PASS);
 });
 
-it('usesRector warns unless both rector packages installed', function (): void {
+it('usesRector warns unless both rector packages installed and ci-lint script configured', function (): void {
+    // WARN when packages not installed
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect((new Checker(makeCommand()))->usesRector())->toBe(CheckResult::WARN);
 
+    // WARN when packages installed but ci-lint script missing
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => true]);
-    $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
+    $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
+
+    expect((new Checker(makeCommand()))->usesRector())->toBe(CheckResult::WARN);
+
+    // PASS when packages installed and ci-lint script configured
+    bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => true]);
+    $composer = ['scripts' => ['ci-lint' => ['rector']]];
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
     expect((new Checker(makeCommand()))->usesRector())->toBe(CheckResult::PASS);
 });
@@ -529,14 +538,13 @@ it('isCiLintComplete checks ci-lint composer script contents', function (): void
         'ci-lint' => [
             'pint --parallel',
             'phpstan',
-            'rector',
         ],
     ];
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => $scriptsOk])]);
 
     expect((new Checker(makeCommand()))->isCiLintComplete())->toBe(CheckResult::PASS);
 
-    $scriptsBad = ['ci-lint' => ['pint --parallel', 'phpstan']];
+    $scriptsBad = ['ci-lint' => ['pint --parallel']];
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => $scriptsBad])]);
 
     expect((new Checker(makeCommand()))->isCiLintComplete())->toBe(CheckResult::FAIL);

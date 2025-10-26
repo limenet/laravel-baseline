@@ -195,10 +195,13 @@ class Checker
 
     public function usesRector(): CheckResult
     {
-        return $this->checkPackagePresence([
+        return $this->checkComposerPackages([
             'rector/rector',
             'driftingly/rector-laravel',
-        ]);
+        ])
+        && $this->checkComposerScript('ci-lint', 'rector')
+            ? CheckResult::PASS
+            : CheckResult::WARN;
     }
 
     public function usesLarastan(): CheckResult
@@ -247,7 +250,6 @@ class Checker
     {
         return $this->checkComposerScript('ci-lint', 'pint --parallel')
         && $this->checkComposerScript('ci-lint', 'phpstan')
-        && $this->checkComposerScript('ci-lint', 'rector')
             ? CheckResult::PASS
             : CheckResult::FAIL;
     }
