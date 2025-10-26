@@ -478,14 +478,30 @@ it('usesPhpstanExtensions passes only when both extension packages are installed
     expect((new Checker(makeCommand()))->usesPhpstanExtensions())->toBe(CheckResult::PASS);
 });
 
-it('usesPhpInsights passes only when phpinsights is installed', function (): void {
+it('usesPhpInsights passes only when phpinsights is installed and ci-lint scripts are configured', function (): void {
+    // FAIL when package not installed
     bindFakeComposer(['nunomaduro/phpinsights' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect((new Checker(makeCommand()))->usesPhpInsights())->toBe(CheckResult::FAIL);
 
+    // FAIL when package installed but ci-lint scripts missing
     bindFakeComposer(['nunomaduro/phpinsights' => true]);
-    $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
+    $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
+
+    expect((new Checker(makeCommand()))->usesPhpInsights())->toBe(CheckResult::FAIL);
+
+    // PASS when package installed and ci-lint scripts configured
+    bindFakeComposer(['nunomaduro/phpinsights' => true]);
+    $composer = [
+        'scripts' => [
+            'ci-lint' => [
+                'insights --summary --no-interaction',
+                'insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null',
+            ],
+        ],
+    ];
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
     expect((new Checker(makeCommand()))->usesPhpInsights())->toBe(CheckResult::PASS);
 });
@@ -514,8 +530,6 @@ it('isCiLintComplete checks ci-lint composer script contents', function (): void
             'pint --parallel',
             'phpstan',
             'rector',
-            'insights --summary --no-interaction',
-            'insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null',
         ],
     ];
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => $scriptsOk])]);

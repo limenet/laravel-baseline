@@ -219,10 +219,11 @@ class Checker
 
     public function usesPhpInsights(): CheckResult
     {
-        return $this->checkPackagePresence(
-            'nunomaduro/phpinsights',
-            ifAbsent: CheckResult::FAIL,
-        );
+        return $this->checkComposerPackages('nunomaduro/phpinsights')
+        && $this->checkComposerScript('ci-lint', 'insights --summary --no-interaction')
+        && $this->checkComposerScript('ci-lint', 'insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     public function isLaravelVersionMaintained(): CheckResult
@@ -247,8 +248,6 @@ class Checker
         return $this->checkComposerScript('ci-lint', 'pint --parallel')
         && $this->checkComposerScript('ci-lint', 'phpstan')
         && $this->checkComposerScript('ci-lint', 'rector')
-        && $this->checkComposerScript('ci-lint', 'insights --summary --no-interaction')
-        && $this->checkComposerScript('ci-lint', 'insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null')
             ? CheckResult::PASS
             : CheckResult::FAIL;
     }
