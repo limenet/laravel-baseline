@@ -472,7 +472,7 @@ it('usesPhpstanExtensions passes only when both extension packages are installed
 
     expect((new Checker(makeCommand()))->usesPhpstanExtensions())->toBe(CheckResult::FAIL);
 
-    bindFakeComposer(['phpstan/phpstan-deprecation-rules' => true, 'phpstan/phpstan-strict-rules' => true]);
+    bindFakeComposer(['phpstan/extension-installer' => true, 'phpstan/phpstan-deprecation-rules' => true, 'phpstan/phpstan-strict-rules' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect((new Checker(makeCommand()))->usesPhpstanExtensions())->toBe(CheckResult::PASS);

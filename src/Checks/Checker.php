@@ -212,7 +212,7 @@ class Checker
     public function usesPhpstanExtensions(): CheckResult
     {
         return $this->checkPackagePresence(
-            ['phpstan/phpstan-deprecation-rules', 'phpstan/phpstan-strict-rules'],
+            ['phpstan/extension-installer', 'phpstan/phpstan-deprecation-rules', 'phpstan/phpstan-strict-rules'],
             ifAbsent: CheckResult::FAIL,
         );
     }
