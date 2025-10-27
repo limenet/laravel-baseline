@@ -23,6 +23,7 @@ class LaravelBaselineCommand extends Command
             $checker->ddevHasPcovPackage(...),
             $checker->hasCompleteRectorConfiguration(...),
             $checker->hasEncryptedEnvFile(...),
+            $checker->hasNpmScripts(...),
             $checker->isCiLintComplete(...),
             $checker->isLaravelVersionMaintained(...),
             $checker->doesNotUseIgnition(...),
@@ -42,6 +43,7 @@ class LaravelBaselineCommand extends Command
             $checker->usesPhpstanExtensions(...),
             $checker->usesPredis(...),
             $checker->usesRector(...),
+            $checker->usesReleaseIt(...),
             $checker->usesSpatieBackup(...),
             $checker->usesSpatieHealth(...),
         ] as $check) {
