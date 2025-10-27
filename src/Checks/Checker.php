@@ -536,6 +536,31 @@ class Checker
         return CheckResult::PASS;
     }
 
+    public function hasNpmScripts(): CheckResult
+    {
+        $packageJson = $this->getPackageJson();
+
+        if ($packageJson === null) {
+            return CheckResult::FAIL;
+        }
+
+        // Check if ci-lint npm script exists
+        if (!isset($packageJson['scripts']['ci-lint'])) {
+            $this->addComment('Missing ci-lint script in package.json: Add "ci-lint" to scripts section');
+
+            return CheckResult::FAIL;
+        }
+
+        // Check if production npm script exists
+        if (!isset($packageJson['scripts']['production'])) {
+            $this->addComment('Missing production script in package.json: Add "production" to scripts section');
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
     /** @return string[] */
     public function getComments(): array
     {
