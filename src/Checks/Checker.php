@@ -493,6 +493,49 @@ class Checker
         return CheckResult::PASS;
     }
 
+    public function usesReleaseIt(): CheckResult
+    {
+        // Check if release-it and @release-it/bumper are in devDependencies
+        if (!$this->checkNpmPackages(['release-it', '@release-it/bumper'])) {
+            return CheckResult::FAIL;
+        }
+
+        // Check if release npm script exists
+        if (!$this->checkNpmScript('release', 'release-it')) {
+            $this->addComment('Missing release script in package.json: Add "release": "release-it" to scripts section');
+
+            return CheckResult::FAIL;
+        }
+
+        // Check if .release-it.json exists and has correct configuration
+        $releaseItConfig = $this->getReleaseItConfig();
+
+        if ($releaseItConfig === null) {
+            return CheckResult::FAIL;
+        }
+
+        // Check for plugins configuration
+        $bumperPlugin = $releaseItConfig['plugins']['@release-it/bumper'] ?? null;
+
+        if ($bumperPlugin === null) {
+            $this->addComment('Missing @release-it/bumper plugin configuration in .release-it.json: Add plugins section with @release-it/bumper');
+
+            return CheckResult::FAIL;
+        }
+
+        // Check bumper plugin out configuration
+        $outFile = $bumperPlugin['out']['file'] ?? null;
+        $outPath = $bumperPlugin['out']['path'] ?? null;
+
+        if ($outFile !== 'composer.json' || $outPath !== 'version') {
+            $this->addComment('Invalid @release-it/bumper configuration in .release-it.json: Set out.file to "composer.json" and out.path to "version"');
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
     /** @return string[] */
     public function getComments(): array
     {
@@ -735,5 +778,88 @@ class Checker
         }
 
         return $matches[1];
+    }
+
+    /**
+     * @return array<string,mixed>|null
+     */
+    private function getPackageJson(): ?array
+    {
+        $packageFile = base_path('package.json');
+
+        if (!file_exists($packageFile)) {
+            $this->addComment('Package.json missing: Create package.json in project root');
+
+            return null;
+        }
+
+        return json_decode(
+            file_get_contents($packageFile) ?: throw new \RuntimeException(),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+    }
+
+    /**
+     * @return array<string,mixed>|null
+     */
+    private function getReleaseItConfig(): ?array
+    {
+        $releaseItFile = base_path('.release-it.json');
+
+        if (!file_exists($releaseItFile)) {
+            $this->addComment('Release-it configuration missing: Create .release-it.json in project root');
+
+            return null;
+        }
+
+        return json_decode(
+            file_get_contents($releaseItFile) ?: throw new \RuntimeException(),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+    }
+
+    /**
+     * @param  string|list<string>  $packages
+     */
+    private function checkNpmPackages(string|array $packages, string $packageType = 'devDependencies'): bool
+    {
+        $packageJson = $this->getPackageJson();
+
+        if ($packageJson === null) {
+            return false;
+        }
+
+        $packages = is_string($packages) ? [$packages] : $packages;
+
+        $this->addComment('NPM check ('.$packageType.'): '.implode(', ', $packages));
+
+        foreach ($packages as $package) {
+            if (!isset($packageJson[$packageType][$package])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function checkNpmScript(string $scriptName, string $match): bool
+    {
+        $packageJson = $this->getPackageJson();
+
+        if ($packageJson === null) {
+            return false;
+        }
+
+        $this->addComment('NPM script check: '.$scriptName.' for '.$match);
+
+        $script = $packageJson['scripts'][$scriptName] ?? null;
+
+        if ($script === null) {
+            return false;
+        }
+
+        return str_contains($script, $match);
     }
 }
