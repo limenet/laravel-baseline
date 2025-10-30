@@ -47,7 +47,15 @@ class Checker
 
     public function usesLaravelBoost(): CheckResult
     {
-        return $this->checkPackagePresence('laravel/boost');
+        if (!$this->checkComposerPackages('laravel/boost')) {
+            return CheckResult::WARN;
+        }
+
+        if (!$this->hasPostUpdateScript('boost:update')) {
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
     }
 
     public function usesLaravelHorizon(): CheckResult

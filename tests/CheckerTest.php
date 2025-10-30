@@ -783,9 +783,11 @@ it('usesLaravelBoost warns when not installed and passes when installed', functi
     expect((new Checker(makeCommand()))->usesLaravelBoost())->toBe(CheckResult::WARN);
 
     bindFakeComposer(['laravel/boost' => true]);
-    $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
+    $composer = ['scripts' => ['post-update-cmd' => ['php artisan boost:update']]];
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
-    expect((new Checker(makeCommand()))->usesLaravelBoost())->toBe(CheckResult::PASS);
+    $checker = new Checker(makeCommand());
+    expect($checker->usesLaravelBoost())->toBe(CheckResult::PASS);
 });
 
 it('hasCompleteRectorConfiguration fails when file missing and passes when configuration is complete', function (): void {
