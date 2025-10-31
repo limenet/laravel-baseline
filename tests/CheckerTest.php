@@ -873,6 +873,148 @@ PHP;
     expect((new Checker(makeCommand()))->hasCompleteRectorConfiguration())->toBe(CheckResult::PASS);
 });
 
+it('hasCompleteRectorConfiguration provides specific error message for missing withComposerBased arguments', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+
+return static function (RectorConfig $config): void {
+    $config->withComposerBased(phpunit: true, symfony: false, laravel: true);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasCompleteRectorConfiguration();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toHaveCount(1);
+    expect($comments[0])->toContain('withComposerBased()')
+        ->toContain('Expected named arguments: phpunit: true, symfony: true, laravel: true');
+});
+
+it('hasCompleteRectorConfiguration provides specific error message for missing withPreparedSets arguments', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+
+return static function (RectorConfig $config): void {
+    $config
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(deadCode: true, codeQuality: true);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasCompleteRectorConfiguration();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toHaveCount(1);
+    expect($comments[0])->toContain('withPreparedSets()')
+        ->toContain('Expected named arguments')
+        ->toContain('deadCode: true')
+        ->toContain('typeDeclarations: true');
+});
+
+it('hasCompleteRectorConfiguration provides specific error message for missing withPhpSets call', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+
+return static function (RectorConfig $config): void {
+    $config->withComposerBased(phpunit: true, symfony: true, laravel: true);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasCompleteRectorConfiguration();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toHaveCount(1);
+    expect($comments[0])->toContain('Missing call to withPhpSets()');
+});
+
+it('hasCompleteRectorConfiguration provides specific error message for missing LaravelSetProvider', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+
+return static function (RectorConfig $config): void {
+    $config
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            codingStyle: true,
+            typeDeclarations: true,
+            privatization: true,
+            instanceOf: true,
+            earlyReturn: true,
+        )
+        ->withPhpSets()
+        ->withAttributesSets()
+        ->withImportNames(importShortClasses: false);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasCompleteRectorConfiguration();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toHaveCount(1);
+    expect($comments[0])->toContain('withSetProviders()')
+        ->toContain('LaravelSetProvider');
+});
+
+it('hasCompleteRectorConfiguration provides specific error message for missing withRules argument', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+use RectorLaravel\Set\LaravelSetProvider;
+
+return static function (RectorConfig $config): void {
+    $config
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            codingStyle: true,
+            typeDeclarations: true,
+            privatization: true,
+            instanceOf: true,
+            earlyReturn: true,
+        )
+        ->withPhpSets()
+        ->withAttributesSets()
+        ->withImportNames(importShortClasses: false)
+        ->withSetProviders(LaravelSetProvider::class)
+        ->withRules([]);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasCompleteRectorConfiguration();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toHaveCount(1);
+    expect($comments[0])->toContain('withRules()')
+        ->toContain('AddGenericReturnTypeToRelationsRector');
+});
+
 it('phpVersionMatchesCi passes when composer PHP constraint matches CI PHP_VERSION', function (): void {
     bindFakeComposer([]);
     $composer = ['require' => ['php' => '^8.2']];

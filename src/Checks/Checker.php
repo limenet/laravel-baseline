@@ -375,7 +375,7 @@ class Checker
 
         foreach ($visitors as $visitor) {
             if (!$visitor->wasFound()) {
-                $this->addComment(sprintf('Rector configuration incomplete: Missing or incorrect call to %s() in rector.php (check: %s)', $visitor->methodName, class_basename($visitor)));
+                $this->addComment($visitor->getErrorMessage());
 
                 return CheckResult::FAIL;
             }

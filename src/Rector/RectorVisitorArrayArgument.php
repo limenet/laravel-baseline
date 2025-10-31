@@ -6,6 +6,15 @@ use PhpParser\Node;
 
 class RectorVisitorArrayArgument extends AbstractRectorVisitor
 {
+    public function getErrorMessage(): string
+    {
+        return sprintf(
+            'Rector configuration incomplete: Missing or incorrect call to %s() in rector.php - Expected array containing: %s',
+            $this->methodName,
+            implode(', ', $this->payload),
+        );
+    }
+
     protected function checkMethod(Node\Expr\MethodCall $node): bool
     {
         $args = [];

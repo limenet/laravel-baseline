@@ -19,6 +19,8 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
         public readonly array $payload = [],
     ) {}
 
+    abstract public function getErrorMessage(): string;
+
     public function wasFound(): bool
     {
         return $this->found;
@@ -33,8 +35,6 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
         if (!$node->name instanceof Node\Identifier || $node->name->toString() !== $this->methodName) {
             return null;
         }
-
-        $this->checker->addComment('Rector check: '.$this->methodName.'('.implode(', ', $this->payload).')');
 
         $this->found = $this->checkMethod($node);
 

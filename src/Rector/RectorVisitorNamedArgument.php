@@ -6,6 +6,24 @@ use PhpParser\Node;
 
 class RectorVisitorNamedArgument extends AbstractRectorVisitor
 {
+    public function getErrorMessage(): string
+    {
+        $expectedArgs = [];
+        foreach ($this->payload as $name) {
+            if (str_starts_with($name, '!')) {
+                $expectedArgs[] = substr($name, 1).': false';
+            } else {
+                $expectedArgs[] = $name.': true';
+            }
+        }
+
+        return sprintf(
+            'Rector configuration incomplete: Missing or incorrect call to %s() in rector.php - Expected named arguments: %s',
+            $this->methodName,
+            implode(', ', $expectedArgs),
+        );
+    }
+
     protected function checkMethod(Node\Expr\MethodCall $node): bool
     {
         $args = [];
