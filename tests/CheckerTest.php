@@ -249,6 +249,44 @@ it('doesNotUseIgnition passes only when ignition is not installed', function ():
     expect($checker->doesNotUseIgnition())->toBe(CheckResult::FAIL);
 });
 
+it('doesNotUseSail passes when sail is not installed and docker-compose.yml is missing', function (): void {
+    bindFakeComposer(['laravel/sail' => false]);
+    $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->doesNotUseSail())->toBe(CheckResult::PASS);
+});
+
+it('doesNotUseSail fails when sail package is installed', function (): void {
+    bindFakeComposer(['laravel/sail' => true]);
+    $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->doesNotUseSail())->toBe(CheckResult::FAIL);
+});
+
+it('doesNotUseSail fails when docker-compose.yml exists', function (): void {
+    bindFakeComposer(['laravel/sail' => false]);
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'docker-compose.yml' => 'version: "3"',
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->doesNotUseSail())->toBe(CheckResult::FAIL);
+});
+
+it('doesNotUseSail fails when both sail package and docker-compose.yml exist', function (): void {
+    bindFakeComposer(['laravel/sail' => true]);
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'docker-compose.yml' => 'version: "3"',
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->doesNotUseSail())->toBe(CheckResult::FAIL);
+});
+
 it('usesLaravelTelescope requires package, post-update script and schedule', function (): void {
     // Missing package -> FAIL
     bindFakeComposer(['laravel/telescope' => false]);

@@ -102,6 +102,21 @@ class Checker
         );
     }
 
+    public function doesNotUseSail(): CheckResult
+    {
+        if ($this->checkComposerPackages('laravel/sail')) {
+            return CheckResult::FAIL;
+        }
+
+        if (file_exists(base_path('docker-compose.yml'))) {
+            $this->addComment('docker-compose.yml file should be removed from project root');
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
     public function usesLaravelTelescope(): CheckResult
     {
         if (!$this->checkComposerPackages('laravel/telescope')) {
