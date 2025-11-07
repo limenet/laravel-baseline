@@ -51,3 +51,13 @@ it('registers all public check methods from Checker class', function (): void {
         ->and($checkerMethods)
         ->not->toBeEmpty();
 })->group('command');
+
+it('has correct command signature', function (): void {
+    $command = new LaravelBaselineCommand();
+    expect($command->signature)->toBe('limenet:laravel-baseline:check');
+})->group('command');
+
+it('has correct command description', function (): void {
+    $command = new LaravelBaselineCommand();
+    expect($command->description)->toBe('Checks the project against a highly opinionated set of coding standards.');
+})->group('command');
