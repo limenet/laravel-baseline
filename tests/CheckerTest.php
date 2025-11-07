@@ -369,7 +369,7 @@ it('usesLimenetPintConfig requires package and post-update publish script', func
 
 it('callsBaseline checks post-update script', function (): void {
     bindFakeComposer([]);
-    $composer = ['scripts' => ['post-update-cmd' => ['php artisan limenet:laravel-baseline']]];
+    $composer = ['scripts' => ['post-update-cmd' => ['php artisan limenet:laravel-baseline:check']]];
 
     $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
@@ -928,7 +928,18 @@ it('hasCompleteRectorConfiguration provides specific error message for missing w
 use Rector\Config\RectorConfig;
 
 return static function (RectorConfig $config): void {
-    $config->withComposerBased(phpunit: true, symfony: true, laravel: true);
+    $config
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            codingStyle: true,
+            typeDeclarations: true,
+            privatization: true,
+            instanceOf: true,
+            earlyReturn: true,
+        )
+        ->withImportNames(importShortClasses: false);
 };
 PHP;
     $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
@@ -1734,4 +1745,75 @@ it('hasNpmScripts fails when scripts section is missing', function (): void {
     ]);
 
     expect((new Checker(makeCommand()))->hasNpmScripts())->toBe(CheckResult::FAIL);
+});
+
+it('hasGuidelinesUpdateScript passes when guidelines update script is in post-update-cmd', function (): void {
+    bindFakeComposer([]);
+    $composer = [
+        'scripts' => [
+            'post-update-cmd' => [
+                '@php artisan limenet:laravel-baseline:guidelines',
+            ],
+        ],
+    ];
+
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->hasGuidelinesUpdateScript())->toBe(CheckResult::PASS);
+});
+
+it('hasGuidelinesUpdateScript fails when guidelines update script is missing', function (): void {
+    bindFakeComposer([]);
+    $composer = [
+        'scripts' => [
+            'post-update-cmd' => [
+                '@php artisan ide-helper:generate',
+            ],
+        ],
+    ];
+
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->hasGuidelinesUpdateScript())->toBe(CheckResult::FAIL);
+});
+
+it('hasGuidelinesUpdateScript fails when composer.json is missing', function (): void {
+    bindFakeComposer([]);
+
+    $this->withTempBasePath([]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->hasGuidelinesUpdateScript())->toBe(CheckResult::FAIL);
+});
+
+it('hasGuidelinesUpdateScript fails when post-update-cmd section is missing', function (): void {
+    bindFakeComposer([]);
+    $composer = [
+        'scripts' => [],
+    ];
+
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->hasGuidelinesUpdateScript())->toBe(CheckResult::FAIL);
+});
+
+it('hasGuidelinesUpdateScript provides helpful comment when script is missing', function (): void {
+    bindFakeComposer([]);
+    $composer = [
+        'scripts' => [
+            'post-update-cmd' => [],
+        ],
+    ];
+
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasGuidelinesUpdateScript();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('Missing guidelines update script in composer.json: Add "@php artisan limenet:laravel-baseline:guidelines" to post-update-cmd section');
 });

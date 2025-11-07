@@ -150,7 +150,7 @@ class Checker
 
     public function callsBaseline(): CheckResult
     {
-        return $this->hasPostUpdateScript('limenet:laravel-baseline')
+        return $this->hasPostUpdateScript('limenet:laravel-baseline:check')
             ? CheckResult::PASS
             : CheckResult::FAIL;
     }
@@ -577,6 +577,17 @@ class Checker
         // Check if production npm script exists
         if (!isset($packageJson['scripts']['production'])) {
             $this->addComment('Missing production script in package.json: Add "production" to scripts section');
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
+    public function hasGuidelinesUpdateScript(): CheckResult
+    {
+        if (!$this->hasPostUpdateScript('limenet:laravel-baseline:guidelines')) {
+            $this->addComment('Missing guidelines update script in composer.json: Add "@php artisan limenet:laravel-baseline:guidelines" to post-update-cmd section');
 
             return CheckResult::FAIL;
         }

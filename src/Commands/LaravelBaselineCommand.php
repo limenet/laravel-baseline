@@ -7,7 +7,7 @@ use Limenet\LaravelBaseline\Checks\Checker;
 
 class LaravelBaselineCommand extends Command
 {
-    public $signature = 'limenet:laravel-baseline';
+    public $signature = 'limenet:laravel-baseline:check';
 
     public $description = 'Checks the project against a highly opinionated set of coding standards.';
 
@@ -25,6 +25,7 @@ class LaravelBaselineCommand extends Command
             $checker->doesNotUseSail(...),
             $checker->hasCompleteRectorConfiguration(...),
             $checker->hasEncryptedEnvFile(...),
+            $checker->hasGuidelinesUpdateScript(...),
             $checker->hasNpmScripts(...),
             $checker->isCiLintComplete(...),
             $checker->isLaravelVersionMaintained(...),

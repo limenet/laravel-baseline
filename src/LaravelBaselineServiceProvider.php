@@ -3,6 +3,7 @@
 namespace Limenet\LaravelBaseline;
 
 use Limenet\LaravelBaseline\Commands\LaravelBaselineCommand;
+use Limenet\LaravelBaseline\Commands\UpdateGuidelinesCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -18,6 +19,9 @@ class LaravelBaselineServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-baseline')
             ->hasConfigFile()
-            ->hasCommand(LaravelBaselineCommand::class);
+            ->hasCommands([
+                LaravelBaselineCommand::class,
+                UpdateGuidelinesCommand::class,
+            ]);
     }
 }
