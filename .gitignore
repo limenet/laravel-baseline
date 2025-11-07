@@ -28,3 +28,5 @@ _ide_helper_models.php
 testbench.yaml
 /docs
 /coverage
+coverage.xml
+junit.xml
