@@ -789,6 +789,12 @@ use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRecto
 
 return static function (RectorConfig $config): void {
     $config
+        ->withPaths([
+            __DIR__.'/app',
+            __DIR__.'/database',
+            __DIR__.'/routes',
+            __DIR__.'/tests',
+        ])
         ->withComposerBased(phpunit: true, symfony: true, laravel: true)
         ->withPreparedSets(
             deadCode: true,
@@ -968,6 +974,100 @@ PHP;
     expect($comments)->toHaveCount(1);
     expect($comments[0])->toContain('withRules()')
         ->toContain('AddGenericReturnTypeToRelationsRector');
+});
+
+it('hasCompleteRectorConfiguration provides specific error message for missing withPaths', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+use RectorLaravel\Set\LaravelSetProvider;
+use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
+use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
+
+return static function (RectorConfig $config): void {
+    $config
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            codingStyle: true,
+            typeDeclarations: true,
+            privatization: true,
+            instanceOf: true,
+            earlyReturn: true,
+        )
+        ->withPhpSets()
+        ->withAttributesSets()
+        ->withImportNames(importShortClasses: false)
+        ->withSetProviders(LaravelSetProvider::class)
+        ->withRules([
+            AddGenericReturnTypeToRelationsRector::class,
+        ])
+        ->withSkip([
+            FunctionLikeToFirstClassCallableRector::class,
+        ]);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasCompleteRectorConfiguration();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toHaveCount(1);
+    expect($comments[0])->toContain('withPaths()')
+        ->toContain('app, database, routes, tests');
+});
+
+it('hasCompleteRectorConfiguration provides specific error message for incomplete withPaths', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+use RectorLaravel\Set\LaravelSetProvider;
+use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
+use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
+
+return static function (RectorConfig $config): void {
+    $config
+        ->withPaths([
+            __DIR__.'/app',
+            __DIR__.'/tests',
+        ])
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            codingStyle: true,
+            typeDeclarations: true,
+            privatization: true,
+            instanceOf: true,
+            earlyReturn: true,
+        )
+        ->withPhpSets()
+        ->withAttributesSets()
+        ->withImportNames(importShortClasses: false)
+        ->withSetProviders(LaravelSetProvider::class)
+        ->withRules([
+            AddGenericReturnTypeToRelationsRector::class,
+        ])
+        ->withSkip([
+            FunctionLikeToFirstClassCallableRector::class,
+        ]);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->hasCompleteRectorConfiguration();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toHaveCount(1);
+    expect($comments[0])->toContain('withPaths()')
+        ->toContain('app, database, routes, tests');
 });
 
 it('phpVersionMatchesCi passes when composer PHP constraint matches CI PHP_VERSION', function (): void {

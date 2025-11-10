@@ -9,6 +9,7 @@ use Limenet\LaravelBaseline\Rector\RectorVisitorArrayArgument;
 use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
 use Limenet\LaravelBaseline\Rector\RectorVisitorHasCall;
 use Limenet\LaravelBaseline\Rector\RectorVisitorNamedArgument;
+use Limenet\LaravelBaseline\Rector\RectorVisitorPaths;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
@@ -365,6 +366,7 @@ class Checker
             new RectorVisitorClassFetch($this, 'withSetProviders', ['LaravelSetProvider']),
             new RectorVisitorArrayArgument($this, 'withRules', ['AddGenericReturnTypeToRelationsRector']),
             new RectorVisitorArrayArgument($this, 'withSkip', ['FunctionLikeToFirstClassCallableRector']),
+            new RectorVisitorPaths($this, 'withPaths', ['app', 'database', 'routes', 'tests']),
         ];
 
         foreach ($visitors as $visitor) {
