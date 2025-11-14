@@ -124,12 +124,12 @@ it('usesLaravelPennant checks for pennant:purge in post-deploy scripts', functio
 });
 
 it('usesLaravelPulse checks scheduled pulse:trim', function (): void {
-    // WARN when not installed
+    // FAIL when not installed
     bindFakeComposer(['laravel/pulse' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
     $checker = new Checker(makeCommand());
-    expect($checker->usesLaravelPulse())->toBe(CheckResult::WARN);
+    expect($checker->usesLaravelPulse())->toBe(CheckResult::FAIL);
 
     // FAIL when installed but not scheduled
     bindFakeComposer(['laravel/pulse' => true]);
@@ -368,11 +368,11 @@ it('callsSentryHook behaves based on package and YAML configuration', function (
     expect($checker->callsSentryHook())->toBe(CheckResult::PASS);
 });
 
-it('usesPredis warns when not installed and passes when installed', function (): void {
+it('usesPredis fails when not installed and passes when installed', function (): void {
     bindFakeComposer(['predis/predis' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
-    expect((new Checker(makeCommand()))->usesPredis())->toBe(CheckResult::WARN);
+    expect((new Checker(makeCommand()))->usesPredis())->toBe(CheckResult::FAIL);
 
     bindFakeComposer(['predis/predis' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
@@ -424,18 +424,18 @@ it('usesSpatieBackup requires scheduled backup tasks', function (): void {
     expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::PASS);
 });
 
-it('usesRector warns unless both rector packages installed and ci-lint script configured', function (): void {
-    // WARN when packages not installed
+it('usesRector fails unless both rector packages installed and ci-lint script configured', function (): void {
+    // FAIL when packages not installed
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
-    expect((new Checker(makeCommand()))->usesRector())->toBe(CheckResult::WARN);
+    expect((new Checker(makeCommand()))->usesRector())->toBe(CheckResult::FAIL);
 
-    // WARN when packages installed but ci-lint script missing
+    // FAIL when packages installed but ci-lint script missing
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
-    expect((new Checker(makeCommand()))->usesRector())->toBe(CheckResult::WARN);
+    expect((new Checker(makeCommand()))->usesRector())->toBe(CheckResult::FAIL);
 
     // PASS when packages installed and ci-lint script configured
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => true]);
@@ -758,11 +758,11 @@ it('hasCiJobs fails when required jobs are missing or not extending the correct 
     expect((new Checker(makeCommand()))->hasCiJobs())->toBe(CheckResult::FAIL);
 });
 
-it('usesLaravelBoost warns when not installed and passes when installed', function (): void {
+it('usesLaravelBoost fails when not installed and passes when installed', function (): void {
     bindFakeComposer(['laravel/boost' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
-    expect((new Checker(makeCommand()))->usesLaravelBoost())->toBe(CheckResult::WARN);
+    expect((new Checker(makeCommand()))->usesLaravelBoost())->toBe(CheckResult::FAIL);
 
     bindFakeComposer(['laravel/boost' => true]);
     $composer = ['scripts' => ['post-update-cmd' => ['php artisan boost:update']]];

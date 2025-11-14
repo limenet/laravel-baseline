@@ -49,7 +49,7 @@ class Checker
     public function usesLaravelBoost(): CheckResult
     {
         if (!$this->checkComposerPackages('laravel/boost')) {
-            return CheckResult::WARN;
+            return CheckResult::FAIL;
         }
 
         if (!$this->hasPostUpdateScript('boost:update')) {
@@ -78,7 +78,7 @@ class Checker
     public function usesLaravelPulse(): CheckResult
     {
         if (!$this->checkComposerPackages('laravel/pulse')) {
-            return CheckResult::WARN;
+            return CheckResult::FAIL;
         }
 
         if (!$this->hasScheduleEntry('pulse:trim')) {
@@ -198,7 +198,10 @@ class Checker
 
     public function usesPredis(): CheckResult
     {
-        return $this->checkPackagePresence('predis/predis');
+        return $this->checkPackagePresence(
+            'predis/predis',
+            ifAbsent: CheckResult::FAIL,
+        );
     }
 
     public function usesSpatieHealth(): CheckResult
@@ -225,7 +228,7 @@ class Checker
         ])
         && $this->checkComposerScript('ci-lint', 'rector')
             ? CheckResult::PASS
-            : CheckResult::WARN;
+            : CheckResult::FAIL;
     }
 
     public function usesLarastan(): CheckResult
