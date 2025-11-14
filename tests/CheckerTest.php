@@ -99,13 +99,13 @@ it('usesLaravelHorizon fails when package is missing or post-deploy script is mi
     expect($checker->usesLaravelHorizon())->toBe(CheckResult::PASS);
 });
 
-it('usesLaravelPennant fails when package is missing or post-deploy script is missing', function (): void {
-    // FAIL when not installed
+it('usesLaravelPennant warns when package is missing and fails when post-deploy script is missing', function (): void {
+    // WARN when not installed
     bindFakeComposer(['laravel/pennant' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
     $checker = new Checker(makeCommand());
-    expect($checker->usesLaravelPennant())->toBe(CheckResult::FAIL);
+    expect($checker->usesLaravelPennant())->toBe(CheckResult::WARN);
 
     // FAIL when installed but missing script
     bindFakeComposer(['laravel/pennant' => true]);

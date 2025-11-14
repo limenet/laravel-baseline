@@ -73,7 +73,7 @@ class Checker
     public function usesLaravelPennant(): CheckResult
     {
         if (!$this->checkComposerPackages('laravel/pennant')) {
-            return CheckResult::FAIL;
+            return CheckResult::WARN;
         }
 
         return $this->hasPostDeployScript('pennant:purge')
