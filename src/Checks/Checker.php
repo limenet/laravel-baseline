@@ -61,18 +61,34 @@ class Checker
 
     public function usesLaravelHorizon(): CheckResult
     {
-        return $this->checkPackageWithPostDeploy(
+        $packageResult = $this->checkPackagePresence(
             'laravel/horizon',
-            'horizon:terminate',
+            ifAbsent: CheckResult::WARN,
         );
+
+        if ($packageResult !== CheckResult::PASS) {
+            return $packageResult;
+        }
+
+        return $this->hasPostDeployScript('horizon:terminate')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     public function usesLaravelPennant(): CheckResult
     {
-        return $this->checkPackageWithPostDeploy(
+        $packageResult = $this->checkPackagePresence(
             'laravel/pennant',
-            'pennant:purge',
+            ifAbsent: CheckResult::WARN,
         );
+
+        if ($packageResult !== CheckResult::PASS) {
+            return $packageResult;
+        }
+
+        return $this->hasPostDeployScript('pennant:purge')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     public function usesLaravelPulse(): CheckResult
@@ -733,24 +749,6 @@ class Checker
         }
 
         return false;
-    }
-
-    /**
-     * Checks if a package is installed and has a required post-deploy script
-     */
-    private function checkPackageWithPostDeploy(
-        string $package,
-        string $postDeployCommand,
-    ): CheckResult {
-        if (!$this->checkComposerPackages($package)) {
-            return CheckResult::WARN;
-        }
-
-        if (!$this->hasPostDeployScript($postDeployCommand)) {
-            return CheckResult::FAIL;
-        }
-
-        return CheckResult::PASS;
     }
 
     /**
