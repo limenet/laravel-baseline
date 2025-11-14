@@ -61,13 +61,8 @@ class Checker
 
     public function usesLaravelHorizon(): CheckResult
     {
-        $packageResult = $this->checkPackagePresence(
-            'laravel/horizon',
-            ifAbsent: CheckResult::WARN,
-        );
-
-        if ($packageResult !== CheckResult::PASS) {
-            return $packageResult;
+        if (!$this->checkComposerPackages('laravel/horizon')) {
+            return CheckResult::FAIL;
         }
 
         return $this->hasPostDeployScript('horizon:terminate')
@@ -77,13 +72,8 @@ class Checker
 
     public function usesLaravelPennant(): CheckResult
     {
-        $packageResult = $this->checkPackagePresence(
-            'laravel/pennant',
-            ifAbsent: CheckResult::WARN,
-        );
-
-        if ($packageResult !== CheckResult::PASS) {
-            return $packageResult;
+        if (!$this->checkComposerPackages('laravel/pennant')) {
+            return CheckResult::FAIL;
         }
 
         return $this->hasPostDeployScript('pennant:purge')
@@ -112,11 +102,9 @@ class Checker
 
     public function doesNotUseIgnition(): CheckResult
     {
-        return $this->checkPackagePresence(
-            'spatie/laravel-ignition',
-            CheckResult::FAIL,
-            CheckResult::PASS,
-        );
+        return $this->checkComposerPackages('spatie/laravel-ignition')
+            ? CheckResult::FAIL
+            : CheckResult::PASS;
     }
 
     public function doesNotUseSail(): CheckResult
@@ -214,10 +202,9 @@ class Checker
 
     public function usesPredis(): CheckResult
     {
-        return $this->checkPackagePresence(
-            'predis/predis',
-            ifAbsent: CheckResult::FAIL,
-        );
+        return $this->checkComposerPackages('predis/predis')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     public function usesSpatieHealth(): CheckResult
@@ -249,18 +236,20 @@ class Checker
 
     public function usesLarastan(): CheckResult
     {
-        return $this->checkPackagePresence(
-            'larastan/larastan',
-            ifAbsent: CheckResult::FAIL,
-        );
+        return $this->checkComposerPackages('larastan/larastan')
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     public function usesPhpstanExtensions(): CheckResult
     {
-        return $this->checkPackagePresence(
-            ['phpstan/extension-installer', 'phpstan/phpstan-deprecation-rules', 'phpstan/phpstan-strict-rules'],
-            ifAbsent: CheckResult::FAIL,
-        );
+        return $this->checkComposerPackages([
+            'phpstan/extension-installer',
+            'phpstan/phpstan-deprecation-rules',
+            'phpstan/phpstan-strict-rules',
+        ])
+            ? CheckResult::PASS
+            : CheckResult::FAIL;
     }
 
     public function usesPhpInsights(): CheckResult
@@ -654,19 +643,6 @@ class Checker
     public function addComment(string $comment): void
     {
         $this->comments[] = $comment;
-    }
-
-    /**
-     * Helper to simplify package presence checks
-     *
-     * @param  string|list<string>  $packages
-     */
-    private function checkPackagePresence(
-        string|array $packages,
-        CheckResult $ifPresent = CheckResult::PASS,
-        CheckResult $ifAbsent = CheckResult::WARN,
-    ): CheckResult {
-        return $this->checkComposerPackages($packages) ? $ifPresent : $ifAbsent;
     }
 
     private function getComposer(): Composer

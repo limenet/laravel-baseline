@@ -75,13 +75,13 @@ it('bumpsComposer passes when composer bump is in post-update scripts', function
     expect($checker->bumpsComposer())->toBe(CheckResult::PASS);
 });
 
-it('usesLaravelHorizon returns WARN if package missing, FAIL if missing post-deploy, PASS when all ok', function (): void {
-    // WARN
+it('usesLaravelHorizon fails when package is missing or post-deploy script is missing', function (): void {
+    // FAIL when package missing
     bindFakeComposer(['laravel/horizon' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
     $checker = new Checker(makeCommand());
-    expect($checker->usesLaravelHorizon())->toBe(CheckResult::WARN);
+    expect($checker->usesLaravelHorizon())->toBe(CheckResult::FAIL);
 
     // FAIL if present but no ci-deploy-post horizon:terminate
     bindFakeComposer(['laravel/horizon' => true]);
@@ -99,13 +99,13 @@ it('usesLaravelHorizon returns WARN if package missing, FAIL if missing post-dep
     expect($checker->usesLaravelHorizon())->toBe(CheckResult::PASS);
 });
 
-it('usesLaravelPennant checks for pennant:purge in post-deploy scripts', function (): void {
-    // WARN when not installed
+it('usesLaravelPennant fails when package is missing or post-deploy script is missing', function (): void {
+    // FAIL when not installed
     bindFakeComposer(['laravel/pennant' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
     $checker = new Checker(makeCommand());
-    expect($checker->usesLaravelPennant())->toBe(CheckResult::WARN);
+    expect($checker->usesLaravelPennant())->toBe(CheckResult::FAIL);
 
     // FAIL when installed but missing script
     bindFakeComposer(['laravel/pennant' => true]);
