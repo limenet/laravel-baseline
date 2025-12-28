@@ -207,7 +207,7 @@ class Checker
             'test' => '.test',
         ];
         foreach ($jobs as $jobName => $extends) {
-            if (($data[$jobName] ?? null) !== ['extends' => [$extends]]) {
+            if (!isset($data[$jobName]['extends']) || $data[$jobName]['extends'] !== [$extends]) {
                 $this->addComment("Missing or misconfigured CI job in .gitlab-ci.yml: Add job '$jobName' with 'extends: [$extends]'");
 
                 return CheckResult::FAIL;

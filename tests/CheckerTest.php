@@ -343,6 +343,37 @@ YML;
     expect($checker->hasCiJobs())->toBe(CheckResult::PASS);
 });
 
+it('hasCiJobs allows additional keys like before_script in job definitions', function (): void {
+    bindFakeComposer([]);
+    $yaml = <<<'YML'
+build:
+  extends: ['.build']
+  before_script:
+    - composer install
+php:
+  extends: ['.lint_php']
+  variables:
+    PHP_CS_FIXER_IGNORE_ENV: 1
+js:
+  extends: ['.lint_js']
+  before_script:
+    - npm install
+test:
+  extends: ['.test']
+  artifacts:
+    reports:
+      junit: report.xml
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        '.gitlab-ci.yml' => $yaml,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->hasCiJobs())->toBe(CheckResult::PASS);
+});
+
 it('callsSentryHook behaves based on package and YAML configuration', function (): void {
     // WARN when sentry not installed
     bindFakeComposer(['sentry/sentry-laravel' => false]);
