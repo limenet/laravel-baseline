@@ -578,6 +578,14 @@ class Checker
 
         if (file_exists($ddevGitignoreFile)) {
             $gitignoreContent = file_get_contents($ddevGitignoreFile) ?: '';
+
+            // Check if .gitignore is auto-generated
+            if (str_contains($gitignoreContent, '#ddev-generated')) {
+                $this->addComment('DDEV .gitignore is auto-generated: Remove "#ddev-generated" comment from .ddev/.gitignore to prevent DDEV from regenerating it');
+
+                return CheckResult::FAIL;
+            }
+
             $gitignoreLines = array_map('trim', explode("\n", $gitignoreContent));
 
             // Check for patterns that would ignore mutagen.yml

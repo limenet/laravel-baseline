@@ -2289,3 +2289,62 @@ YML;
     $comments = $checker->getComments();
     expect($comments)->toContain('DDEV Mutagen configuration is auto-generated: Remove "#ddev-generated" comment from .ddev/mutagen/mutagen.yml to prevent DDEV from overwriting your changes');
 });
+
+it('ddevMutagenIgnoresNodeModules fails when .ddev/.gitignore contains #ddev-generated comment', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $gitignore = <<<'TXT'
+#ddev-generated
+/.ddev-docker-compose-*.yaml
+/db_snapshots
+TXT;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+        '.ddev/.gitignore' => $gitignore,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV .gitignore is auto-generated: Remove "#ddev-generated" comment from .ddev/.gitignore to prevent DDEV from regenerating it');
+});
+
+it('ddevMutagenIgnoresNodeModules fails when .ddev/.gitignore contains #ddev-generated in middle', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $gitignore = <<<'TXT'
+# DDEV-generated settings
+#ddev-generated
+/.ddev-docker-compose-*.yaml
+/db_snapshots
+TXT;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+        '.ddev/.gitignore' => $gitignore,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV .gitignore is auto-generated: Remove "#ddev-generated" comment from .ddev/.gitignore to prevent DDEV from regenerating it');
+});
