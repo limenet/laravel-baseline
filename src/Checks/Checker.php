@@ -602,6 +602,15 @@ class Checker
             }
         }
 
+        // Check if the file contains #ddev-generated comment
+        $mutagenConfigContent = file_get_contents($mutagenConfigFile) ?: '';
+
+        if (str_contains($mutagenConfigContent, '#ddev-generated')) {
+            $this->addComment('DDEV Mutagen configuration is auto-generated: Remove "#ddev-generated" comment from .ddev/mutagen/mutagen.yml to prevent DDEV from overwriting your changes');
+
+            return CheckResult::FAIL;
+        }
+
         $mutagenConfig = Yaml::parseFile($mutagenConfigFile);
 
         // Check if sync.defaults.ignore.paths exists and contains "/node_modules"

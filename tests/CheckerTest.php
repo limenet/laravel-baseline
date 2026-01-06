@@ -2243,3 +2243,49 @@ YML;
     $checker = new Checker(makeCommand());
     expect($checker->ddevMutagenIgnoresNodeModules())->toBe(CheckResult::PASS);
 });
+
+it('ddevMutagenIgnoresNodeModules fails when mutagen.yml contains #ddev-generated comment', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+#ddev-generated
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV Mutagen configuration is auto-generated: Remove "#ddev-generated" comment from .ddev/mutagen/mutagen.yml to prevent DDEV from overwriting your changes');
+});
+
+it('ddevMutagenIgnoresNodeModules fails when mutagen.yml contains #ddev-generated in middle of file', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    #ddev-generated
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV Mutagen configuration is auto-generated: Remove "#ddev-generated" comment from .ddev/mutagen/mutagen.yml to prevent DDEV from overwriting your changes');
+});
