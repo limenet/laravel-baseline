@@ -21,6 +21,7 @@ class LaravelBaselineCommand extends Command
             $checker->callsSentryHook(...),
             $checker->checkPhpunit(...),
             $checker->ddevHasPcovPackage(...),
+            $checker->ddevMutagenIgnoresNodeModules(...),
             $checker->doesNotUseIgnition(...),
             $checker->doesNotUseSail(...),
             $checker->hasCompleteRectorConfiguration(...),

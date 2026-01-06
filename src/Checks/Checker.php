@@ -563,6 +563,30 @@ class Checker
         return CheckResult::PASS;
     }
 
+    public function ddevMutagenIgnoresNodeModules(): CheckResult
+    {
+        $mutagenConfigFile = base_path('.ddev/mutagen/mutagen.yml');
+
+        if (!file_exists($mutagenConfigFile)) {
+            $this->addComment('DDEV Mutagen configuration missing: Create .ddev/mutagen/mutagen.yml');
+
+            return CheckResult::FAIL;
+        }
+
+        $mutagenConfig = Yaml::parseFile($mutagenConfigFile);
+
+        // Check if sync.defaults.ignore.paths exists and contains "/node_modules"
+        $ignorePaths = $mutagenConfig['sync']['defaults']['ignore']['paths'] ?? [];
+
+        if (!in_array('/node_modules', $ignorePaths, true)) {
+            $this->addComment('DDEV Mutagen configuration incomplete: Add "/node_modules" to sync.defaults.ignore.paths in .ddev/mutagen/mutagen.yml and run "ddev mutagen reset" to apply changes');
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
     public function usesReleaseIt(): CheckResult
     {
         // Check if release-it and @release-it/bumper are in devDependencies

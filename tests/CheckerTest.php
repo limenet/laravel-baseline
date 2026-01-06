@@ -2052,3 +2052,82 @@ it('hasGuidelinesUpdateScript passes when only guidelines exists without boost',
     $checker = new Checker(makeCommand());
     expect($checker->hasGuidelinesUpdateScript())->toBe(CheckResult::PASS);
 });
+
+it('ddevMutagenIgnoresNodeModules passes when mutagen.yml has /node_modules in ignore paths', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+        - "/.git"
+YML;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->ddevMutagenIgnoresNodeModules())->toBe(CheckResult::PASS);
+});
+
+it('ddevMutagenIgnoresNodeModules fails when mutagen.yml is missing', function (): void {
+    bindFakeComposer([]);
+
+    $this->withTempBasePath([]);
+
+    expect((new Checker(makeCommand()))->ddevMutagenIgnoresNodeModules())->toBe(CheckResult::FAIL);
+});
+
+it('ddevMutagenIgnoresNodeModules fails when /node_modules is not in ignore paths', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/.git"
+        - "/vendor"
+YML;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+    ]);
+
+    expect((new Checker(makeCommand()))->ddevMutagenIgnoresNodeModules())->toBe(CheckResult::FAIL);
+});
+
+it('ddevMutagenIgnoresNodeModules provides helpful comment when file is missing', function (): void {
+    bindFakeComposer([]);
+
+    $this->withTempBasePath([]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV Mutagen configuration missing: Create .ddev/mutagen/mutagen.yml');
+});
+
+it('ddevMutagenIgnoresNodeModules provides helpful comment when /node_modules is missing', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/.git"
+YML;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV Mutagen configuration incomplete: Add "/node_modules" to sync.defaults.ignore.paths in .ddev/mutagen/mutagen.yml and run "ddev mutagen reset" to apply changes');
+});
