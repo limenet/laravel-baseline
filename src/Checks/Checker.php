@@ -573,6 +573,35 @@ class Checker
             return CheckResult::FAIL;
         }
 
+        // Check if mutagen config is not ignored in .ddev/.gitignore
+        $ddevGitignoreFile = base_path('.ddev/.gitignore');
+
+        if (file_exists($ddevGitignoreFile)) {
+            $gitignoreContent = file_get_contents($ddevGitignoreFile) ?: '';
+            $gitignoreLines = array_map('trim', explode("\n", $gitignoreContent));
+
+            // Check for patterns that would ignore mutagen.yml
+            $ignoringMutagen = false;
+            foreach ($gitignoreLines as $line) {
+                // Skip comments and empty lines
+                if (empty($line) || str_starts_with($line, '#')) {
+                    continue;
+                }
+
+                // Check if line matches patterns that would ignore mutagen.yml
+                if ($line === '/mutagen/mutagen.yml' || $line === 'mutagen/mutagen.yml' || $line === '/mutagen/' || $line === 'mutagen/') {
+                    $ignoringMutagen = true;
+                    break;
+                }
+            }
+
+            if ($ignoringMutagen) {
+                $this->addComment('DDEV Mutagen configuration is ignored by git: Remove "/mutagen/mutagen.yml" from .ddev/.gitignore to track the configuration');
+
+                return CheckResult::FAIL;
+            }
+        }
+
         $mutagenConfig = Yaml::parseFile($mutagenConfigFile);
 
         // Check if sync.defaults.ignore.paths exists and contains "/node_modules"

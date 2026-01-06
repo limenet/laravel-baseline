@@ -2131,3 +2131,115 @@ YML;
     $comments = $checker->getComments();
     expect($comments)->toContain('DDEV Mutagen configuration incomplete: Add "/node_modules" to sync.defaults.ignore.paths in .ddev/mutagen/mutagen.yml and run "ddev mutagen reset" to apply changes');
 });
+
+it('ddevMutagenIgnoresNodeModules fails when mutagen.yml is ignored in .ddev/.gitignore', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $gitignore = <<<'TXT'
+# DDEV-generated settings
+/.ddev-docker-compose-*.yaml
+/db_snapshots
+/sequelpro.spf
+/import.yaml
+/import-db
+/.bgswitch
+/.dbimageBuild
+/monitoring
+/postgres
+/traefik
+/.gitignore
+/.webimageBuild
+/.webimageExtra
+/.ddevstarttime
+/mutagen/mutagen.yml
+TXT;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+        '.ddev/.gitignore' => $gitignore,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV Mutagen configuration is ignored by git: Remove "/mutagen/mutagen.yml" from .ddev/.gitignore to track the configuration');
+});
+
+it('ddevMutagenIgnoresNodeModules fails when mutagen.yml is ignored by directory pattern', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $gitignore = <<<'TXT'
+/mutagen/
+TXT;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+        '.ddev/.gitignore' => $gitignore,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV Mutagen configuration is ignored by git: Remove "/mutagen/mutagen.yml" from .ddev/.gitignore to track the configuration');
+});
+
+it('ddevMutagenIgnoresNodeModules passes when mutagen.yml is not ignored', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $gitignore = <<<'TXT'
+# DDEV-generated settings
+/.ddev-docker-compose-*.yaml
+/db_snapshots
+TXT;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+        '.ddev/.gitignore' => $gitignore,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->ddevMutagenIgnoresNodeModules())->toBe(CheckResult::PASS);
+});
+
+it('ddevMutagenIgnoresNodeModules passes when .ddev/.gitignore does not exist', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    expect($checker->ddevMutagenIgnoresNodeModules())->toBe(CheckResult::PASS);
+});
