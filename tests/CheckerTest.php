@@ -2154,7 +2154,6 @@ YML;
 /monitoring
 /postgres
 /traefik
-/.gitignore
 /.webimageBuild
 /.webimageExtra
 /.ddevstarttime
@@ -2347,4 +2346,62 @@ TXT;
     expect($result)->toBe(CheckResult::FAIL);
     $comments = $checker->getComments();
     expect($comments)->toContain('DDEV .gitignore is auto-generated: Remove "#ddev-generated" comment from .ddev/.gitignore to prevent DDEV from regenerating it');
+});
+
+it('ddevMutagenIgnoresNodeModules fails when .ddev/.gitignore ignores itself', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $gitignore = <<<'TXT'
+/.ddev-docker-compose-*.yaml
+/db_snapshots
+/.gitignore
+TXT;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+        '.ddev/.gitignore' => $gitignore,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV .gitignore is ignoring itself: Remove "/.gitignore" from .ddev/.gitignore to track the gitignore file');
+});
+
+it('ddevMutagenIgnoresNodeModules fails when .ddev/.gitignore ignores itself without slash', function (): void {
+    bindFakeComposer([]);
+    $mutagenConfig = <<<'YML'
+sync:
+  defaults:
+    ignore:
+      paths:
+        - "/node_modules"
+YML;
+
+    $gitignore = <<<'TXT'
+/.ddev-docker-compose-*.yaml
+/db_snapshots
+.gitignore
+TXT;
+
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => $mutagenConfig,
+        '.ddev/.gitignore' => $gitignore,
+    ]);
+
+    $checker = new Checker(makeCommand());
+    $result = $checker->ddevMutagenIgnoresNodeModules();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $checker->getComments();
+    expect($comments)->toContain('DDEV .gitignore is ignoring itself: Remove "/.gitignore" from .ddev/.gitignore to track the gitignore file');
 });

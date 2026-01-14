@@ -588,6 +588,27 @@ class Checker
 
             $gitignoreLines = array_map('trim', explode("\n", $gitignoreContent));
 
+            // Check for patterns that would ignore the gitignore file itself
+            $ignoringSelf = false;
+            foreach ($gitignoreLines as $line) {
+                // Skip comments and empty lines
+                if (empty($line) || str_starts_with($line, '#')) {
+                    continue;
+                }
+
+                // Check if line matches patterns that would ignore .gitignore itself
+                if ($line === '/.gitignore' || $line === '.gitignore') {
+                    $ignoringSelf = true;
+                    break;
+                }
+            }
+
+            if ($ignoringSelf) {
+                $this->addComment('DDEV .gitignore is ignoring itself: Remove "/.gitignore" from .ddev/.gitignore to track the gitignore file');
+
+                return CheckResult::FAIL;
+            }
+
             // Check for patterns that would ignore mutagen.yml
             $ignoringMutagen = false;
             foreach ($gitignoreLines as $line) {
