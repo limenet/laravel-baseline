@@ -32,6 +32,59 @@ php artisan vendor:publish --tag="laravel-baseline-config"
 ],
 ```
 
+## Checks
+
+This package validates your Laravel installation against the following checks:
+
+### Testing & Quality Tools
+- **`usesPest()`** - Validates Pest testing framework is configured (not PHPUnit directly)
+- **`usesRector()`** - Validates Rector automated code modernization is installed
+- **`usesLarastan()`** - Validates Larastan static analysis tool is configured
+- **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
+- **`usesPhpInsights()`** - Validates PHP Insights code quality analysis is configured
+- **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports
+- **`hasCompleteRectorConfiguration()`** - Validates comprehensive Rector configuration
+
+### IDE & Developer Tools
+- **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured
+- **`usesLaravelBoost()`** - Validates Laravel Boost AI development tool
+- **`usesLimenetPintConfig()`** - Validates custom Laravel Pint formatting standards
+
+### Laravel Features & Monitoring
+- **`usesLaravelHorizon()`** - Validates Laravel Horizon Redis queue manager
+- **`usesLaravelPennant()`** - Warns if Laravel Pennant feature flags are missing (optional)
+- **`usesLaravelPulse()`** - Validates Laravel Pulse application monitoring
+- **`usesLaravelTelescope()`** - Validates Laravel Telescope request debugging
+- **`usesSpatieHealth()`** - Validates Spatie Health check monitoring
+- **`usesSpatieBackup()`** - Validates Spatie Backup database backups
+
+### Infrastructure & Dependencies
+- **`usesPredis()`** - Validates Predis Redis client is installed
+- **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used
+- **`doesNotUseSail()`** - Validates Sail is NOT used (negative check)
+
+### CI/CD & Deployment
+- **`hasCiJobs()`** - Validates GitLab CI pipeline jobs are properly configured
+- **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
+- **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
+- **`isCiLintComplete()`** - Validates complete linting pipeline
+- **`doesNotUseIgnition()`** - Validates Ignition debugger is NOT installed
+
+### Local Development
+- **`phpVersionMatchesDdev()`** - Validates PHP version consistency with DDEV
+- **`ddevHasPcovPackage()`** - Validates DDEV coverage configuration
+- **`ddevMutagenIgnoresNodeModules()`** - Validates DDEV Mutagen sync configuration
+
+### Build & Release
+- **`bumpsComposer()`** - Validates automatic composer dependency bumping
+- **`usesReleaseIt()`** - Validates automated release management
+- **`hasNpmScripts()`** - Validates required npm build scripts
+
+### Security & Configuration
+- **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
+- **`hasGuidelinesUpdateScript()`** - Validates baseline guidelines update script
+- **`callsBaseline()`** - Validates self-validation runs after updates
+
 ## Testing
 
 ```bash
