@@ -41,6 +41,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesRector()`** - Validates Rector automated code modernization is installed
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
+- **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
 - **`usesPhpInsights()`** - Validates PHP Insights code quality analysis is configured
 - **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports
 - **`hasCompleteRectorConfiguration()`** - Validates comprehensive Rector configuration
