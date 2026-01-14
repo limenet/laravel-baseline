@@ -1,0 +1,3 @@
+- Add docs for each check to README.md.
+- Write tests for every check. Ensure there tests for absence and presence.
+- Every check needs to be added to LaravelBaselineCommand.
