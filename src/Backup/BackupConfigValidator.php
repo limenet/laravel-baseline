@@ -18,11 +18,16 @@ class BackupConfigValidator
     private array $config = [];
 
     /**
+     * @var array<string|int, mixed>
+     */
+    private array $databaseConfig = [];
+
+    /**
      * Validate the backup configuration file.
      *
      * @return list<string> List of validation errors
      */
-    public function validate(string $configPath): array
+    public function validate(string $configPath, ?string $databaseConfigPath = null): array
     {
         $this->errors = [];
 
@@ -48,6 +53,10 @@ class BackupConfigValidator
             return $this->errors;
         }
 
+        // Parse database config if path provided, otherwise derive from backup config path
+        $databaseConfigPath ??= dirname($configPath).'/database.php';
+        $this->databaseConfig = $this->parseDatabaseConfig($databaseConfigPath);
+
         $this->validateBackupName();
         $this->validateCleanupSettings();
         $this->validateDiskConsistency();
@@ -55,6 +64,26 @@ class BackupConfigValidator
         $this->validateNotificationMail();
 
         return $this->errors;
+    }
+
+    /**
+     * Parse the database configuration file.
+     *
+     * @return array<string|int, mixed>
+     */
+    private function parseDatabaseConfig(string $path): array
+    {
+        if (!file_exists($path)) {
+            return [];
+        }
+
+        $code = file_get_contents($path);
+
+        if ($code === false) {
+            return [];
+        }
+
+        return $this->parseConfig($code);
     }
 
     /**
@@ -295,7 +324,7 @@ class BackupConfigValidator
             $this->errors[] = 'Backup relative_path must use base_path(): Set backup.source.files.relative_path to base_path()';
         }
 
-        // Check databases includes config('database.default')
+        // Check databases matches database.default from database.php
         $databases = $this->getValueAt('backup.source.databases');
 
         if (!is_array($databases)) {
@@ -304,17 +333,29 @@ class BackupConfigValidator
             return;
         }
 
-        $hasDatabaseDefault = false;
+        $databaseDefault = $this->databaseConfig['default'] ?? null;
+
+        if ($databaseDefault === null) {
+            $this->errors[] = 'Unable to determine database default: Ensure config/database.php exists and has a \'default\' key';
+
+            return;
+        }
+
+        $hasMatchingDatabase = false;
 
         foreach ($databases as $db) {
-            if ($db instanceof FuncCallInfo && $db->isCall('config', 'database.default')) {
-                $hasDatabaseDefault = true;
+            if ($this->valuesMatch($db, $databaseDefault)) {
+                $hasMatchingDatabase = true;
                 break;
             }
         }
 
-        if (!$hasDatabaseDefault) {
-            $this->errors[] = 'Backup source databases must include config(\'database.default\'): Add config(\'database.default\') to backup.source.databases array';
+        if (!$hasMatchingDatabase) {
+            $expectedValue = $this->formatExpectedValue($databaseDefault);
+            $this->errors[] = sprintf(
+                'Backup source databases must include the database default: Add %s to backup.source.databases array (must match database.default from config/database.php)',
+                $expectedValue,
+            );
         }
     }
 
@@ -345,5 +386,44 @@ class BackupConfigValidator
         if (!$fromName instanceof FuncCallInfo || !$fromName->isCall('config', 'mail.from.name')) {
             $this->errors[] = 'Backup notification mail.from.name must use config(\'mail.from.name\'): Set notifications.mail.from.name to config(\'mail.from.name\')';
         }
+    }
+
+    /**
+     * Check if two values match (handles FuncCallInfo comparison).
+     */
+    private function valuesMatch(mixed $a, mixed $b): bool
+    {
+        // Both are FuncCallInfo - compare function name and arguments
+        if ($a instanceof FuncCallInfo && $b instanceof FuncCallInfo) {
+            return $a->name === $b->name && $a->args === $b->args;
+        }
+
+        // Both are scalar values
+        if (is_string($a) && is_string($b)) {
+            return $a === $b;
+        }
+
+        return false;
+    }
+
+    /**
+     * Format a value for display in error messages.
+     */
+    private function formatExpectedValue(mixed $value): string
+    {
+        if ($value instanceof FuncCallInfo) {
+            $args = array_map(
+                fn ($arg) => is_string($arg) ? "'{$arg}'" : (string) $arg,
+                $value->args,
+            );
+
+            return $value->name.'('.implode(', ', $args).')';
+        }
+
+        if (is_string($value)) {
+            return "'{$value}'";
+        }
+
+        return (string) $value;
     }
 }

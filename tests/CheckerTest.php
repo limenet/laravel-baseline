@@ -466,7 +466,7 @@ return [
         'name' => 'my-app',
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -492,9 +492,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -512,7 +520,7 @@ return [
         'name' => env('APP_URL', 'laravel'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -538,9 +546,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -558,7 +574,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -584,9 +600,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -604,7 +628,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local', 's3']],
     ],
@@ -630,9 +654,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -650,7 +682,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => false, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -676,9 +708,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -696,7 +736,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => '/var/www'],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -722,9 +762,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -732,7 +780,7 @@ PHP;
     expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::FAIL);
 });
 
-it('usesSpatieBackup fails when databases does not include config(database.default)', function (): void {
+it('usesSpatieBackup fails when databases does not match database.default', function (): void {
     bindFakeComposer(['spatie/laravel-backup' => true]);
 
     $config = <<<'PHP'
@@ -768,6 +816,117 @@ return [
 ];
 PHP;
 
+    // database.php uses env() but backup.php uses hardcoded 'mysql' - should fail
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
+    ]);
+
+    Schedule::command('backup:run');
+    Schedule::command('backup:clean');
+    expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::FAIL);
+});
+
+it('usesSpatieBackup passes when database.default is a simple string and backup.databases matches', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'databases' => ['mysql'],
+        ],
+        'destination' => ['disks' => ['local']],
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    // database.php uses a simple string, not env()
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => 'mysql',
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
+    ]);
+
+    Schedule::command('backup:run');
+    Schedule::command('backup:clean');
+    expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::PASS);
+});
+
+it('usesSpatieBackup fails when database.php is missing', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'databases' => ['mysql'],
+        ],
+        'destination' => ['disks' => ['local']],
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    // No database.php provided
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
@@ -788,7 +947,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -814,9 +973,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -834,7 +1001,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -860,9 +1027,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -880,7 +1055,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -906,9 +1081,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -926,7 +1109,7 @@ return [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -952,9 +1135,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -972,7 +1163,7 @@ return [
         'name' => env('APP_NAME', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -998,9 +1189,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
@@ -1018,7 +1217,7 @@ return [
         'name' => env('APP_NAME', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
-            'databases' => [config('database.default')],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
     ],
@@ -1044,9 +1243,17 @@ return [
 ];
 PHP;
 
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
     ]);
 
     Schedule::command('backup:run');
