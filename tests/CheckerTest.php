@@ -962,6 +962,98 @@ PHP;
     expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::PASS);
 });
 
+it('usesSpatieBackup passes with valid APP_NAME configuration', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_NAME', 'my-app'),
+        'source' => [
+            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'databases' => [config('database.default')],
+        ],
+        'destination' => ['disks' => ['local']],
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'config/backup.php' => $config,
+    ]);
+
+    Schedule::command('backup:run');
+    Schedule::command('backup:clean');
+    expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::PASS);
+});
+
+it('usesSpatieBackup fails when monitor_backups uses different env var than backup.name', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_NAME', 'my-app'),
+        'source' => [
+            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'databases' => [config('database.default')],
+        ],
+        'destination' => ['disks' => ['local']],
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'config/backup.php' => $config,
+    ]);
+
+    Schedule::command('backup:run');
+    Schedule::command('backup:clean');
+    expect((new Checker(makeCommand()))->usesSpatieBackup())->toBe(CheckResult::FAIL);
+});
+
 it('usesRector fails unless both rector packages installed and ci-lint script configured', function (): void {
     // FAIL when packages not installed
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => false]);
