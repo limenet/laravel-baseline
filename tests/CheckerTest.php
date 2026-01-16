@@ -477,7 +477,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -509,7 +509,7 @@ it('usesSpatieBackup fails when backup.name uses env() with laravel default', fu
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'laravel'),
+        'name' => env('APP_URL', 'laravel'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -523,7 +523,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'laravel'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'laravel'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -555,7 +555,7 @@ it('usesSpatieBackup fails when cleanup settings are incorrect', function (): vo
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -569,7 +569,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -601,7 +601,7 @@ it('usesSpatieBackup fails when disk configuration mismatches', function (): voi
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -615,7 +615,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -647,7 +647,7 @@ it('usesSpatieBackup fails when follow_links is not true', function (): void {
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => false, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -661,7 +661,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -693,7 +693,7 @@ it('usesSpatieBackup fails when relative_path does not use base_path()', functio
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => '/var/www'],
             'databases' => [config('database.default')],
@@ -707,7 +707,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -739,7 +739,7 @@ it('usesSpatieBackup fails when databases does not include config(database.defau
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => ['mysql'],
@@ -753,7 +753,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -785,7 +785,7 @@ it('usesSpatieBackup fails when mail.to does not end with @inbound.postmarkapp.c
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -799,7 +799,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -831,7 +831,7 @@ it('usesSpatieBackup fails when mail.from.address does not use config()', functi
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -845,7 +845,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -877,7 +877,7 @@ it('usesSpatieBackup fails when monitor_backups.name default differs from backup
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -891,7 +891,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'different-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'different-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [
@@ -923,7 +923,7 @@ it('usesSpatieBackup passes with valid configuration', function (): void {
 <?php
 return [
     'backup' => [
-        'name' => env('APP_NAME', 'my-app'),
+        'name' => env('APP_URL', 'my-app'),
         'source' => [
             'files' => ['follow_links' => true, 'relative_path' => base_path()],
             'databases' => [config('database.default')],
@@ -937,7 +937,7 @@ return [
         ],
     ],
     'monitor_backups' => [
-        ['name' => env('APP_NAME', 'my-app'), 'disks' => ['local']],
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
     ],
     'cleanup' => [
         'default_strategy' => [

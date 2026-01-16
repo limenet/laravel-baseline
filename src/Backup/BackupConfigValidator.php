@@ -109,15 +109,15 @@ class BackupConfigValidator
     {
         $backupName = $this->getValueAt('backup.name');
 
-        // Check backup.name uses env('APP_NAME', ...)
+        // Check backup.name uses env('APP_URL', ...)
         if (!$backupName instanceof FuncCallInfo) {
-            $this->errors[] = 'Backup name must use env() function: Set backup.name to env(\'APP_NAME\', \'your-app-name\')';
+            $this->errors[] = 'Backup name must use env() function: Set backup.name to env(\'APP_URL\', \'your-app-url\')';
 
             return;
         }
 
-        if (!$backupName->isCall('env', 'APP_NAME')) {
-            $this->errors[] = 'Backup name must use APP_NAME environment variable: Set backup.name to env(\'APP_NAME\', \'your-app-name\')';
+        if (!$backupName->isCall('env', 'APP_URL')) {
+            $this->errors[] = 'Backup name must use APP_URL environment variable: Set backup.name to env(\'APP_URL\', \'your-app-url\')';
 
             return;
         }
@@ -125,13 +125,13 @@ class BackupConfigValidator
         $defaultValue = $backupName->getSecondArg();
 
         if (!is_string($defaultValue) || $defaultValue === '') {
-            $this->errors[] = 'Backup name env() must have a non-empty default value: Set backup.name to env(\'APP_NAME\', \'your-app-name\')';
+            $this->errors[] = 'Backup name env() must have a non-empty default value: Set backup.name to env(\'APP_URL\', \'your-app-url\')';
 
             return;
         }
 
         if (strtolower($defaultValue) === 'laravel') {
-            $this->errors[] = 'Backup name env() default must not be "laravel": Set backup.name to env(\'APP_NAME\', \'your-actual-app-name\')';
+            $this->errors[] = 'Backup name env() default must not be "laravel": Set backup.name to env(\'APP_URL\', \'your-actual-app-url\')';
 
             return;
         }
@@ -147,11 +147,11 @@ class BackupConfigValidator
 
                 $monitorName = $monitor['name'] ?? null;
 
-                // Monitor name should also use env('APP_NAME', ...)
+                // Monitor name should also use env('APP_URL', ...)
                 if ($monitorName instanceof FuncCallInfo) {
-                    if (!$monitorName->isCall('env', 'APP_NAME')) {
+                    if (!$monitorName->isCall('env', 'APP_URL')) {
                         $this->errors[] = sprintf(
-                            'Monitor backup name mismatch at index %s: monitor_backups.%s.name must also use env(\'APP_NAME\', \'your-app-name\')',
+                            'Monitor backup name mismatch at index %s: monitor_backups.%s.name must also use env(\'APP_URL\', \'your-app-url\')',
                             $index,
                             $index,
                         );
@@ -166,7 +166,7 @@ class BackupConfigValidator
                     }
                 } elseif ($monitorName !== null) {
                     $this->errors[] = sprintf(
-                        'Monitor backup name must use env() at index %s: Set monitor_backups.%s.name to env(\'APP_NAME\', \'your-app-name\')',
+                        'Monitor backup name must use env() at index %s: Set monitor_backups.%s.name to env(\'APP_URL\', \'your-app-url\')',
                         $index,
                         $index,
                     );
