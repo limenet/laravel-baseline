@@ -3,6 +3,8 @@
 use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer as IlluminateComposer;
+use Limenet\LaravelBaseline\Checks\CheckInterface;
+use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Commands\LaravelBaselineCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -21,6 +23,35 @@ function makeCommand(): LaravelBaselineCommand
     $command->setOutput($output);
 
     return $command;
+}
+
+/**
+ * Helper: create a check instance with a comment collector.
+ *
+ * @template T of CheckInterface
+ *
+ * @param  class-string<T>  $checkClass
+ * @return T
+ */
+function makeCheck(string $checkClass): CheckInterface
+{
+    return new $checkClass(new CommentCollector());
+}
+
+/**
+ * Helper: create a check instance with a shared comment collector.
+ * Returns both the check and the collector for tests that need to inspect comments.
+ *
+ * @template T of CheckInterface
+ *
+ * @param  class-string<T>  $checkClass
+ * @return array{0: T, 1: CommentCollector}
+ */
+function makeCheckWithCollector(string $checkClass): array
+{
+    $collector = new CommentCollector();
+
+    return [new $checkClass($collector), $collector];
 }
 
 /**

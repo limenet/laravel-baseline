@@ -2,7 +2,7 @@
 
 namespace Limenet\LaravelBaseline\Rector;
 
-use Limenet\LaravelBaseline\Checks\Checker;
+use Limenet\LaravelBaseline\Checks\CommentCollector;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -14,7 +14,7 @@ abstract class AbstractRectorVisitor extends NodeVisitorAbstract
      * @param  string[]  $payload
      */
     public function __construct(
-        protected readonly Checker $checker,
+        protected readonly CommentCollector $commentCollector,
         public readonly string $methodName,
         public readonly array $payload = [],
     ) {}

@@ -2,38 +2,75 @@
 
 **Note:** Keep this file up-to-date as patterns evolve. If you add new helper methods, configuration parsers, or change the workflow, update the relevant sections in this document.
 
+## Architecture Overview
+
+The codebase uses a **one class per check** architecture:
+
+```
+src/Checks/
+├── CheckInterface.php           # Contract for all checks
+├── AbstractCheck.php            # Base class with helper methods
+├── CheckRegistry.php            # Registry of all check classes
+├── CommentCollector.php         # Manages comments for a check run
+└── Checks/                      # Individual check classes (35 total)
+    ├── BumpsComposerCheck.php
+    ├── CallsBaselineCheck.php
+    └── ...
+```
+
 ## When Adding a New Check
 
-### 1. Create the Check Method in Checker.php
+### 1. Create a New Check Class
 
-- Add a public method that returns `CheckResult` to [src/Checks/Checker.php](src/Checks/Checker.php)
-- Method name should be descriptive and follow camelCase (e.g., `usesPest()`, `hasCompleteRectorConfiguration()`)
-- Return one of: `CheckResult::PASS`, `CheckResult::FAIL`, or `CheckResult::WARN`
-- Use `$this->addComment($message)` to provide helpful error messages when a check fails
-- Error messages should be actionable and specific, telling the developer what file to modify and what to add/change
+Create a new class in `src/Checks/Checks/` that extends `AbstractCheck`:
 
-**Example check structure:**
 ```php
-public function myNewCheck(): CheckResult
+<?php
+
+namespace Limenet\LaravelBaseline\Checks\Checks;
+
+use Limenet\LaravelBaseline\Checks\AbstractCheck;
+use Limenet\LaravelBaseline\Enums\CheckResult;
+
+class MyNewCheck extends AbstractCheck
 {
-    if (!$this->checkComposerPackages('vendor/package')) {
-        return CheckResult::FAIL;
-    }
+    public function check(): CheckResult
+    {
+        if (!$this->checkComposerPackages('vendor/package')) {
+            return CheckResult::FAIL;
+        }
 
-    if (!$this->hasPostUpdateScript('some:command')) {
-        $this->addComment('Missing script in composer.json: Add "php artisan some:command" to post-update-cmd section');
-        return CheckResult::FAIL;
-    }
+        if (!$this->hasPostUpdateScript('some:command')) {
+            $this->addComment('Missing script in composer.json: Add "php artisan some:command" to post-update-cmd section');
+            return CheckResult::FAIL;
+        }
 
-    return CheckResult::PASS;
+        return CheckResult::PASS;
+    }
 }
 ```
 
-### 2. Register the Check in LaravelBaselineCommand
+Key points:
+- Class name should be descriptive and end with `Check` (e.g., `UsesPestCheck`, `HasCompleteRectorConfigurationCheck`)
+- The `name()` method is auto-derived from class name (e.g., `UsesPestCheck` → `usesPest`)
+- Return one of: `CheckResult::PASS`, `CheckResult::FAIL`, or `CheckResult::WARN`
+- Use `$this->addComment($message)` to provide helpful error messages when a check fails
+- Error messages should be actionable and specific
 
-- Add `$checker->methodName(...)` to the foreach array in [src/Commands/LaravelBaselineCommand.php](src/Commands/LaravelBaselineCommand.php:18-53)
-- Keep the array alphabetically sorted for maintainability
-- The test suite will automatically verify all check methods are registered
+### 2. Register the Check in CheckRegistry
+
+Add your check class to the array in [src/Checks/CheckRegistry.php](src/Checks/CheckRegistry.php):
+
+```php
+use Limenet\LaravelBaseline\Checks\Checks\MyNewCheck;
+
+private static array $checks = [
+    // ... existing checks ...
+    MyNewCheck::class,
+];
+```
+
+Keep the array alphabetically sorted for maintainability.
 
 ### 3. Write Comprehensive Tests
 
@@ -41,59 +78,42 @@ Add tests to [tests/CheckerTest.php](tests/CheckerTest.php) covering:
 
 **Absence test:** Check fails when package/configuration is missing
 ```php
-it('myCheck fails when package is missing', function (): void {
+it('myNew fails when package is missing', function (): void {
     bindFakeComposer(['vendor/package' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
-    $checker = new Checker(makeCommand());
-    expect($checker->myNewCheck())->toBe(CheckResult::FAIL);
+    expect(makeCheck(MyNewCheck::class)->check())->toBe(CheckResult::FAIL);
 });
 ```
 
 **Presence test:** Check passes when properly configured
 ```php
-it('myCheck passes when properly configured', function (): void {
+it('myNew passes when properly configured', function (): void {
     bindFakeComposer(['vendor/package' => true]);
     $composer = ['scripts' => ['post-update-cmd' => ['php artisan some:command']]];
     $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
-    $checker = new Checker(makeCommand());
-    expect($checker->myNewCheck())->toBe(CheckResult::PASS);
+    expect(makeCheck(MyNewCheck::class)->check())->toBe(CheckResult::PASS);
 });
 ```
 
-**Edge cases:** Test partial configurations, wrong values, etc.
+**Testing comments:** If you need to verify error messages
 ```php
-it('myCheck fails when script is missing despite package being installed', function (): void {
+it('myNew provides helpful comment when script is missing', function (): void {
     bindFakeComposer(['vendor/package' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
-    $checker = new Checker(makeCommand());
-    expect($checker->myNewCheck())->toBe(CheckResult::FAIL);
+    $check = makeCheck(MyNewCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($check->getComments())->toContain('Missing script in composer.json...');
 });
 ```
 
 ### 4. Document in README.md
 
-Add check documentation to [README.md](README.md) under the appropriate category:
+Add check documentation to [README.md](README.md) under the appropriate category.
 
-```markdown
-- **`myNewCheck()`** - Brief description of what this validates
-```
-
-Categories include:
-- Testing & Quality Tools
-- IDE & Developer Tools
-- Laravel Features & Monitoring
-- Infrastructure & Dependencies
-- CI/CD & Deployment
-- Local Development
-- Build & Release
-- Security & Configuration
-
-Keep descriptions concise but clear about what is being validated.
-
-## Available Helper Methods in Checker
+## Available Helper Methods in AbstractCheck
 
 ### Composer Checks
 - `checkComposerPackages(string|array $packages): bool` - Check if composer packages are installed
@@ -121,8 +141,7 @@ Keep descriptions concise but clear about what is being validated.
 
 ### Comments
 - `addComment(string $comment): void` - Add error message shown to user
-- `resetComments(): void` - Clear comments (done automatically between checks)
-- `getComments(): array` - Get all comments (used by command)
+- `getComments(): array` - Get all comments
 
 ## Check Result Types
 

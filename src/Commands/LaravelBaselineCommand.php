@@ -3,7 +3,10 @@
 namespace Limenet\LaravelBaseline\Commands;
 
 use Illuminate\Console\Command;
-use Limenet\LaravelBaseline\Checks\Checker;
+use Limenet\LaravelBaseline\Checks\CheckInterface;
+use Limenet\LaravelBaseline\Checks\CheckRegistry;
+use Limenet\LaravelBaseline\Checks\CommentCollector;
+use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class LaravelBaselineCommand extends Command
 {
@@ -11,73 +14,15 @@ class LaravelBaselineCommand extends Command
 
     public $description = 'Checks the project against a highly opinionated set of coding standards.';
 
-    public function handle(Checker $checker): int
+    public function handle(): int
     {
-        $errorCount = 0;
+        $collector = new CommentCollector();
 
-        foreach ([
-            $checker->bumpsComposer(...),
-            $checker->callsBaseline(...),
-            $checker->callsSentryHook(...),
-            $checker->checkPhpunit(...),
-            $checker->ddevHasPcovPackage(...),
-            $checker->ddevMutagenIgnoresNodeModules(...),
-            $checker->doesNotUseIgnition(...),
-            $checker->doesNotUseSail(...),
-            $checker->hasClaudeSettingsWithLaravelSimplifier(...),
-            $checker->hasCompleteRectorConfiguration(...),
-            $checker->hasEncryptedEnvFile(...),
-            $checker->hasGuidelinesUpdateScript(...),
-            $checker->hasNpmScripts(...),
-            $checker->isCiLintComplete(...),
-            $checker->isLaravelVersionMaintained(...),
-            $checker->hasCiJobs(...),
-            $checker->phpstanLevelAtLeastEight(...),
-            $checker->phpVersionMatchesCi(...),
-            $checker->phpVersionMatchesDdev(...),
-            $checker->usesIdeHelpers(...),
-            $checker->usesLarastan(...),
-            $checker->usesLaravelBoost(...),
-            $checker->usesLaravelHorizon(...),
-            $checker->usesLaravelPennant(...),
-            $checker->usesLaravelPulse(...),
-            $checker->usesLaravelTelescope(...),
-            $checker->usesLimenetPintConfig(...),
-            $checker->usesPest(...),
-            $checker->usesPhpInsights(...),
-            $checker->usesPhpstanExtensions(...),
-            $checker->usesPredis(...),
-            $checker->usesRector(...),
-            $checker->usesReleaseIt(...),
-            $checker->usesSpatieBackup(...),
-            $checker->usesSpatieHealth(...),
-        ] as $check) {
-            $nameRaw = (new \ReflectionFunction($check))->getName();
-            $name = str($nameRaw)->ucsplit()->implode(' ');
-
-            if (in_array($nameRaw, config('baseline.excludes', []), true)) {
-                $this->line(sprintf('⚪ %s (excluded)', $name));
-
-                continue;
-            }
-
-            $checker->resetComments();
-            $result = $check();
-            $comments = $checker->getComments();
-
-            $errorCount += $result->isError() ? 1 : 0;
-
-            if ($result->isError() || $this->getOutput()->isVerbose()) {
-                $this->line(sprintf('%s %s', $result->icon(), $name));
-            }
-
-            if ($result->isError() || $this->getOutput()->isVeryVerbose()) {
-                foreach ($comments as $comment) {
-                    $this->comment($comment);
-                }
-            }
-
-        }
+        $errorCount = collect(CheckRegistry::createAll($collector))
+            ->reject(fn (CheckInterface $check): bool => $this->isExcluded($check))
+            ->map(fn (CheckInterface $check): CheckResult => $this->runCheck($check, $collector))
+            ->filter(fn (CheckResult $result): bool => $result->isError())
+            ->count();
 
         if ($errorCount !== 0) {
             $this->error("Baseline check failed with {$errorCount} error(s). Run with -v or -vv for more details.");
@@ -88,5 +33,35 @@ class LaravelBaselineCommand extends Command
         $this->info('Baseline check passed!');
 
         return Command::SUCCESS;
+    }
+
+    private function isExcluded(CheckInterface $check): bool
+    {
+        $name = $check::name();
+
+        if (in_array($name, config('baseline.excludes', []), true)) {
+            $this->line(sprintf('⚪ %s (excluded)', str($name)->ucsplit()->implode(' ')));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function runCheck(CheckInterface $check, CommentCollector $collector): CheckResult
+    {
+        $collector->reset();
+        $result = $check->check();
+        $displayName = str($check::name())->ucsplit()->implode(' ');
+
+        if ($result->isError() || $this->getOutput()->isVerbose()) {
+            $this->line(sprintf('%s %s', $result->icon(), $displayName));
+        }
+
+        if ($result->isError() || $this->getOutput()->isVeryVerbose()) {
+            collect($collector->all())->each(fn (string $comment) => $this->comment($comment));
+        }
+
+        return $result;
     }
 }
