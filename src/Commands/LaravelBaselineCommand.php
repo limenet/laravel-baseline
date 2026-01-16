@@ -24,6 +24,7 @@ class LaravelBaselineCommand extends Command
             $checker->ddevMutagenIgnoresNodeModules(...),
             $checker->doesNotUseIgnition(...),
             $checker->doesNotUseSail(...),
+            $checker->hasClaudeSettingsWithLaravelSimplifier(...),
             $checker->hasCompleteRectorConfiguration(...),
             $checker->hasEncryptedEnvFile(...),
             $checker->hasGuidelinesUpdateScript(...),

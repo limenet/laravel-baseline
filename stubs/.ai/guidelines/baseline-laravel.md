@@ -70,6 +70,7 @@ ddev artisan ide-helper:meta
 
 1. **During Development**: Write tests alongside features
 2. **Before Committing**: Run `ddev composer run ci-lint`, `npm run ci-lint`, and `ddev composer run test`
+3. **Review Changes**: Use the `laravel-simplifier` agent to review recent changes for simplification opportunities
 
 ## Best Practices
 

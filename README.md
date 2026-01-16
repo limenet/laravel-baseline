@@ -47,6 +47,7 @@ This package validates your Laravel installation against the following checks:
 - **`hasCompleteRectorConfiguration()`** - Validates comprehensive Rector configuration
 
 ### IDE & Developer Tools
+- **`hasClaudeSettingsWithLaravelSimplifier()`** - Validates Claude Code settings include Laravel Simplifier plugin
 - **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured
 - **`usesLaravelBoost()`** - Validates Laravel Boost AI development tool
 - **`usesLimenetPintConfig()`** - Validates custom Laravel Pint formatting standards
