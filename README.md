@@ -57,7 +57,17 @@ This package validates your Laravel installation against the following checks:
 - **`usesLaravelPulse()`** - Validates Laravel Pulse application monitoring
 - **`usesLaravelTelescope()`** - Validates Laravel Telescope request debugging
 - **`usesSpatieHealth()`** - Validates Spatie Health check monitoring
-- **`usesSpatieBackup()`** - Validates Spatie Backup database backups
+- **`usesSpatieBackup()`** - Validates Spatie Backup database backups with comprehensive config validation:
+  - `backup.name` must use `env('APP_NAME', '<non-empty-non-laravel-default>')`
+  - `monitor_backups[*].name` must match `backup.name` configuration
+  - `backup.destination.disks` must match `monitor_backups[*].disks`
+  - `backup.source.files.follow_links` must be `true`
+  - `backup.source.files.relative_path` must use `base_path()`
+  - `backup.source.databases` must include `config('database.default')`
+  - `notifications.mail.to` must end with `@inbound.postmarkapp.com`
+  - `notifications.mail.from.address` must use `config('mail.from.address')`
+  - `notifications.mail.from.name` must use `config('mail.from.name')`
+  - Cleanup settings: `keep_all_backups_for_days=30`, `keep_daily_backups_for_days=30`, `keep_weekly_backups_for_weeks=8`, `keep_monthly_backups_for_months=4`, `keep_yearly_backups_for_years=2`, `delete_oldest_backups_when_using_more_megabytes_than=null`
 
 ### Infrastructure & Dependencies
 - **`usesPredis()`** - Validates Predis Redis client is installed

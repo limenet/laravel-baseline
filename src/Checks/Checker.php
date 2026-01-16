@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks;
 
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Schedule;
+use Limenet\LaravelBaseline\Backup\BackupConfigValidator;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Rector\RectorVisitorArrayArgument;
 use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
@@ -254,10 +255,30 @@ class Checker
 
     public function usesSpatieBackup(): CheckResult
     {
-        return $this->checkPackageWithSchedule(
+        $scheduleResult = $this->checkPackageWithSchedule(
             'spatie/laravel-backup',
             ['backup:run', 'backup:clean'],
         );
+
+        // If package is not installed, return WARN (from checkPackageWithSchedule)
+        if ($scheduleResult === CheckResult::WARN) {
+            return CheckResult::WARN;
+        }
+
+        // If schedule checks failed, return FAIL
+        if ($scheduleResult === CheckResult::FAIL) {
+            return CheckResult::FAIL;
+        }
+
+        // Validate the backup configuration file
+        $validator = new BackupConfigValidator();
+        $errors = $validator->validate(base_path('config/backup.php'));
+
+        foreach ($errors as $error) {
+            $this->addComment($error);
+        }
+
+        return $errors === [] ? CheckResult::PASS : CheckResult::FAIL;
     }
 
     public function usesRector(): CheckResult
