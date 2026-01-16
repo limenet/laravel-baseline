@@ -65,27 +65,14 @@ it('usesIdeHelpers passes with package and post-update scripts', function (): vo
     expect($checker->usesIdeHelpers())->toBe(CheckResult::PASS);
 });
 
-it('bumpsComposer passes when composer bump is in post-update and post-require scripts', function (): void {
-    bindFakeComposer([]);
-    $composer = ['scripts' => [
-        'post-update-cmd' => ['composer bump'],
-        'post-require-cmd' => ['composer bump'],
-    ]];
-
-    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
-
-    $checker = new Checker(makeCommand());
-    expect($checker->bumpsComposer())->toBe(CheckResult::PASS);
-});
-
-it('bumpsComposer fails when composer bump is missing from post-require-cmd', function (): void {
+it('bumpsComposer passes when composer bump is in post-update scripts', function (): void {
     bindFakeComposer([]);
     $composer = ['scripts' => ['post-update-cmd' => ['composer bump']]];
 
     $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
     $checker = new Checker(makeCommand());
-    expect($checker->bumpsComposer())->toBe(CheckResult::FAIL);
+    expect($checker->bumpsComposer())->toBe(CheckResult::PASS);
 });
 
 it('usesLaravelHorizon fails when package is missing or post-deploy script is missing', function (): void {

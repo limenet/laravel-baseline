@@ -43,7 +43,6 @@ class Checker
     public function bumpsComposer(): CheckResult
     {
         return $this->hasPostUpdateScript('composer bump')
-            && $this->hasPostRequireScript('composer bump')
             ? CheckResult::PASS
             : CheckResult::FAIL;
     }
@@ -888,11 +887,6 @@ class Checker
     private function hasPostUpdateScript(string $match): bool
     {
         return $this->checkComposerScript('post-update-cmd', $match);
-    }
-
-    private function hasPostRequireScript(string $match): bool
-    {
-        return $this->checkComposerScript('post-require-cmd', $match);
     }
 
     /**
