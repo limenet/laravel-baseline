@@ -140,7 +140,7 @@ class BackupConfigValidator
 
         // Check backup.name uses env('APP_NAME', ...) or env('APP_URL', ...)
         if (!$backupName instanceof FuncCallInfo) {
-            $this->errors[] = 'Backup name must use env() function: Set backup.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')';
+            $this->errors[] = 'Backup name must use env() function in config/backup.php: Set backup.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')';
 
             return;
         }
@@ -149,7 +149,7 @@ class BackupConfigValidator
         $usedEnvVar = $backupName->getFirstArg();
 
         if (!$backupName->isCall('env') || !in_array($usedEnvVar, $allowedEnvVars, true)) {
-            $this->errors[] = 'Backup name must use APP_NAME or APP_URL environment variable: Set backup.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')';
+            $this->errors[] = 'Backup name must use APP_NAME or APP_URL environment variable in config/backup.php: Set backup.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')';
 
             return;
         }
@@ -157,13 +157,13 @@ class BackupConfigValidator
         $defaultValue = $backupName->getSecondArg();
 
         if (!is_string($defaultValue) || $defaultValue === '') {
-            $this->errors[] = 'Backup name env() must have a non-empty default value: Set backup.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')';
+            $this->errors[] = 'Backup name env() must have a non-empty default value in config/backup.php: Set backup.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')';
 
             return;
         }
 
         if (strtolower($defaultValue) === 'laravel') {
-            $this->errors[] = 'Backup name env() default must not be "laravel": Set backup.name to env(\'APP_NAME\', \'your-actual-app-name\') or env(\'APP_URL\', \'your-actual-app-url\')';
+            $this->errors[] = 'Backup name env() default must not be "laravel" in config/backup.php: Set backup.name to env(\'APP_NAME\', \'your-actual-app-name\') or env(\'APP_URL\', \'your-actual-app-url\')';
 
             return;
         }
@@ -185,20 +185,20 @@ class BackupConfigValidator
 
                     if (!$monitorName->isCall('env') || !in_array($monitorEnvVar, $allowedEnvVars, true)) {
                         $this->errors[] = sprintf(
-                            'Monitor backup name mismatch at index %s: monitor_backups.%s.name must use env(\'APP_NAME\', ...) or env(\'APP_URL\', ...)',
+                            'Monitor backup name mismatch at index %s in config/backup.php: monitor_backups.%s.name must use env(\'APP_NAME\', ...) or env(\'APP_URL\', ...)',
                             $index,
                             $index,
                         );
                     } elseif ($monitorEnvVar !== $usedEnvVar) {
                         $this->errors[] = sprintf(
-                            'Monitor backup name env var mismatch at index %s: monitor_backups.%s.name must use the same env variable as backup.name (%s)',
+                            'Monitor backup name env var mismatch at index %s in config/backup.php: monitor_backups.%s.name must use the same env variable as backup.name (%s)',
                             $index,
                             $index,
                             $usedEnvVar,
                         );
                     } elseif ($monitorName->getSecondArg() !== $defaultValue) {
                         $this->errors[] = sprintf(
-                            'Monitor backup name default mismatch at index %s: monitor_backups.%s.name default ("%s") must match backup.name default ("%s")',
+                            'Monitor backup name default mismatch at index %s in config/backup.php: monitor_backups.%s.name default ("%s") must match backup.name default ("%s")',
                             $index,
                             $index,
                             $monitorName->getSecondArg() ?? 'null',
@@ -207,7 +207,7 @@ class BackupConfigValidator
                     }
                 } elseif ($monitorName !== null) {
                     $this->errors[] = sprintf(
-                        'Monitor backup name must use env() at index %s: Set monitor_backups.%s.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')',
+                        'Monitor backup name must use env() at index %s in config/backup.php: Set monitor_backups.%s.name to env(\'APP_NAME\', \'your-app-name\') or env(\'APP_URL\', \'your-app-url\')',
                         $index,
                         $index,
                     );
@@ -244,7 +244,7 @@ class BackupConfigValidator
                 };
 
                 $this->errors[] = sprintf(
-                    'Backup cleanup setting incorrect: Set %s to %s (found: %s)',
+                    'Backup cleanup setting incorrect in config/backup.php: Set %s to %s (found: %s)',
                     $path,
                     $expectedStr,
                     $actualStr,
@@ -261,7 +261,7 @@ class BackupConfigValidator
         $backupDisks = $this->getValueAt('backup.destination.disks');
 
         if (!is_array($backupDisks)) {
-            $this->errors[] = 'Backup destination disks must be an array: Set backup.destination.disks to an array of disk names';
+            $this->errors[] = 'Backup destination disks must be an array in config/backup.php: Set backup.destination.disks to an array of disk names';
 
             return;
         }
@@ -281,7 +281,7 @@ class BackupConfigValidator
 
             if (!is_array($monitorDisks)) {
                 $this->errors[] = sprintf(
-                    'Monitor backup disks must be an array at index %s: Set monitor_backups.%s.disks to an array',
+                    'Monitor backup disks must be an array at index %s in config/backup.php: Set monitor_backups.%s.disks to an array',
                     $index,
                     $index,
                 );
@@ -297,7 +297,7 @@ class BackupConfigValidator
 
             if ($backupDisksSorted !== $monitorDisksSorted) {
                 $this->errors[] = sprintf(
-                    'Disk configuration mismatch at index %s: monitor_backups.%s.disks must match backup.destination.disks',
+                    'Disk configuration mismatch at index %s in config/backup.php: monitor_backups.%s.disks must match backup.destination.disks',
                     $index,
                     $index,
                 );
@@ -314,21 +314,21 @@ class BackupConfigValidator
         $followLinks = $this->getValueAt('backup.source.files.follow_links');
 
         if ($followLinks !== true) {
-            $this->errors[] = 'Backup source follow_links must be true: Set backup.source.files.follow_links to true';
+            $this->errors[] = 'Backup source follow_links must be true in config/backup.php: Set backup.source.files.follow_links to true';
         }
 
         // Check relative_path uses base_path()
         $relativePath = $this->getValueAt('backup.source.files.relative_path');
 
         if (!$relativePath instanceof FuncCallInfo || !$relativePath->isCall('base_path')) {
-            $this->errors[] = 'Backup relative_path must use base_path(): Set backup.source.files.relative_path to base_path()';
+            $this->errors[] = 'Backup relative_path must use base_path() in config/backup.php: Set backup.source.files.relative_path to base_path()';
         }
 
         // Check databases matches database.default from database.php
         $databases = $this->getValueAt('backup.source.databases');
 
         if (!is_array($databases)) {
-            $this->errors[] = 'Backup source databases must be an array: Set backup.source.databases to an array';
+            $this->errors[] = 'Backup source databases must be an array in config/backup.php: Set backup.source.databases to an array';
 
             return;
         }
@@ -445,23 +445,23 @@ class BackupConfigValidator
         $mailTo = $this->getValueAt('notifications.mail.to');
 
         if (!is_string($mailTo)) {
-            $this->errors[] = 'Backup notification mail.to must be a string: Set notifications.mail.to to an @inbound.postmarkapp.com address';
+            $this->errors[] = 'Backup notification mail.to must be a string in config/backup.php: Set notifications.mail.to to an @inbound.postmarkapp.com address';
         } elseif (!str_ends_with($mailTo, '@inbound.postmarkapp.com')) {
-            $this->errors[] = 'Backup notification mail.to must end with @inbound.postmarkapp.com: Update notifications.mail.to';
+            $this->errors[] = 'Backup notification mail.to must end with @inbound.postmarkapp.com in config/backup.php: Update notifications.mail.to';
         }
 
         // Check mail.from.address uses config('mail.from.address')
         $fromAddress = $this->getValueAt('notifications.mail.from.address');
 
         if (!$fromAddress instanceof FuncCallInfo || !$fromAddress->isCall('config', 'mail.from.address')) {
-            $this->errors[] = 'Backup notification mail.from.address must use config(\'mail.from.address\'): Set notifications.mail.from.address to config(\'mail.from.address\')';
+            $this->errors[] = 'Backup notification mail.from.address must use config(\'mail.from.address\') in config/backup.php: Set notifications.mail.from.address to config(\'mail.from.address\')';
         }
 
         // Check mail.from.name uses config('mail.from.name')
         $fromName = $this->getValueAt('notifications.mail.from.name');
 
         if (!$fromName instanceof FuncCallInfo || !$fromName->isCall('config', 'mail.from.name')) {
-            $this->errors[] = 'Backup notification mail.from.name must use config(\'mail.from.name\'): Set notifications.mail.from.name to config(\'mail.from.name\')';
+            $this->errors[] = 'Backup notification mail.from.name must use config(\'mail.from.name\') in config/backup.php: Set notifications.mail.from.name to config(\'mail.from.name\')';
         }
     }
 
