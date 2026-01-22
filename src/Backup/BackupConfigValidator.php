@@ -357,6 +357,83 @@ class BackupConfigValidator
                 $expectedValue,
             );
         }
+
+        // Validate dump configuration for each database connection
+        $this->validateDatabaseDumpConfig($databases);
+    }
+
+    /**
+     * Validate that each database connection has proper dump configuration.
+     *
+     * @param  array<int|string, mixed>  $databases
+     */
+    private function validateDatabaseDumpConfig(array $databases): void
+    {
+        $connections = $this->databaseConfig['connections'] ?? [];
+
+        if (!is_array($connections)) {
+            return;
+        }
+
+        foreach ($databases as $db) {
+            $connectionName = $this->resolveConnectionName($db);
+
+            if ($connectionName === null) {
+                continue;
+            }
+
+            $connection = $connections[$connectionName] ?? null;
+
+            if (!is_array($connection)) {
+                continue;
+            }
+
+            $dump = $connection['dump'] ?? null;
+
+            if (!is_array($dump)) {
+                $this->errors[] = sprintf(
+                    'Database dump configuration missing: Add \'dump\' key to connections.%s in config/database.php.',
+                    $connectionName,
+                );
+
+                continue;
+            }
+
+            if (!array_key_exists('useSingleTransaction', $dump) || $dump['useSingleTransaction'] !== true) {
+                $this->errors[] = sprintf(
+                    'Database dump useSingleTransaction must be true: Set connections.%s.dump.useSingleTransaction to true in config/database.php',
+                    $connectionName,
+                );
+            }
+
+            if (!array_key_exists('addExtraOption', $dump) || $dump['addExtraOption'] !== '--hex-blob') {
+                $this->errors[] = sprintf(
+                    'Database dump addExtraOption must be \'--hex-blob\': Set connections.%s.dump.addExtraOption to \'--hex-blob\' in config/database.php',
+                    $connectionName,
+                );
+            }
+        }
+    }
+
+    /**
+     * Resolve a database connection name from a value (string or FuncCallInfo).
+     */
+    private function resolveConnectionName(mixed $db): ?string
+    {
+        if (is_string($db)) {
+            return $db;
+        }
+
+        // For env() calls like env('DB_CONNECTION', 'mysql'), use the default value
+        if ($db instanceof FuncCallInfo && $db->isCall('env')) {
+            $defaultValue = $db->getSecondArg();
+
+            if (is_string($defaultValue)) {
+                return $defaultValue;
+            }
+        }
+
+        return null;
     }
 
     /**
