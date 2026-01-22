@@ -203,7 +203,12 @@ abstract class AbstractCheck implements CheckInterface
             return null;
         }
 
-        return simplexml_load_string(file_get_contents($xmlFile) ?: '');
+        $content = file_get_contents($xmlFile);
+        if ($content === false || $content === '') {
+            return false;
+        }
+
+        return simplexml_load_string($content);
     }
 
     protected function checkPhpunitEnvVar(string $name, string $expectedValue): bool
