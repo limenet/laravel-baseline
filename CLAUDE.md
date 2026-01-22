@@ -56,6 +56,7 @@ Key points:
 - Return one of: `CheckResult::PASS`, `CheckResult::FAIL`, or `CheckResult::WARN`
 - Use `$this->addComment($message)` to provide helpful error messages when a check fails
 - Error messages should be actionable and specific
+- Include the file path that needs to be changed when applicable (e.g., "Missing script in composer.json" or "Add to .env.example")
 
 ### 2. Register the Check in CheckRegistry
 
