@@ -17,11 +17,15 @@ class HasClaudeSettingsWithLaravelSimplifierCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
-        $settings = json_decode(
-            file_get_contents($settingsFile) ?: throw new \RuntimeException(),
-            true,
-            flags: JSON_THROW_ON_ERROR,
-        );
+        $content = file_get_contents($settingsFile);
+
+        if ($content === false || trim($content) === '') {
+            $this->addComment('Claude settings empty: Add content to .claude/settings.json');
+
+            return CheckResult::FAIL;
+        }
+
+        $settings = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
 
         $enabledPlugins = $settings['enabledPlugins'] ?? null;
 
