@@ -23,6 +23,7 @@ use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesIdeHelpersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLarastanCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelAdminerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelBoostCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelHorizonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelPennantCheck;
@@ -63,6 +64,7 @@ class CheckRegistry
         PhpVersionMatchesDdevCheck::class,
         UsesIdeHelpersCheck::class,
         UsesLarastanCheck::class,
+        UsesLaravelAdminerCheck::class,
         UsesLaravelBoostCheck::class,
         UsesLaravelHorizonCheck::class,
         UsesLaravelPennantCheck::class,
