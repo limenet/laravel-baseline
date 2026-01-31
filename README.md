@@ -63,7 +63,8 @@ This package validates your Laravel installation against the following checks:
 ### Infrastructure & Dependencies
 - **`usesPredis()`** - Validates Predis Redis client is installed
 - **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used
-- **`doesNotUseSail()`** - Validates Sail is NOT used (negative check)
+- **`doesNotUseSail()`** - Validates Sail is NOT used
+- **`doesNotUseHorizonWatcher()`** - Validates Spatie Horizon Watcher is NOT installed
 
 ### CI/CD & Deployment
 - **`hasCiJobs()`** - Validates GitLab CI pipeline jobs are properly configured
