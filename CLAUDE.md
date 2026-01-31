@@ -114,6 +114,16 @@ it('myNew provides helpful comment when script is missing', function (): void {
 
 Add check documentation to [README.md](README.md) under the appropriate category.
 
+### 5. Run the Full Test Suite
+
+Always run the full test suite after adding a new check:
+
+```bash
+composer test
+```
+
+Adding a new check to the registry can affect other tests (e.g., tests that count total checks or iterate over all registered checks). Do not rely solely on running tests for the new check.
+
 ## Available Helper Methods in AbstractCheck
 
 ### Composer Checks
