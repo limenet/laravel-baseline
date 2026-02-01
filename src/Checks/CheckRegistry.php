@@ -14,6 +14,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSimplifierCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCompleteRectorConfigurationCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasDailyLoggingCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasGuidelinesUpdateScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasNpmScriptsCheck;
@@ -56,6 +57,7 @@ class CheckRegistry
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSimplifierCheck::class,
         HasCompleteRectorConfigurationCheck::class,
+        HasDailyLoggingCheck::class,
         HasEncryptedEnvFileCheck::class,
         HasGuidelinesUpdateScriptCheck::class,
         HasNpmScriptsCheck::class,
