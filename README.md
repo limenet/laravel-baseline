@@ -84,7 +84,7 @@ This package validates your Laravel installation against the following checks:
 - **`hasNpmScripts()`** - Validates required npm build scripts
 
 ### Security & Configuration
-- **`hasDailyLogging()`** - Validates logging default channel is set to `daily`
+- **`hasDailyLogging()`** - Validates logging uses `daily` channel (directly or via `stack`)
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
 - **`hasGuidelinesUpdateScript()`** - Validates baseline guidelines update script
 - **`callsBaseline()`** - Validates self-validation runs after updates
