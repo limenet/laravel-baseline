@@ -50,9 +50,28 @@ class HasDailyLoggingCheck extends AbstractCheck
         return CheckResult::FAIL;
     }
 
+    /**
+     * @param  array<string|int, mixed>  $loggingConfig
+     */
     private function validateStackChannels(array $loggingConfig): CheckResult
     {
-        $stackChannels = $loggingConfig['channels']['stack']['channels'] ?? [];
+        $channels = $loggingConfig['channels'] ?? [];
+
+        if (!is_array($channels)) {
+            $this->addComment('Stack channel must include "daily": Update config/logging.php channels.stack.channels to include \'daily\'');
+
+            return CheckResult::FAIL;
+        }
+
+        $stack = $channels['stack'] ?? [];
+
+        if (!is_array($stack)) {
+            $this->addComment('Stack channel must include "daily": Update config/logging.php channels.stack.channels to include \'daily\'');
+
+            return CheckResult::FAIL;
+        }
+
+        $stackChannels = $stack['channels'] ?? [];
 
         if (is_array($stackChannels) && in_array('daily', $stackChannels, true)) {
             return CheckResult::PASS;
@@ -64,7 +83,7 @@ class HasDailyLoggingCheck extends AbstractCheck
     }
 
     /**
-     * @return array<string,mixed>|null
+     * @return array<string|int, mixed>|null
      */
     private function getLoggingConfig(): ?array
     {
@@ -90,7 +109,7 @@ class HasDailyLoggingCheck extends AbstractCheck
     /**
      * Parse the config file using PHP Parser.
      *
-     * @return array<string,mixed>|null
+     * @return array<string|int, mixed>|null
      */
     private function parseConfig(string $code): ?array
     {
