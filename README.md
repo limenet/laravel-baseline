@@ -65,6 +65,7 @@ This package validates your Laravel installation against the following checks:
 - **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used
 - **`doesNotUseSail()`** - Validates Sail is NOT used
 - **`doesNotUseHorizonWatcher()`** - Validates Spatie Horizon Watcher is NOT installed
+- **`doesNotUseGreaterThanOrEqualConstraints()`** - Validates no `>=` version constraints in composer.json (use `^` or `~` instead)
 
 ### CI/CD & Deployment
 - **`hasCiJobs()`** - Validates GitLab CI pipeline jobs are properly configured
