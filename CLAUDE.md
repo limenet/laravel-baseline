@@ -75,7 +75,19 @@ Keep the array alphabetically sorted for maintainability.
 
 ### 3. Write Comprehensive Tests
 
-Add tests to [tests/CheckerTest.php](tests/CheckerTest.php) covering:
+Create a new test file in `tests/Checks/` named `{YourCheckName}Test.php`:
+
+```
+tests/Checks/
+├── BumpsComposerCheckTest.php
+├── MyNewCheckTest.php          # Your new test file
+└── ...
+```
+
+**Test helpers available** (from `tests/Helpers.php`):
+- `makeCheck(CheckClass::class)` - Create a check instance
+- `makeCheckWithCollector(CheckClass::class)` - Returns `[$check, $collector]` tuple for comment verification
+- `bindFakeComposer(['package' => true/false])` - Mock composer package checks
 
 **Absence test:** Check fails when package/configuration is missing
 ```php
@@ -98,15 +110,15 @@ it('myNew passes when properly configured', function (): void {
 });
 ```
 
-**Testing comments:** If you need to verify error messages
+**Testing comments:** Use `makeCheckWithCollector()` to verify error messages
 ```php
 it('myNew provides helpful comment when script is missing', function (): void {
     bindFakeComposer(['vendor/package' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['scripts' => []])]);
 
-    $check = makeCheck(MyNewCheck::class);
+    [$check, $collector] = makeCheckWithCollector(MyNewCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($check->getComments())->toContain('Missing script in composer.json...');
+    expect($collector->all())->toContain('Missing script in composer.json...');
 });
 ```
 
