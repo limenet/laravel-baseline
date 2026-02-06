@@ -32,6 +32,18 @@ class UsesLaravelBoostCheck extends AbstractCheck
             flags: JSON_THROW_ON_ERROR,
         );
 
+        if ($this->composerPackageSatisfies('laravel/boost', '^2.0')) {
+            return $this->checkV2($boostConfig);
+        }
+
+        return $this->checkV1($boostConfig);
+    }
+
+    /**
+     * @param  array<string, mixed>  $boostConfig
+     */
+    protected function checkV1(array $boostConfig): CheckResult
+    {
         $requiredAgents = ['claude_code', 'phpstorm'];
         $requiredEditors = ['claude_code', 'phpstorm', 'vscode'];
 
@@ -50,6 +62,37 @@ class UsesLaravelBoostCheck extends AbstractCheck
         $missingEditors = array_diff($requiredEditors, $actualEditors);
         if (!empty($missingEditors)) {
             $this->addComment('Laravel Boost configuration incomplete: boost.json must include editors: '.implode(', ', $requiredEditors));
+
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
+    }
+
+    /**
+     * @param  array<string, mixed>  $boostConfig
+     */
+    protected function checkV2(array $boostConfig): CheckResult
+    {
+        $requiredAgents = ['claude_code', 'copilot', 'junie'];
+
+        $actualAgents = $boostConfig['agents'] ?? [];
+
+        $missingAgents = array_diff($requiredAgents, $actualAgents);
+        if (!empty($missingAgents)) {
+            $this->addComment('Laravel Boost v2 configuration incomplete: boost.json must include agents: '.implode(', ', $requiredAgents));
+
+            return CheckResult::FAIL;
+        }
+
+        if (($boostConfig['guidelines'] ?? null) !== true) {
+            $this->addComment('Laravel Boost v2 configuration incomplete: boost.json must set "guidelines": true');
+
+            return CheckResult::FAIL;
+        }
+
+        if (($boostConfig['mcp'] ?? null) !== true) {
+            $this->addComment('Laravel Boost v2 configuration incomplete: boost.json must set "mcp": true');
 
             return CheckResult::FAIL;
         }

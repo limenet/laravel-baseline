@@ -2,6 +2,8 @@
 
 namespace Limenet\LaravelBaseline\Checks;
 
+use Composer\Semver\Intervals;
+use Composer\Semver\VersionParser;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
@@ -99,6 +101,30 @@ abstract class AbstractCheck implements CheckInterface
             file_get_contents($composerFile) ?: throw new \RuntimeException(),
             true,
             flags: JSON_THROW_ON_ERROR,
+        );
+    }
+
+    protected function composerPackageSatisfies(string $package, string $constraint): bool
+    {
+        $composerJson = $this->getComposerJson();
+
+        if ($composerJson === null) {
+            return false;
+        }
+
+        $installedConstraint = $composerJson['require'][$package]
+            ?? $composerJson['require-dev'][$package]
+            ?? null;
+
+        if ($installedConstraint === null) {
+            return false;
+        }
+
+        $parser = new VersionParser();
+
+        return Intervals::haveIntersections(
+            $parser->parseConstraints($installedConstraint),
+            $parser->parseConstraints($constraint),
         );
     }
 
