@@ -52,14 +52,24 @@ class LaravelBaselineCommand extends Command
     {
         $collector->reset();
         $result = $check->check();
-        $displayName = str($check::name())->ucsplit()->implode(' ');
+        $checkName = $check::name();
+        $displayName = str($checkName)->ucsplit()->implode(' ');
 
-        if ($result->isError() || $this->getOutput()->isVerbose()) {
+        $hasOutput = $result->isError() || $this->getOutput()->isVerbose();
+        $hasComments = $result->isError() || $this->getOutput()->isVeryVerbose();
+
+        if ($hasOutput) {
+            $this->newLine();
             $this->line(sprintf('%s %s', $result->icon(), $displayName));
         }
 
-        if ($result->isError() || $this->getOutput()->isVeryVerbose()) {
+        if ($hasComments) {
             collect($collector->all())->each(fn (string $comment) => $this->comment($comment));
+        }
+
+        if ($hasOutput) {
+            $this->line(sprintf('  💡 To exclude, add <info>%s</info> to the <info>baseline.excludes</info> config', $checkName));
+            $this->newLine();
         }
 
         return $result;
