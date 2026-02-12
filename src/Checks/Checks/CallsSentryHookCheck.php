@@ -15,6 +15,10 @@ class CallsSentryHookCheck extends AbstractCheck
 
         $data = $this->getGitlabCiData();
 
+        if ($data === null) {
+            return CheckResult::FAIL;
+        }
+
         if (
             ($data['release']['extends'][0] ?? null) !== '.release'
             || !str_starts_with($data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? '', 'https://sentry.io/api/hooks/release/builtin/')

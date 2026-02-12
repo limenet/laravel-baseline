@@ -256,19 +256,27 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
-     * @return array<string,mixed>
+     * @return array<string,mixed>|null
      */
-    protected function getGitlabCiData(): array
+    protected function getGitlabCiData(): ?array
     {
         $ciFile = base_path('/.gitlab-ci.yml');
 
         if (!file_exists($ciFile)) {
             $this->addComment('GitLab CI configuration missing: Create .gitlab-ci.yml in project root');
 
-            throw new \RuntimeException();
+            return null;
         }
 
-        return Yaml::parseFile($ciFile);
+        $data = Yaml::parseFile($ciFile);
+
+        if (!is_array($data)) {
+            $this->addComment('GitLab CI configuration is empty or invalid: Check .gitlab-ci.yml');
+
+            return null;
+        }
+
+        return $data;
     }
 
     /**

@@ -10,6 +10,11 @@ class HasCiJobsCheck extends AbstractCheck
     public function check(): CheckResult
     {
         $data = $this->getGitlabCiData();
+
+        if ($data === null) {
+            return CheckResult::FAIL;
+        }
+
         $jobs = [
             'build' => '.build',
             'php' => '.lint_php',

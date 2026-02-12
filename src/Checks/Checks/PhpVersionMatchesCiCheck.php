@@ -15,9 +15,9 @@ class PhpVersionMatchesCiCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
-        try {
-            $ciData = $this->getGitlabCiData();
-        } catch (\RuntimeException) {
+        $ciData = $this->getGitlabCiData();
+
+        if ($ciData === null) {
             return CheckResult::FAIL;
         }
 

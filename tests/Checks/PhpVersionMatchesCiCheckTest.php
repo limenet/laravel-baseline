@@ -73,8 +73,20 @@ it('phpVersionMatchesCi fails when .gitlab-ci.yml is missing', function (): void
 
     $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
-    $check = makeCheck(PhpVersionMatchesCiCheck::class);
+    [$check, $collector] = makeCheckWithCollector(PhpVersionMatchesCiCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('GitLab CI configuration missing: Create .gitlab-ci.yml in project root');
+});
+
+it('phpVersionMatchesCi fails when .gitlab-ci.yml is empty', function (): void {
+    bindFakeComposer([]);
+    $composer = ['require' => ['php' => '^8.2']];
+
+    $this->withTempBasePath(['composer.json' => json_encode($composer), '.gitlab-ci.yml' => '']);
+
+    [$check, $collector] = makeCheckWithCollector(PhpVersionMatchesCiCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('GitLab CI configuration is empty or invalid: Check .gitlab-ci.yml');
 });
 
 it('phpVersionMatchesCi fails when PHP_VERSION is missing from .gitlab-ci.yml', function (): void {

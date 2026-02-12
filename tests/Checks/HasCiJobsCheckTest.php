@@ -65,3 +65,21 @@ it('hasCiJobs fails when required jobs are missing or not extending the correct 
     $check = makeCheck(HasCiJobsCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
 });
+
+it('hasCiJobs fails when .gitlab-ci.yml is missing', function (): void {
+    bindFakeComposer([]);
+    $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
+
+    [$check, $collector] = makeCheckWithCollector(HasCiJobsCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('GitLab CI configuration missing: Create .gitlab-ci.yml in project root');
+});
+
+it('hasCiJobs fails when .gitlab-ci.yml is empty', function (): void {
+    bindFakeComposer([]);
+    $this->withTempBasePath(['.gitlab-ci.yml' => '', 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    [$check, $collector] = makeCheckWithCollector(HasCiJobsCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('GitLab CI configuration is empty or invalid: Check .gitlab-ci.yml');
+});
