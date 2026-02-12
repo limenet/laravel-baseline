@@ -107,6 +107,21 @@ it('hasClaudeSettingsWithLaravelSimplifier passes with additional plugins', func
     expect($check->check())->toBe(CheckResult::PASS);
 });
 
+it('hasClaudeSettingsWithLaravelSimplifier fails when settings file is empty', function (): void {
+    bindFakeComposer([]);
+
+    $this->withTempBasePath([
+        '.claude/settings.json' => '',
+    ]);
+
+    $check = makeCheck(HasClaudeSettingsWithLaravelSimplifierCheck::class);
+    $result = $check->check();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $check->getComments();
+    expect($comments)->toContain('Claude settings empty: Add content to .claude/settings.json');
+});
+
 it('hasClaudeSettingsWithLaravelSimplifier fails when enabledPlugins is empty', function (): void {
     bindFakeComposer([]);
     $settings = [

@@ -65,6 +65,24 @@ final class EnforceWithoutRelationsOnJobsRuleTest extends RuleTestCase
             [__DIR__.'/Fixtures/User.php'],
             [],
         );
+
+        // Job with no constructor - should pass
+        $this->analyse(
+            [__DIR__.'/Fixtures/JobWithNoConstructor.php'],
+            [],
+        );
+
+        // Job with untyped param - should pass (no model type)
+        $this->analyse(
+            [__DIR__.'/Fixtures/JobWithUntypedParam.php'],
+            [],
+        );
+
+        // Job with non-model typed params - should pass
+        $this->analyse(
+            [__DIR__.'/Fixtures/JobWithNonModelParam.php'],
+            [],
+        );
     }
 
     protected function getRule(): Rule

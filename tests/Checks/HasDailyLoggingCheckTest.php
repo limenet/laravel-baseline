@@ -274,3 +274,91 @@ PHP;
     $check = makeCheck(HasDailyLoggingCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
 });
+
+it('hasDailyLogging fails when channels is not an array for stack default', function (): void {
+    bindFakeComposer([]);
+    $loggingConfig = <<<'PHP'
+<?php
+
+return [
+    'default' => 'stack',
+    'channels' => 'not-an-array',
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'config/logging.php' => $loggingConfig,
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(HasDailyLoggingCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Stack channel must include "daily": Update config/logging.php channels.stack.channels to include \'daily\'');
+});
+
+it('hasDailyLogging fails when stack channel is not an array', function (): void {
+    bindFakeComposer([]);
+    $loggingConfig = <<<'PHP'
+<?php
+
+return [
+    'default' => 'stack',
+    'channels' => [
+        'stack' => 'not-an-array',
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'config/logging.php' => $loggingConfig,
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(HasDailyLoggingCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Stack channel must include "daily": Update config/logging.php channels.stack.channels to include \'daily\'');
+});
+
+it('hasDailyLogging fails when channels is not an array for env stack fallback', function (): void {
+    bindFakeComposer([]);
+    $loggingConfig = <<<'PHP'
+<?php
+
+return [
+    'default' => env('LOG_CHANNEL', 'stack'),
+    'channels' => 'not-an-array',
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'config/logging.php' => $loggingConfig,
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(HasDailyLoggingCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Stack channel must include "daily": Update config/logging.php channels.stack.channels to include \'daily\'');
+});
+
+it('hasDailyLogging fails when stack channel is not an array for env stack fallback', function (): void {
+    bindFakeComposer([]);
+    $loggingConfig = <<<'PHP'
+<?php
+
+return [
+    'default' => env('LOG_CHANNEL', 'stack'),
+    'channels' => [
+        'stack' => 'not-an-array',
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['scripts' => []]),
+        'config/logging.php' => $loggingConfig,
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(HasDailyLoggingCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Stack channel must include "daily": Update config/logging.php channels.stack.channels to include \'daily\'');
+});

@@ -44,6 +44,12 @@ it('doesNotUseGreaterThanOrEqualConstraints fails when >= constraint exists in r
     expect(makeCheck(DoesNotUseGreaterThanOrEqualConstraintsCheck::class)->check())->toBe(CheckResult::FAIL);
 });
 
+it('doesNotUseGreaterThanOrEqualConstraints fails when composer.json is missing', function (): void {
+    $this->withTempBasePath([]);
+
+    expect(makeCheck(DoesNotUseGreaterThanOrEqualConstraintsCheck::class)->check())->toBe(CheckResult::FAIL);
+});
+
 it('doesNotUseGreaterThanOrEqualConstraints provides helpful comment listing violations', function (): void {
     $composer = [
         'require' => [

@@ -76,6 +76,18 @@ YML;
     expect($check->check())->toBe(CheckResult::FAIL);
 });
 
+it('ddevHasRedisAddon fails when manifest is empty or invalid', function (): void {
+    bindFakeComposer([]);
+
+    $this->withTempBasePath([
+        '.ddev/addon-metadata/redis/manifest.yaml' => '',
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(DdevHasRedisAddonCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('DDEV Redis addon manifest is empty or invalid: Check .ddev/addon-metadata/redis/manifest.yaml');
+});
+
 it('ddevHasRedisAddon provides comment when addon is missing', function (): void {
     bindFakeComposer([]);
 
