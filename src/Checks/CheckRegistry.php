@@ -7,6 +7,7 @@ use Limenet\LaravelBaseline\Checks\Checks\CallsBaselineCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsSentryHookCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DdevHasRedisAddonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
@@ -51,6 +52,7 @@ class CheckRegistry
         CallsSentryHookCheck::class,
         CheckPhpunitCheck::class,
         DdevHasPcovPackageCheck::class,
+        DdevHasRedisAddonCheck::class,
         DdevMutagenIgnoresNodeModulesCheck::class,
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,
