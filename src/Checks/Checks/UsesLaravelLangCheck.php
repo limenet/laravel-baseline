@@ -27,6 +27,12 @@ class UsesLaravelLangCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
+        if (!$this->hasPostUpdateScript('pint --dirty')) {
+            $this->addComment('Missing script in composer.json: Add "./vendor/bin/pint --dirty" to post-update-cmd section');
+
+            return CheckResult::FAIL;
+        }
+
         return CheckResult::PASS;
     }
 }
