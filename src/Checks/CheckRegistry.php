@@ -30,6 +30,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesLarastanCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelAdminerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelBoostCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelHorizonCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelLangCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelPennantCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelPulseCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelTelescopeCheck;
@@ -75,6 +76,7 @@ class CheckRegistry
         UsesLaravelAdminerCheck::class,
         UsesLaravelBoostCheck::class,
         UsesLaravelHorizonCheck::class,
+        UsesLaravelLangCheck::class,
         UsesLaravelPennantCheck::class,
         UsesLaravelPulseCheck::class,
         UsesLaravelTelescopeCheck::class,
