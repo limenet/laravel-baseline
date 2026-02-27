@@ -37,7 +37,7 @@ class HasCompleteRectorConfigurationCheck extends AbstractCheck
             new RectorVisitorHasCall($this->commentCollector, 'withPhpSets'),
             new RectorVisitorHasCall($this->commentCollector, 'withAttributesSets'),
             new RectorVisitorClassFetch($this->commentCollector, 'withSetProviders', ['LaravelSetProvider']),
-            new RectorVisitorArrayArgument($this->commentCollector, 'withRules', ['AddGenericReturnTypeToRelationsRector']),
+            new RectorVisitorArrayArgument($this->commentCollector, 'withRules', ['AddGenericReturnTypeToRelationsRector', 'RemoveMigrationDocBlocksRector']),
             // new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', ['FunctionLikeToFirstClassCallableRector']),
             new RectorVisitorPaths($this->commentCollector, 'withPaths', ['app', 'database', 'routes', 'tests']),
         ];

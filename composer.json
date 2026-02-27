@@ -39,6 +39,7 @@
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan-deprecation-rules": "^2.0.3",
         "phpstan/phpstan-phpunit": "^2.0.7",
+        "rector/rector": "^2.3",
         "spatie/temporary-directory": "^2.3"
     },
     "autoload": {
@@ -57,8 +58,8 @@
         "post-autoload-dump": "@composer run prepare",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
+        "test": "php -d memory_limit=512M vendor/bin/pest",
+        "test-coverage": "php -d memory_limit=512M vendor/bin/pest --coverage",
         "format": "vendor/bin/pint --parallel"
     },
     "config": {
