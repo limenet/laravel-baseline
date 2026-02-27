@@ -46,7 +46,7 @@ return new class extends Migration
 };
 CODE_SAMPLE
                 ),
-            ]
+            ],
         );
     }
 
