@@ -20,27 +20,27 @@
         "ext-simplexml": "*",
         "composer/semver": "^3.4",
         "illuminate/contracts": "^12.0",
-        "nikic/php-parser": "^5.6.2",
-        "phpstan/phpstan": "^2.1.8",
+        "nikic/php-parser": "^5.7",
+        "phpstan/phpstan": "^2.1.40",
         "rector/rector": "^2.3",
-        "spatie/laravel-package-tools": "^1.16",
-        "symfony/finder": "^7.0",
-        "symfony/yaml": "^7.0"
+        "spatie/laravel-package-tools": "^1.93",
+        "symfony/finder": "^7.4",
+        "symfony/yaml": "^7.4"
     },
     "require-dev": {
-        "larastan/larastan": "^3.8.0",
-        "laravel/framework": "^12.40.0",
-        "laravel/pint": "^1.25.1",
-        "mockery/mockery": "^1.6.10",
-        "nunomaduro/collision": "^8.8.3",
-        "orchestra/testbench": "^10.2.0",
-        "pestphp/pest": "^4.3.2",
+        "larastan/larastan": "^3.9.2",
+        "laravel/framework": "^12.53.0",
+        "laravel/pint": "^1.27.1",
+        "mockery/mockery": "^1.6.12",
+        "nunomaduro/collision": "^8.9.1",
+        "orchestra/testbench": "^10.9.0",
+        "pestphp/pest": "^4.4.1",
         "pestphp/pest-plugin-arch": "^4.0",
-        "pestphp/pest-plugin-laravel": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.1",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan-deprecation-rules": "^2.0.3",
-        "phpstan/phpstan-phpunit": "^2.0.7",
-        "spatie/temporary-directory": "^2.3"
+        "phpstan/phpstan-deprecation-rules": "^2.0.4",
+        "phpstan/phpstan-phpunit": "^2.0.16",
+        "spatie/temporary-directory": "^2.3.1"
     },
     "autoload": {
         "psr-4": {
