@@ -7,35 +7,35 @@ namespace Limenet\LaravelBaseline\Rector\Rules;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
-final class RemoveMigrationDocBlocksRector extends AbstractRemoveDocBlocksRector
+final class RemoveListenerDocBlocksRector extends AbstractRemoveDocBlocksRector
 {
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition(
-            'Remove default Laravel migration PHPDoc comments from up() and down() methods',
+            'Remove default Laravel event listener PHPDoc comments from __construct() and handle() methods',
             [
                 new CodeSample(
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class SendShipmentNotification
 {
     /**
-     * Run the migrations.
+     * Create the event listener.
      */
-    public function up(): void {}
+    public function __construct() {}
 
     /**
-     * Reverse the migrations.
+     * Handle the event.
      */
-    public function down(): void {}
-};
+    public function handle(OrderShipped $event): void {}
+}
 CODE_SAMPLE,
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class SendShipmentNotification
 {
-    public function up(): void {}
+    public function __construct() {}
 
-    public function down(): void {}
-};
+    public function handle(OrderShipped $event): void {}
+}
 CODE_SAMPLE
                 ),
             ],
@@ -45,8 +45,8 @@ CODE_SAMPLE
     protected function commentsToRemove(): array
     {
         return [
-            'Run the migrations.',
-            'Reverse the migrations.',
+            'Create the event listener.',
+            'Handle the event.',
         ];
     }
 }

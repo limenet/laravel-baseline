@@ -17,7 +17,7 @@ it('hasCompleteRectorConfiguration fails when file missing and passes when confi
 use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
-use Limenet\LaravelBaseline\Rector\Rules\RemoveMigrationDocBlocksRector;
+use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
 use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
 
 return static function (RectorConfig $config): void {
@@ -43,7 +43,9 @@ return static function (RectorConfig $config): void {
         ->withImportNames(importShortClasses: false)
         ->withRules([
             AddGenericReturnTypeToRelationsRector::class,
-            RemoveMigrationDocBlocksRector::class,
+        ])
+        ->withSets([
+            LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
         ])
         ->withSkip([
             FunctionLikeToFirstClassCallableRector::class,
@@ -208,8 +210,7 @@ PHP;
     $comments = $check->getComments();
     expect($comments)->toHaveCount(1);
     expect($comments[0])->toContain('withRules()')
-        ->toContain('AddGenericReturnTypeToRelationsRector')
-        ->toContain('RemoveMigrationDocBlocksRector');
+        ->toContain('AddGenericReturnTypeToRelationsRector');
 });
 
 it('hasCompleteRectorConfiguration provides specific error message for missing withPaths', function (): void {
@@ -219,7 +220,7 @@ it('hasCompleteRectorConfiguration provides specific error message for missing w
 use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
-use Limenet\LaravelBaseline\Rector\Rules\RemoveMigrationDocBlocksRector;
+use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
 use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
 
 return static function (RectorConfig $config): void {
@@ -240,7 +241,9 @@ return static function (RectorConfig $config): void {
         ->withSetProviders(LaravelSetProvider::class)
         ->withRules([
             AddGenericReturnTypeToRelationsRector::class,
-            RemoveMigrationDocBlocksRector::class,
+        ])
+        ->withSets([
+            LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
         ])
         ->withSkip([
             FunctionLikeToFirstClassCallableRector::class,
@@ -266,7 +269,7 @@ it('hasCompleteRectorConfiguration provides specific error message for incomplet
 use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
-use Limenet\LaravelBaseline\Rector\Rules\RemoveMigrationDocBlocksRector;
+use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
 use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
 
 return static function (RectorConfig $config): void {
@@ -291,7 +294,9 @@ return static function (RectorConfig $config): void {
         ->withSetProviders(LaravelSetProvider::class)
         ->withRules([
             AddGenericReturnTypeToRelationsRector::class,
-            RemoveMigrationDocBlocksRector::class,
+        ])
+        ->withSets([
+            LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
         ])
         ->withSkip([
             FunctionLikeToFirstClassCallableRector::class,

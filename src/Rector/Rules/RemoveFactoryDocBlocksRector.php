@@ -7,35 +7,28 @@ namespace Limenet\LaravelBaseline\Rector\Rules;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
-final class RemoveMigrationDocBlocksRector extends AbstractRemoveDocBlocksRector
+final class RemoveFactoryDocBlocksRector extends AbstractRemoveDocBlocksRector
 {
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition(
-            'Remove default Laravel migration PHPDoc comments from up() and down() methods',
+            'Remove default Laravel factory PHPDoc comments from definition() method',
             [
                 new CodeSample(
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class UserFactory extends Factory
 {
     /**
-     * Run the migrations.
+     * Define the model's default state.
      */
-    public function up(): void {}
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void {}
-};
+    public function definition(): array {}
+}
 CODE_SAMPLE,
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class UserFactory extends Factory
 {
-    public function up(): void {}
-
-    public function down(): void {}
-};
+    public function definition(): array {}
+}
 CODE_SAMPLE
                 ),
             ],
@@ -45,8 +38,7 @@ CODE_SAMPLE
     protected function commentsToRemove(): array
     {
         return [
-            'Run the migrations.',
-            'Reverse the migrations.',
+            "Define the model's default state.",
         ];
     }
 }

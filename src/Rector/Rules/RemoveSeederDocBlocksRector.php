@@ -7,35 +7,28 @@ namespace Limenet\LaravelBaseline\Rector\Rules;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
-final class RemoveMigrationDocBlocksRector extends AbstractRemoveDocBlocksRector
+final class RemoveSeederDocBlocksRector extends AbstractRemoveDocBlocksRector
 {
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition(
-            'Remove default Laravel migration PHPDoc comments from up() and down() methods',
+            'Remove default Laravel seeder PHPDoc comments from run() method',
             [
                 new CodeSample(
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class DatabaseSeeder extends Seeder
 {
     /**
-     * Run the migrations.
+     * Run the database seeds.
      */
-    public function up(): void {}
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void {}
-};
+    public function run(): void {}
+}
 CODE_SAMPLE,
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class DatabaseSeeder extends Seeder
 {
-    public function up(): void {}
-
-    public function down(): void {}
-};
+    public function run(): void {}
+}
 CODE_SAMPLE
                 ),
             ],
@@ -45,8 +38,7 @@ CODE_SAMPLE
     protected function commentsToRemove(): array
     {
         return [
-            'Run the migrations.',
-            'Reverse the migrations.',
+            'Run the database seeds.',
         ];
     }
 }

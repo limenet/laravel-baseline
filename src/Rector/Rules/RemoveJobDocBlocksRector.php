@@ -7,35 +7,35 @@ namespace Limenet\LaravelBaseline\Rector\Rules;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
-final class RemoveMigrationDocBlocksRector extends AbstractRemoveDocBlocksRector
+final class RemoveJobDocBlocksRector extends AbstractRemoveDocBlocksRector
 {
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition(
-            'Remove default Laravel migration PHPDoc comments from up() and down() methods',
+            'Remove default Laravel job PHPDoc comments from __construct() and handle() methods',
             [
                 new CodeSample(
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class ProcessPodcast implements ShouldQueue
 {
     /**
-     * Run the migrations.
+     * Create a new job instance.
      */
-    public function up(): void {}
+    public function __construct() {}
 
     /**
-     * Reverse the migrations.
+     * Execute the job.
      */
-    public function down(): void {}
-};
+    public function handle(): void {}
+}
 CODE_SAMPLE,
                     <<<'CODE_SAMPLE'
-return new class extends Migration
+class ProcessPodcast implements ShouldQueue
 {
-    public function up(): void {}
+    public function __construct() {}
 
-    public function down(): void {}
-};
+    public function handle(): void {}
+}
 CODE_SAMPLE
                 ),
             ],
@@ -45,8 +45,8 @@ CODE_SAMPLE
     protected function commentsToRemove(): array
     {
         return [
-            'Run the migrations.',
-            'Reverse the migrations.',
+            'Create a new job instance.',
+            'Execute the job.',
         ];
     }
 }
