@@ -15,7 +15,7 @@ use Limenet\LaravelBaseline\Rector\Rules\RemoveSeederDocBlocksRector;
 use Rector\Config\RectorConfig;
 
 return static function (RectorConfig $config): void {
-    $config->withRules([
+    $config->rules([
         RemoveFactoryDocBlocksRector::class,
         RemoveFormRequestDocBlocksRector::class,
         RemoveJobDocBlocksRector::class,
