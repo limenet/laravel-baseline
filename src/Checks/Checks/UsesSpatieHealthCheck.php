@@ -54,7 +54,7 @@ class UsesSpatieHealthCheck extends AbstractCheck
             return false;
         }
 
-        $content = file_get_contents($file);
+        $content = file_get_contents($file) ?: '';
         $required = [
             'Health::checks(',
             'CacheCheck',
@@ -85,7 +85,7 @@ class UsesSpatieHealthCheck extends AbstractCheck
             return false;
         }
 
-        return str_contains(file_get_contents($file), 's3_health');
+        return str_contains(file_get_contents($file) ?: '', 's3_health');
     }
 
     private function hasHealthResultStoreConfig(): bool
@@ -96,7 +96,7 @@ class UsesSpatieHealthCheck extends AbstractCheck
             return false;
         }
 
-        $content = file_get_contents($file);
+        $content = file_get_contents($file) ?: '';
 
         return str_contains($content, 'JsonFileHealthResultStore')
             && str_contains($content, 's3_health')
