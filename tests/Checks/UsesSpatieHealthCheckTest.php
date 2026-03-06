@@ -34,21 +34,21 @@ return ['result_stores' => [
 ]];
 PHP;
 
-it('usesSpatieHealth warns when packages are not installed', function () use ($validAppServiceProvider, $validFilesystems, $validHealth): void {
+it('usesSpatieHealth warns when packages are not installed', function (): void {
     bindFakeComposer(['spatie/laravel-health' => false, 'spatie/cpu-load-health-check' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect(makeCheck(UsesSpatieHealthCheck::class)->check())->toBe(CheckResult::WARN);
 });
 
-it('usesSpatieHealth warns when only spatie/laravel-health is installed', function () use ($validAppServiceProvider, $validFilesystems, $validHealth): void {
+it('usesSpatieHealth warns when only spatie/laravel-health is installed', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect(makeCheck(UsesSpatieHealthCheck::class)->check())->toBe(CheckResult::WARN);
 });
 
-it('usesSpatieHealth fails when health:check is not scheduled', function () use ($validAppServiceProvider, $validFilesystems, $validHealth): void {
+it('usesSpatieHealth fails when health:check is not scheduled', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
@@ -57,7 +57,7 @@ it('usesSpatieHealth fails when health:check is not scheduled', function () use 
     expect($collector->all())->toContain('Missing schedule: Add RunHealthChecksCommand::class scheduled everyThirtyMinutes() in your scheduler');
 });
 
-it('usesSpatieHealth fails when health:schedule-check-heartbeat is not scheduled', function () use ($validAppServiceProvider, $validFilesystems, $validHealth): void {
+it('usesSpatieHealth fails when health:schedule-check-heartbeat is not scheduled', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
@@ -68,7 +68,7 @@ it('usesSpatieHealth fails when health:schedule-check-heartbeat is not scheduled
     expect($collector->all())->toContain('Missing schedule: Add ScheduleCheckHeartbeatCommand::class scheduled everyMinute() in your scheduler');
 });
 
-it('usesSpatieHealth fails when health checks are not registered in AppServiceProvider', function () use ($validAppServiceProvider, $validFilesystems, $validHealth): void {
+it('usesSpatieHealth fails when health checks are not registered in AppServiceProvider', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
