@@ -510,6 +510,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 

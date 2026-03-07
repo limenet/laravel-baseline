@@ -63,6 +63,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -118,6 +119,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -228,6 +230,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -283,6 +286,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -338,6 +342,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -393,6 +398,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -449,6 +455,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -505,6 +512,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -553,6 +561,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -608,6 +617,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -663,6 +673,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -718,6 +729,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -773,6 +785,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -828,6 +841,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -883,6 +897,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -944,6 +959,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -1008,6 +1024,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -1072,6 +1089,7 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
+    'verify_backup' => true,
 ];
 PHP;
 
@@ -1093,6 +1111,172 @@ PHP;
 
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
+        'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
+    ]);
+
+    Schedule::command('backup:run');
+    Schedule::command('backup:clean');
+    $check = makeCheck(UsesSpatieBackupCheck::class);
+    expect($check->check())->toBe(CheckResult::PASS);
+});
+
+it('usesSpatieBackup fails when verify_backup is not true (v10)', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+    'verify_backup' => false,
+];
+PHP;
+
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp', 'require' => ['spatie/laravel-backup' => '^10.0']]),
+        'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
+    ]);
+
+    Schedule::command('backup:run');
+    Schedule::command('backup:clean');
+    $check = makeCheck(UsesSpatieBackupCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+});
+
+it('usesSpatieBackup fails when verify_backup is missing (v10)', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp', 'require' => ['spatie/laravel-backup' => '^10.0']]),
+        'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
+    ]);
+
+    Schedule::command('backup:run');
+    Schedule::command('backup:clean');
+    $check = makeCheck(UsesSpatieBackupCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+});
+
+it('usesSpatieBackup skips verify_backup check on v9', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp', 'require' => ['spatie/laravel-backup' => '^9.0']]),
         'config/backup.php' => $config,
         'config/database.php' => $databaseConfig,
     ]);

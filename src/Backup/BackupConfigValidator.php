@@ -27,7 +27,7 @@ class BackupConfigValidator
      *
      * @return list<string> List of validation errors
      */
-    public function validate(string $configPath, ?string $databaseConfigPath = null): array
+    public function validate(string $configPath, ?string $databaseConfigPath = null, bool $checkVerifyBackup = true): array
     {
         $this->errors = [];
 
@@ -62,6 +62,10 @@ class BackupConfigValidator
         $this->validateDiskConsistency();
         $this->validateSourceSettings();
         $this->validateNotificationMail();
+
+        if ($checkVerifyBackup) {
+            $this->validateVerifyBackup();
+        }
 
         return $this->errors;
     }
@@ -434,6 +438,18 @@ class BackupConfigValidator
         }
 
         return null;
+    }
+
+    /**
+     * Validate verify_backup setting.
+     */
+    private function validateVerifyBackup(): void
+    {
+        $verifyBackup = $this->getValueAt('verify_backup');
+
+        if ($verifyBackup !== true) {
+            $this->errors[] = 'Backup verification must be enabled in config/backup.php: Set verify_backup to true';
+        }
     }
 
     /**

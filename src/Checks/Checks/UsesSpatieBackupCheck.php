@@ -27,7 +27,10 @@ class UsesSpatieBackupCheck extends AbstractCheck
 
         // Validate the backup configuration file
         $validator = new BackupConfigValidator();
-        $errors = $validator->validate(base_path('config/backup.php'));
+        $errors = $validator->validate(
+            base_path('config/backup.php'),
+            checkVerifyBackup: $this->composerPackageSatisfies('spatie/laravel-backup', '^10'),
+        );
 
         foreach ($errors as $error) {
             $this->addComment($error);
