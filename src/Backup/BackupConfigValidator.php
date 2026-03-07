@@ -65,6 +65,8 @@ class BackupConfigValidator
 
         if ($checkVerifyBackup) {
             $this->validateVerifyBackup();
+            $this->validateDumpFileTimestampFormat();
+            $this->validateSourceExcludes();
         }
 
         return $this->errors;
@@ -449,6 +451,61 @@ class BackupConfigValidator
 
         if ($verifyBackup !== true) {
             $this->errors[] = 'Backup verification must be enabled in config/backup.php: Set backup.verify_backup to true';
+        }
+    }
+
+    /**
+     * Validate database_dump_file_timestamp_format setting.
+     */
+    private function validateDumpFileTimestampFormat(): void
+    {
+        $format = $this->getValueAt('backup.database_dump_file_timestamp_format');
+
+        if ($format !== 'Y-m-d-H-i-s') {
+            $this->errors[] = 'Backup dump file timestamp format must be set in config/backup.php: Set backup.database_dump_file_timestamp_format to \'Y-m-d-H-i-s\'';
+        }
+    }
+
+    /**
+     * Validate backup.source.exclude contains required paths.
+     */
+    private function validateSourceExcludes(): void
+    {
+        $excludes = $this->getValueAt('backup.source.files.exclude');
+
+        if (!is_array($excludes)) {
+            $this->errors[] = 'Backup source excludes must be an array in config/backup.php: Set backup.source.files.exclude to include base_path(\'.git\'), base_path(\'vendor\'), base_path(\'node_modules\'), storage_path(\'framework\')';
+
+            return;
+        }
+
+        $required = [
+            new FuncCallInfo('base_path', ['.git']),
+            new FuncCallInfo('base_path', ['vendor']),
+            new FuncCallInfo('base_path', ['node_modules']),
+            new FuncCallInfo('storage_path', ['framework']),
+        ];
+
+        foreach ($required as $requiredEntry) {
+            $found = false;
+
+            foreach ($excludes as $exclude) {
+                if ($exclude instanceof FuncCallInfo
+                    && $exclude->name === $requiredEntry->name
+                    && $exclude->args === $requiredEntry->args) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $args = implode(', ', array_map(fn ($a) => "'{$a}'", $requiredEntry->args));
+                $this->errors[] = sprintf(
+                    'Backup source excludes missing required entry in config/backup.php: Add %s(%s) to backup.source.files.exclude',
+                    $requiredEntry->name,
+                    $args,
+                );
+            }
         }
     }
 

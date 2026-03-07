@@ -39,11 +39,21 @@ return [
     'backup' => [
         'name' => 'my-app',
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -95,11 +105,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'laravel'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -151,11 +171,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -207,7 +237,16 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local', 's3']],
@@ -262,11 +301,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => false, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => false,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -318,11 +367,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => '/var/www'],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => '/var/www',
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -374,11 +433,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -431,11 +500,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -488,11 +567,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -537,11 +626,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -593,11 +692,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -649,11 +758,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -705,11 +824,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -761,11 +890,21 @@ return [
     'backup' => [
         'name' => env('APP_NAME', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -817,11 +956,21 @@ return [
     'backup' => [
         'name' => env('APP_NAME', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -873,11 +1022,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -935,11 +1094,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -1000,11 +1169,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -1065,11 +1244,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -1130,11 +1319,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => false,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -1186,7 +1385,16 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
@@ -1241,11 +1449,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [

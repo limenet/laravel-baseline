@@ -32,11 +32,21 @@ return [
     'backup' => [
         'name' => 'my-app',
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -77,11 +87,21 @@ return [
     'backup' => [
         'name' => env('DB_CONNECTION', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -122,11 +142,21 @@ return [
     'backup' => [
         'name' => env('APP_NAME'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -167,11 +197,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -214,11 +254,21 @@ return [
     'backup' => [
         'name' => env('APP_NAME', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -261,7 +311,16 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => 'local'],
@@ -307,11 +366,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -354,11 +423,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => 'mysql',
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -401,11 +480,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -448,11 +537,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -495,11 +594,21 @@ return [
     'backup' => [
         'name' => env('APP_URL', 'my-app'),
         'source' => [
-            'files' => ['follow_links' => true, 'relative_path' => base_path()],
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
         'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
     ],
     'notifications' => [
         'mail' => [
@@ -547,4 +656,226 @@ PHP;
     $errors = $validator->validate(base_path('config/backup.php'));
 
     expect($errors)->toBe([]);
+});
+
+it('validates database_dump_file_timestamp_format must be Y-m-d-H-i-s', function (): void {
+    $validator = new BackupConfigValidator();
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d',
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'config/backup.php' => $config,
+        'config/database.php' => '<?php return ["default" => env("DB_CONNECTION", "mysql")];',
+    ]);
+
+    $errors = $validator->validate(base_path('config/backup.php'));
+
+    expect($errors)->toContain('Backup dump file timestamp format must be set in config/backup.php: Set backup.database_dump_file_timestamp_format to \'Y-m-d-H-i-s\'');
+});
+
+it('validates database_dump_file_timestamp_format must be present', function (): void {
+    $validator = new BackupConfigValidator();
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'config/backup.php' => $config,
+        'config/database.php' => '<?php return ["default" => env("DB_CONNECTION", "mysql")];',
+    ]);
+
+    $errors = $validator->validate(base_path('config/backup.php'));
+
+    expect($errors)->toContain('Backup dump file timestamp format must be set in config/backup.php: Set backup.database_dump_file_timestamp_format to \'Y-m-d-H-i-s\'');
+});
+
+it('validates backup source excludes must be an array', function (): void {
+    $validator = new BackupConfigValidator();
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+            ],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'config/backup.php' => $config,
+        'config/database.php' => '<?php return ["default" => env("DB_CONNECTION", "mysql")];',
+    ]);
+
+    $errors = $validator->validate(base_path('config/backup.php'));
+
+    expect($errors)->toContain('Backup source excludes must be an array in config/backup.php: Set backup.source.files.exclude to include base_path(\'.git\'), base_path(\'vendor\'), base_path(\'node_modules\'), storage_path(\'framework\')');
+});
+
+it('validates backup source excludes must contain all required entries', function (): void {
+    $validator = new BackupConfigValidator();
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                ],
+            ],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $this->withTempBasePath([
+        'config/backup.php' => $config,
+        'config/database.php' => '<?php return ["default" => env("DB_CONNECTION", "mysql")];',
+    ]);
+
+    $errors = $validator->validate(base_path('config/backup.php'));
+
+    expect($errors)->toContain('Backup source excludes missing required entry in config/backup.php: Add base_path(\'node_modules\') to backup.source.files.exclude');
+    expect($errors)->toContain('Backup source excludes missing required entry in config/backup.php: Add storage_path(\'framework\') to backup.source.files.exclude');
+    expect(collect($errors)->filter(fn ($e) => str_contains($e, 'base_path(\'.git\')'))->isEmpty())->toBeTrue();
+    expect(collect($errors)->filter(fn ($e) => str_contains($e, 'base_path(\'vendor\')'))->isEmpty())->toBeTrue();
 });
