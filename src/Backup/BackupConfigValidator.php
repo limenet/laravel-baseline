@@ -445,10 +445,10 @@ class BackupConfigValidator
      */
     private function validateVerifyBackup(): void
     {
-        $verifyBackup = $this->getValueAt('verify_backup');
+        $verifyBackup = $this->getValueAt('backup.verify_backup');
 
         if ($verifyBackup !== true) {
-            $this->errors[] = 'Backup verification must be enabled in config/backup.php: Set verify_backup to true';
+            $this->errors[] = 'Backup verification must be enabled in config/backup.php: Set backup.verify_backup to true';
         }
     }
 

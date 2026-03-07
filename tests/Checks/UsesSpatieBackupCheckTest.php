@@ -43,6 +43,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -63,7 +64,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -99,6 +99,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -119,7 +120,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -155,6 +155,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -230,7 +231,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -266,6 +266,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -286,7 +287,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -322,6 +322,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -342,7 +343,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -378,6 +378,7 @@ return [
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -398,7 +399,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -435,6 +435,7 @@ return [
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -455,7 +456,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -492,6 +492,7 @@ return [
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -512,7 +513,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -541,6 +541,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -561,7 +562,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -597,6 +597,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -617,7 +618,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -653,6 +653,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -673,7 +674,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -709,6 +709,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -729,7 +730,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -765,6 +765,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -785,7 +786,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -821,6 +821,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -841,7 +842,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -877,6 +877,7 @@ return [
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -897,7 +898,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -939,6 +939,7 @@ return [
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -959,7 +960,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -1004,6 +1004,7 @@ return [
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -1024,7 +1025,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -1069,6 +1069,7 @@ return [
             'databases' => ['mysql'],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
@@ -1089,7 +1090,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => true,
 ];
 PHP;
 
@@ -1134,6 +1134,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => false,
     ],
     'notifications' => [
         'mail' => [
@@ -1154,7 +1155,6 @@ return [
             'delete_oldest_backups_when_using_more_megabytes_than' => null,
         ],
     ],
-    'verify_backup' => false,
 ];
 PHP;
 
@@ -1245,6 +1245,7 @@ return [
             'databases' => [env('DB_CONNECTION', 'mysql')],
         ],
         'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
     ],
     'notifications' => [
         'mail' => [
