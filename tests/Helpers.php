@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Console\OutputStyle;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer as IlluminateComposer;
 use Limenet\LaravelBaseline\Checks\CheckInterface;
@@ -14,7 +15,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
  */
 function makeCommand(): LaravelBaselineCommand
 {
-    /** @var \Illuminate\Contracts\Foundation\Application $app */
+    /** @var Application $app */
     $app = app();
 
     $command = new LaravelBaselineCommand();

@@ -7,5 +7,5 @@ it('facade returns correct accessor', function (): void {
     $method = $reflection->getMethod('getFacadeAccessor');
     $method->setAccessible(true);
 
-    expect($method->invoke(null))->toBe(\Limenet\LaravelBaseline\LaravelBaseline::class);
+    expect($method->invoke(null))->toBe(Limenet\LaravelBaseline\LaravelBaseline::class);
 });
