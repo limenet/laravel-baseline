@@ -4,12 +4,13 @@ use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieBackupCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-it('usesSpatieBackup warns when package not installed', function (): void {
+it('usesSpatieBackup fails when package not installed', function (): void {
     bindFakeComposer(['spatie/laravel-backup' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
-    $check = makeCheck(UsesSpatieBackupCheck::class);
-    expect($check->check())->toBe(CheckResult::WARN);
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieBackupCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Missing package: Install spatie/laravel-backup');
 });
 
 it('usesSpatieBackup fails when installed but not scheduled', function (): void {

@@ -34,18 +34,22 @@ return ['result_stores' => [
 ]];
 PHP;
 
-it('usesSpatieHealth warns when packages are not installed', function (): void {
+it('usesSpatieHealth fails when packages are not installed', function (): void {
     bindFakeComposer(['spatie/laravel-health' => false, 'spatie/cpu-load-health-check' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
-    expect(makeCheck(UsesSpatieHealthCheck::class)->check())->toBe(CheckResult::WARN);
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Missing packages: Install spatie/laravel-health and spatie/cpu-load-health-check');
 });
 
-it('usesSpatieHealth warns when only spatie/laravel-health is installed', function (): void {
+it('usesSpatieHealth fails when only spatie/laravel-health is installed', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
-    expect(makeCheck(UsesSpatieHealthCheck::class)->check())->toBe(CheckResult::WARN);
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Missing packages: Install spatie/laravel-health and spatie/cpu-load-health-check');
 });
 
 it('usesSpatieHealth fails when health:check is not scheduled', function (): void {

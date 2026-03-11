@@ -15,9 +15,11 @@ class UsesSpatieBackupCheck extends AbstractCheck
             ['backup:run', 'backup:clean'],
         );
 
-        // If package is not installed, return WARN (from checkPackageWithSchedule)
+        // If package is not installed, return FAIL (mandatory check)
         if ($scheduleResult === CheckResult::WARN) {
-            return CheckResult::WARN;
+            $this->addComment('Missing package: Install spatie/laravel-backup');
+
+            return CheckResult::FAIL;
         }
 
         // If schedule checks failed, return FAIL

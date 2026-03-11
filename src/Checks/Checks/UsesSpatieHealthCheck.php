@@ -10,7 +10,9 @@ class UsesSpatieHealthCheck extends AbstractCheck
     public function check(): CheckResult
     {
         if (!$this->checkComposerPackages(['spatie/laravel-health', 'spatie/cpu-load-health-check'])) {
-            return CheckResult::WARN;
+            $this->addComment('Missing packages: Install spatie/laravel-health and spatie/cpu-load-health-check');
+
+            return CheckResult::FAIL;
         }
 
         if (!$this->hasScheduleEntry('health:check')) {
