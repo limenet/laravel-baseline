@@ -18,6 +18,11 @@ final class RemoveMigrationDocBlocksRectorTest extends AbstractRectorTestCase
         $this->doTestFile(__DIR__.'/Fixtures/remove_migration_doc_blocks_no_change.php.inc');
     }
 
+    public function test_preserves_phpdoc_annotations(): void
+    {
+        $this->doTestFile(__DIR__.'/Fixtures/remove_migration_doc_blocks_preserves_phpdoc.php.inc');
+    }
+
     public function provideConfigFilePath(): string
     {
         return __DIR__.'/config/configured_rule.php';
