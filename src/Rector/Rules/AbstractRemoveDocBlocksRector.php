@@ -29,7 +29,7 @@ abstract class AbstractRemoveDocBlocksRector extends AbstractRector
         $newText = $originalText;
 
         foreach ($this->commentsToRemove() as $text) {
-            $newText = preg_replace('/^\s*\*[^\n]*' . preg_quote($text, '/') . '[^\n]*\n?/m', '', $newText) ?? $newText;
+            $newText = preg_replace('/^\s*\*[^\n]*'.preg_quote($text, '/').'[^\n]*\n?/m', '', $newText) ?? $newText;
         }
 
         if ($newText === $originalText) {
@@ -38,7 +38,7 @@ abstract class AbstractRemoveDocBlocksRector extends AbstractRector
 
         // If only the docblock shell remains (no meaningful content lines), remove it entirely
         // A meaningful line starts with * but is not the closing */
-        if (! preg_match('/^\s*\*(?!\/)(?!\s*$)/m', $newText)) {
+        if (!preg_match('/^\s*\*(?!\/)(?!\s*$)/m', $newText)) {
             $node->setAttribute('comments', []);
         } else {
             $node->setDocComment(new Doc($newText, $docComment->getStartLine(), $docComment->getStartFilePos(), $docComment->getStartTokenPos()));
