@@ -40,7 +40,7 @@ class UsesSpatieHealthCheck extends AbstractCheck
         }
 
         if (!$this->hasHealthResultStoreConfig()) {
-            $this->addComment('Missing health result store: Configure JsonFileHealthResultStore with disk s3_health and path health.json in config/health.php');
+            $this->addComment('Missing health result store: Configure JsonFileHealthResultStore with disk s3_health and path health.json in config/health.php, and set notifications.enabled to false');
 
             return CheckResult::FAIL;
         }
@@ -102,6 +102,7 @@ class UsesSpatieHealthCheck extends AbstractCheck
 
         return str_contains($content, 'JsonFileHealthResultStore')
             && str_contains($content, 's3_health')
-            && str_contains($content, 'health.json');
+            && str_contains($content, 'health.json')
+            && str_contains($content, "'enabled' => false");
     }
 }

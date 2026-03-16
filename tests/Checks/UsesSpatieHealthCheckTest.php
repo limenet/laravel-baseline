@@ -31,7 +31,7 @@ return ['result_stores' => [
         'disk' => 's3_health',
         'path' => 'health.json',
     ],
-]];
+], 'notifications' => ['enabled' => false]];
 PHP;
 
 it('usesSpatieHealth fails when packages are not installed', function (): void {
@@ -141,7 +141,35 @@ it('usesSpatieHealth fails when health.php result store is not configured', func
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Missing health result store: Configure JsonFileHealthResultStore with disk s3_health and path health.json in config/health.php');
+    expect($collector->all())->toContain('Missing health result store: Configure JsonFileHealthResultStore with disk s3_health and path health.json in config/health.php, and set notifications.enabled to false');
+});
+
+it('usesSpatieHealth fails when notifications are not disabled in health.php', function () use ($validAppServiceProvider, $validFilesystems): void {
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+
+    $healthWithoutNotificationsDisabled = <<<'PHP'
+<?php
+return ['result_stores' => [
+    \Spatie\Health\ResultStores\JsonFileHealthResultStore::class => [
+        'disk' => 's3_health',
+        'path' => 'health.json',
+    ],
+]];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $validAppServiceProvider,
+        'config/filesystems.php' => $validFilesystems,
+        'config/health.php' => $healthWithoutNotificationsDisabled,
+    ]);
+
+    Schedule::command('health:check');
+    Schedule::command('health:schedule-check-heartbeat');
+
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Missing health result store: Configure JsonFileHealthResultStore with disk s3_health and path health.json in config/health.php, and set notifications.enabled to false');
 });
 
 it('usesSpatieHealth passes when fully configured', function () use ($validAppServiceProvider, $validFilesystems, $validHealth): void {
