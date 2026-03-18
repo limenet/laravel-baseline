@@ -13,8 +13,14 @@ class UsesLaravelHorizonCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
-        return $this->hasPostDeployScript('horizon:terminate')
-            ? CheckResult::PASS
-            : CheckResult::FAIL;
+        if (!$this->hasPostDeployScript('horizon:terminate')) {
+            return CheckResult::FAIL;
+        }
+
+        if (!$this->hasScheduleEntry('horizon:snapshot')) {
+            return CheckResult::FAIL;
+        }
+
+        return CheckResult::PASS;
     }
 }
