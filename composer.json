@@ -19,7 +19,7 @@
         "php": "^8.3",
         "ext-simplexml": "*",
         "composer/semver": "^3.4",
-        "illuminate/contracts": "^12.0",
+        "illuminate/contracts": "^12.0|^13.0",
         "nikic/php-parser": "^5.7",
         "phpstan/phpstan": "^2.1.40",
         "rector/rector": "^2.3.8",
