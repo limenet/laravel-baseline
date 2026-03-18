@@ -13,6 +13,8 @@ Health::checks([
     DebugModeCheck::new(),
     EnvironmentCheck::new(),
     HorizonCheck::new(),
+    LaravelVersionCheck::new(),
+    PhpVersionCheck::new(),
     RedisCheck::new(),
     ScheduleCheck::new(),
     UsedDiskSpaceCheck::new(),
@@ -81,7 +83,7 @@ it('usesSpatieHealth fails when health checks are not registered in AppServicePr
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
+    expect($collector->all())->toContain('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, LaravelVersionCheck, PhpVersionCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
 });
 
 it('usesSpatieHealth fails when a required health check class is missing from AppServiceProvider', function () use ($validFilesystems, $validHealth): void {
@@ -98,6 +100,70 @@ PHP;
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'app/Providers/AppServiceProvider.php' => $incompleteProvider,
+        'config/filesystems.php' => $validFilesystems,
+        'config/health.php' => $validHealth,
+    ]);
+
+    Schedule::command('health:check');
+    Schedule::command('health:schedule-check-heartbeat');
+
+    expect(makeCheck(UsesSpatieHealthCheck::class)->check())->toBe(CheckResult::FAIL);
+});
+
+it('usesSpatieHealth fails when PhpVersionCheck is missing from AppServiceProvider', function () use ($validFilesystems, $validHealth): void {
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+
+    $providerWithoutPhpVersion = <<<'PHP'
+<?php
+Health::checks([
+    CacheCheck::new(),
+    CpuLoadCheck::new(),
+    DatabaseCheck::new(),
+    DebugModeCheck::new(),
+    EnvironmentCheck::new(),
+    HorizonCheck::new(),
+    LaravelVersionCheck::new(),
+    RedisCheck::new(),
+    ScheduleCheck::new(),
+    UsedDiskSpaceCheck::new(),
+]);
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $providerWithoutPhpVersion,
+        'config/filesystems.php' => $validFilesystems,
+        'config/health.php' => $validHealth,
+    ]);
+
+    Schedule::command('health:check');
+    Schedule::command('health:schedule-check-heartbeat');
+
+    expect(makeCheck(UsesSpatieHealthCheck::class)->check())->toBe(CheckResult::FAIL);
+});
+
+it('usesSpatieHealth fails when LaravelVersionCheck is missing from AppServiceProvider', function () use ($validFilesystems, $validHealth): void {
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+
+    $providerWithoutLaravelVersion = <<<'PHP'
+<?php
+Health::checks([
+    CacheCheck::new(),
+    CpuLoadCheck::new(),
+    DatabaseCheck::new(),
+    DebugModeCheck::new(),
+    EnvironmentCheck::new(),
+    HorizonCheck::new(),
+    PhpVersionCheck::new(),
+    RedisCheck::new(),
+    ScheduleCheck::new(),
+    UsedDiskSpaceCheck::new(),
+]);
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $providerWithoutLaravelVersion,
         'config/filesystems.php' => $validFilesystems,
         'config/health.php' => $validHealth,
     ]);

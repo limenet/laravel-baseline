@@ -4,6 +4,9 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Health\HealthChecksStaticCallVisitor;
+use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
 
 class UsesSpatieHealthCheck extends AbstractCheck
 {
@@ -28,7 +31,7 @@ class UsesSpatieHealthCheck extends AbstractCheck
         }
 
         if (!$this->hasHealthChecksRegistered()) {
-            $this->addComment('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
+            $this->addComment('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, LaravelVersionCheck, PhpVersionCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
 
             return CheckResult::FAIL;
         }
@@ -56,27 +59,33 @@ class UsesSpatieHealthCheck extends AbstractCheck
             return false;
         }
 
-        $content = file_get_contents($file) ?: '';
-        $required = [
-            'Health::checks(',
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+
+        try {
+            $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
+        } catch (\Throwable) {
+            return false;
+        }
+
+        $visitor = new HealthChecksStaticCallVisitor([
             'CacheCheck',
             'CpuLoadCheck',
             'DatabaseCheck',
             'DebugModeCheck',
             'EnvironmentCheck',
             'HorizonCheck',
+            'LaravelVersionCheck',
+            'PhpVersionCheck',
             'RedisCheck',
             'ScheduleCheck',
             'UsedDiskSpaceCheck',
-        ];
+        ]);
 
-        foreach ($required as $token) {
-            if (!str_contains($content, $token)) {
-                return false;
-            }
-        }
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
 
-        return true;
+        return $visitor->wasFound();
     }
 
     private function hasS3HealthDisk(): bool

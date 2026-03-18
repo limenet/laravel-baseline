@@ -28,18 +28,19 @@
         "symfony/yaml": "^7.4"
     },
     "require-dev": {
-        "larastan/larastan": "^3.9.2",
-        "laravel/framework": "^12.53.0",
-        "laravel/pint": "^1.27.1",
+        "larastan/larastan": "^3.9.3",
+        "laravel/framework": "^12.53.0|^13.0",
+        "laravel/pint": "^1.29.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.9.1",
-        "orchestra/testbench": "^10.9.0",
-        "pestphp/pest": "^4.4.1",
+        "orchestra/testbench": "^10.9.0|^11.0",
+        "pestphp/pest": "^4.4.2",
         "pestphp/pest-plugin-arch": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.1",
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan-deprecation-rules": "^2.0.4",
         "phpstan/phpstan-phpunit": "^2.0.16",
+        "spatie/laravel-health": "^1.39.1",
         "spatie/temporary-directory": "^2.3.1"
     },
     "autoload": {
@@ -56,6 +57,9 @@
     },
     "scripts": {
         "post-autoload-dump": "@composer run prepare",
+        "post-update-cmd": [
+            "@composer bump -D"
+        ],
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
         "test": "php -d memory_limit=512M vendor/bin/pest",

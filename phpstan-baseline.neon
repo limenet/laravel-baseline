@@ -29,3 +29,15 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: src/Rector/RectorVisitorNamedArgument.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between 803 and 803 will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Health/PhpVersionCheck.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Health/PhpVersionCheck.php
