@@ -2,9 +2,11 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
+use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Health\HealthChecksStaticCallVisitor;
+use Limenet\LaravelBaseline\Health\HealthConfigVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 
@@ -96,7 +98,22 @@ class UsesSpatieHealthCheck extends AbstractCheck
             return false;
         }
 
-        return str_contains(file_get_contents($file) ?: '', 's3_health');
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+
+        try {
+            $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
+        } catch (\Throwable) {
+            return false;
+        }
+
+        $visitor = new BackupConfigVisitor();
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        $config = $visitor->getConfig();
+
+        return isset($config['disks']['s3_health']);
     }
 
     private function hasHealthResultStoreConfig(): bool
@@ -107,11 +124,19 @@ class UsesSpatieHealthCheck extends AbstractCheck
             return false;
         }
 
-        $content = file_get_contents($file) ?: '';
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
 
-        return str_contains($content, 'JsonFileHealthResultStore')
-            && str_contains($content, 's3_health')
-            && str_contains($content, 'health.json')
-            && str_contains($content, "'enabled' => false");
+        try {
+            $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
+        } catch (\Throwable) {
+            return false;
+        }
+
+        $visitor = new HealthConfigVisitor();
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        return $visitor->hasValidResultStore() && $visitor->notificationsDisabled();
     }
 }
