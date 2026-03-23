@@ -21,6 +21,7 @@ use Limenet\LaravelBaseline\Checks\Checks\HasEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasGuidelinesUpdateScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasNpmScriptsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsCiLintCompleteCheck;
+use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
@@ -67,6 +68,7 @@ class CheckRegistry
         HasGuidelinesUpdateScriptCheck::class,
         HasNpmScriptsCheck::class,
         IsCiLintCompleteCheck::class,
+        IsInstalledAsRegularDependencyCheck::class,
         IsLaravelVersionMaintainedCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
         PhpVersionMatchesCiCheck::class,
