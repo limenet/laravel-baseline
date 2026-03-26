@@ -64,17 +64,32 @@ class HealthChecksStaticCallVisitor extends NodeVisitorAbstract
                 continue;
             }
 
-            // CacheCheck::new() is a StaticCall with name 'new'
-            if (
-                $item->value instanceof Node\Expr\StaticCall
-                && $item->value->class instanceof Node\Name
-                && $item->value->name instanceof Node\Identifier
-                && $item->value->name->toString() === 'new'
-            ) {
-                $classNames[] = $item->value->class->getLast();
+            $className = $this->extractClassNameFromExpr($item->value);
+            if ($className !== null) {
+                $classNames[] = $className;
             }
         }
 
         return $classNames;
+    }
+
+    private function extractClassNameFromExpr(Node\Expr $expr): ?string
+    {
+        // CacheCheck::new() is a StaticCall with name 'new'
+        if (
+            $expr instanceof Node\Expr\StaticCall
+            && $expr->class instanceof Node\Name
+            && $expr->name instanceof Node\Identifier
+            && $expr->name->toString() === 'new'
+        ) {
+            return $expr->class->getLast();
+        }
+
+        // CpuLoadCheck::new()->failWhen...() — walk up the method call chain
+        if ($expr instanceof Node\Expr\MethodCall) {
+            return $this->extractClassNameFromExpr($expr->var);
+        }
+
+        return null;
     }
 }
