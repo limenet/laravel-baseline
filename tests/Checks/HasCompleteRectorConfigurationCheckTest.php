@@ -18,7 +18,7 @@ use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
 use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
-use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
+use RectorLaravel\Rector\Class_\TablePropertyToTableAttributeRector;
 
 return static function (RectorConfig $config): void {
     $config
@@ -48,7 +48,7 @@ return static function (RectorConfig $config): void {
             LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
         ])
         ->withSkip([
-            FunctionLikeToFirstClassCallableRector::class,
+            TablePropertyToTableAttributeRector::class,
         ]);
 
     $config->withSetProviders(LaravelSetProvider::class);
@@ -221,7 +221,7 @@ use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
 use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
-use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
+use RectorLaravel\Rector\Class_\TablePropertyToTableAttributeRector;
 
 return static function (RectorConfig $config): void {
     $config
@@ -246,7 +246,7 @@ return static function (RectorConfig $config): void {
             LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
         ])
         ->withSkip([
-            FunctionLikeToFirstClassCallableRector::class,
+            TablePropertyToTableAttributeRector::class,
         ]);
 };
 PHP;
@@ -270,7 +270,7 @@ use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
 use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
-use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
+use RectorLaravel\Rector\Class_\TablePropertyToTableAttributeRector;
 
 return static function (RectorConfig $config): void {
     $config
@@ -299,7 +299,7 @@ return static function (RectorConfig $config): void {
             LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
         ])
         ->withSkip([
-            FunctionLikeToFirstClassCallableRector::class,
+            TablePropertyToTableAttributeRector::class,
         ]);
 };
 PHP;
