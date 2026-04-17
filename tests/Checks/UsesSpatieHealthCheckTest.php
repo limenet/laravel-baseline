@@ -238,6 +238,41 @@ PHP;
     expect($collector->all())->toContain('Missing health result store: Configure JsonFileHealthResultStore with disk s3_health and path health.json in config/health.php, and set notifications.enabled to false');
 });
 
+it('usesSpatieHealth passes when EnvironmentCheck uses a ternary expression', function () use ($validFilesystems, $validHealth): void {
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+
+    $providerWithTernaryEnvironmentCheck = <<<'PHP'
+<?php
+Health::checks([
+    CacheCheck::new(),
+    CpuLoadCheck::new(),
+    DatabaseCheck::new(),
+    DebugModeCheck::new(),
+    $this->app->environment('staging')
+        ? EnvironmentCheck::new()->expectEnvironment('staging')
+        : EnvironmentCheck::new(),
+    HorizonCheck::new(),
+    LaravelVersionCheck::new(),
+    PhpVersionCheck::new(),
+    RedisCheck::new(),
+    ScheduleCheck::new(),
+    UsedDiskSpaceCheck::new(),
+]);
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $providerWithTernaryEnvironmentCheck,
+        'config/filesystems.php' => $validFilesystems,
+        'config/health.php' => $validHealth,
+    ]);
+
+    Schedule::command('health:check');
+    Schedule::command('health:schedule-check-heartbeat');
+
+    expect(makeCheck(UsesSpatieHealthCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
 it('usesSpatieHealth passes when CpuLoadCheck has chained method calls', function () use ($validFilesystems, $validHealth): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
 

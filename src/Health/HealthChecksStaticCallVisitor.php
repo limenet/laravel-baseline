@@ -90,6 +90,11 @@ class HealthChecksStaticCallVisitor extends NodeVisitorAbstract
             return $this->extractClassNameFromExpr($expr->var);
         }
 
+        // $cond ? EnvironmentCheck::new()->... : EnvironmentCheck::new() — use either branch
+        if ($expr instanceof Node\Expr\Ternary) {
+            return $this->extractClassNameFromExpr($expr->if ?? $expr->else) ?? $this->extractClassNameFromExpr($expr->else);
+        }
+
         return null;
     }
 }
