@@ -3,7 +3,6 @@
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
-use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Rector\RectorVisitorArrayArgument;
 use Limenet\LaravelBaseline\Rector\RectorVisitorClassFetch;
