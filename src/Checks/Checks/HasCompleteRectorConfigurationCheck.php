@@ -38,9 +38,12 @@ class HasCompleteRectorConfigurationCheck extends AbstractCheck
             new RectorVisitorClassFetch($this->commentCollector, 'withSetProviders', ['LaravelSetProvider']),
             new RectorVisitorArrayArgument($this->commentCollector, 'withRules', ['AddGenericReturnTypeToRelationsRector']),
             new RectorVisitorArrayArgument($this->commentCollector, 'withSets', ['LaravelBaselineSetList']),
-            new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', ['TablePropertyToTableAttributeRector']),
             new RectorVisitorPaths($this->commentCollector, 'withPaths', ['app', 'database', 'routes', 'tests']),
         ];
+
+        if ($this->composerPackageSatisfies('laravel/framework', '^13')) {
+            $visitors[] = new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', ['TablePropertyToTableAttributeRector']);
+        }
 
         foreach ($visitors as $visitor) {
             $traverser->addVisitor($visitor);

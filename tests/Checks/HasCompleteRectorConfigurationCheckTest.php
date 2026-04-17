@@ -3,15 +3,61 @@
 use Limenet\LaravelBaseline\Checks\Checks\HasCompleteRectorConfigurationCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-it('hasCompleteRectorConfiguration fails when file missing and passes when configuration is complete', function (): void {
+it('hasCompleteRectorConfiguration fails when file missing', function (): void {
     bindFakeComposer([]);
-    // Missing file -> FAIL
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
-    $check = makeCheck(HasCompleteRectorConfigurationCheck::class);
-    expect($check->check())->toBe(CheckResult::FAIL);
+    expect(makeCheck(HasCompleteRectorConfigurationCheck::class)->check())->toBe(CheckResult::FAIL);
+});
 
-    // Complete config -> PASS
+it('hasCompleteRectorConfiguration passes when configuration is complete on Laravel 12', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+use RectorLaravel\Set\LaravelSetProvider;
+use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
+use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
+
+return static function (RectorConfig $config): void {
+    $config
+        ->withPaths([
+            __DIR__.'/app',
+            __DIR__.'/database',
+            __DIR__.'/routes',
+            __DIR__.'/tests',
+        ])
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            codingStyle: true,
+            typeDeclarations: true,
+            privatization: true,
+            instanceOf: true,
+            earlyReturn: true,
+        )
+        ->withPhpSets()
+        ->withAttributesSets()
+        ->withImportNames(importShortClasses: false)
+        ->withRules([
+            AddGenericReturnTypeToRelationsRector::class,
+        ])
+        ->withSets([
+            LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
+        ]);
+
+    $config->withSetProviders(LaravelSetProvider::class);
+};
+PHP;
+    $composer = ['name' => 'tmp', 'require' => ['laravel/framework' => '^12.0']];
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode($composer)]);
+
+    expect(makeCheck(HasCompleteRectorConfigurationCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
+it('hasCompleteRectorConfiguration passes when configuration is complete on Laravel 13', function (): void {
+    bindFakeComposer([]);
     $rector = <<<'PHP'
 <?php
 use Rector\Config\RectorConfig;
@@ -54,10 +100,58 @@ return static function (RectorConfig $config): void {
     $config->withSetProviders(LaravelSetProvider::class);
 };
 PHP;
-    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+    $composer = ['name' => 'tmp', 'require' => ['laravel/framework' => '^13.0']];
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode($composer)]);
+
+    expect(makeCheck(HasCompleteRectorConfigurationCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
+it('hasCompleteRectorConfiguration fails without withSkip on Laravel 13', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+use RectorLaravel\Set\LaravelSetProvider;
+use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
+use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
+
+return static function (RectorConfig $config): void {
+    $config
+        ->withPaths([
+            __DIR__.'/app',
+            __DIR__.'/database',
+            __DIR__.'/routes',
+            __DIR__.'/tests',
+        ])
+        ->withComposerBased(phpunit: true, symfony: true, laravel: true)
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            codingStyle: true,
+            typeDeclarations: true,
+            privatization: true,
+            instanceOf: true,
+            earlyReturn: true,
+        )
+        ->withPhpSets()
+        ->withAttributesSets()
+        ->withImportNames(importShortClasses: false)
+        ->withRules([
+            AddGenericReturnTypeToRelationsRector::class,
+        ])
+        ->withSets([
+            LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS,
+        ]);
+
+    $config->withSetProviders(LaravelSetProvider::class);
+};
+PHP;
+    $composer = ['name' => 'tmp', 'require' => ['laravel/framework' => '^13.0']];
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode($composer)]);
 
     $check = makeCheck(HasCompleteRectorConfigurationCheck::class);
-    expect($check->check())->toBe(CheckResult::PASS);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($check->getComments()[0])->toContain('withSkip()')->toContain('TablePropertyToTableAttributeRector');
 });
 
 it('hasCompleteRectorConfiguration provides specific error message for missing withComposerBased arguments', function (): void {
