@@ -49,6 +49,7 @@ This package validates your Laravel installation against the following checks:
 ### IDE & Developer Tools
 - **`hasClaudeSettingsWithLaravelSimplifier()`** - Validates Claude Code settings include Laravel Simplifier plugin
 - **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured
+- **`usesLaravelAdminer()`** - Warns if Laravel Adminer database UI is missing (optional), validates TFA confirmation and configuration when installed
 - **`usesLaravelBoost()`** - Validates Laravel Boost AI development tool
 - **`usesLimenetPintConfig()`** - Validates custom Laravel Pint formatting standards
 
@@ -78,6 +79,7 @@ This package validates your Laravel installation against the following checks:
 ### Local Development
 - **`phpVersionMatchesDdev()`** - Validates PHP version consistency with DDEV
 - **`ddevHasPcovPackage()`** - Validates DDEV coverage configuration
+- **`ddevHasRedisAddon()`** - Validates DDEV Redis addon is installed and at minimum version 2.2.0
 - **`ddevMutagenIgnoresNodeModules()`** - Validates DDEV Mutagen sync configuration
 
 ### Build & Release
@@ -90,6 +92,8 @@ This package validates your Laravel installation against the following checks:
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
 - **`hasGuidelinesUpdateScript()`** - Validates baseline guidelines update script
 - **`callsBaseline()`** - Validates self-validation runs after updates
+- **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`)
+- **`usesLaravelLang()`** - Validates `laravel-lang/lang` dev dependency is installed with `lang:update` and pint in post-update scripts
 
 ## Testing
 

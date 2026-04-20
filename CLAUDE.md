@@ -122,9 +122,9 @@ it('myNew provides helpful comment when script is missing', function (): void {
 });
 ```
 
-### 4. Document in README.md
+### 4. Document in README.md (required — enforced by tests)
 
-Add check documentation to [README.md](README.md) under the appropriate category.
+Add check documentation to [README.md](README.md) under the appropriate category. The entry must use the exact `name()` of the check (e.g., `**\`usesPest()\`**`). The test in `tests/ReadmeChecksTest.php` enforces that every registered check is documented and will fail if the README is missing any. Forgetting this step will break the test suite.
 
 ### 5. Run the Full Test Suite
 
@@ -135,6 +135,8 @@ composer test
 ```
 
 Adding a new check to the registry can affect other tests (e.g., tests that count total checks or iterate over all registered checks). Do not rely solely on running tests for the new check.
+
+When **renaming** a check class, the `name()` return value changes automatically (it is derived from the class name). Update the README.md entry to match — the `ReadmeChecksTest` will catch any mismatch.
 
 ## Available Helper Methods in AbstractCheck
 
