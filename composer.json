@@ -43,6 +43,9 @@
         "spatie/laravel-health": "^1.39.1",
         "spatie/temporary-directory": "^2.3.1"
     },
+    "conflict": {
+        "laravel/boost": "^1.0"
+    },
     "autoload": {
         "psr-4": {
             "Limenet\\LaravelBaseline\\": "src/",
