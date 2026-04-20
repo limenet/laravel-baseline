@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasCoreChecksCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
@@ -54,7 +53,7 @@ PHP;
     expect(makeCheck(UsesSpatieHealthHasCoreChecksCheck::class)->check())->toBe(CheckResult::FAIL);
 });
 
-it('usesSpatieHealthHasCoreChecks passes when EnvironmentCheck uses a ternary expression', function () use ($validAppServiceProvider): void {
+it('usesSpatieHealthHasCoreChecks passes when EnvironmentCheck uses a ternary expression', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
 
     $providerWithTernaryEnvironmentCheck = <<<'PHP'
@@ -82,7 +81,7 @@ PHP;
     expect(makeCheck(UsesSpatieHealthHasCoreChecksCheck::class)->check())->toBe(CheckResult::PASS);
 });
 
-it('usesSpatieHealthHasCoreChecks passes when CpuLoadCheck has chained method calls', function () use ($validAppServiceProvider): void {
+it('usesSpatieHealthHasCoreChecks passes when CpuLoadCheck has chained method calls', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
 
     $providerWithChainedCpuLoad = <<<'PHP'

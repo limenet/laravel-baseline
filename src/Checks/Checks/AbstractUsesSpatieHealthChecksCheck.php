@@ -10,16 +10,6 @@ use PhpParser\ParserFactory;
 
 abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractCheck
 {
-    /** @return list<string> Short class names required in Health::checks([...]) */
-    abstract protected function requiredHealthCheckClasses(): array;
-
-    protected function missingChecksComment(): string
-    {
-        $classes = implode(', ', $this->requiredHealthCheckClasses());
-
-        return "Health checks not registered: Add Health::checks([{$classes}]) in AppServiceProvider";
-    }
-
     public function check(): CheckResult
     {
         if (!$this->checkComposerPackages($this->requiredComposerPackages())) {
@@ -54,6 +44,16 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractCheck
         }
 
         return CheckResult::PASS;
+    }
+
+    /** @return list<string> Short class names required in Health::checks([...]) */
+    abstract protected function requiredHealthCheckClasses(): array;
+
+    protected function missingChecksComment(): string
+    {
+        $classes = implode(', ', $this->requiredHealthCheckClasses());
+
+        return "Health checks not registered: Add Health::checks([{$classes}]) in AppServiceProvider";
     }
 
     /** @return list<string> */
