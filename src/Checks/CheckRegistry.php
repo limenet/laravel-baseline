@@ -26,6 +26,7 @@ use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
+use Limenet\LaravelBaseline\Checks\Checks\SpatieHealthReleaseAgeCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesIdeHelpersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLarastanCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelAdminerCheck;
@@ -42,7 +43,6 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReleaseItCheck;
-use Limenet\LaravelBaseline\Checks\Checks\SpatieHealthReleaseAgeCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieBackupCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthCheck;
 
