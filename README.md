@@ -58,7 +58,10 @@ This package validates your Laravel installation against the following checks:
 - **`usesLaravelPennant()`** - Warns if Laravel Pennant feature flags are missing (optional)
 - **`usesLaravelPulse()`** - Validates Laravel Pulse application monitoring
 - **`usesLaravelTelescope()`** - Validates Laravel Telescope request debugging
-- **`usesSpatieHealth()`** - Validates Spatie Health check monitoring
+- **`usesSpatieHealthSetup()`** - Validates Spatie Health packages, schedules, s3_health disk, and result store configuration
+- **`usesSpatieHealthHasCoreChecks()`** - Validates core health checks (CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck) are registered
+- **`usesSpatieHealthHasLaravelVersionCheck()`** - Validates LaravelVersionCheck is registered in Health::checks()
+- **`usesSpatieHealthHasPhpVersionCheck()`** - Validates PhpVersionCheck is registered in Health::checks()
 - **`releaseAge()`** - Validates the release is not too old (warns if > 6 weeks, fails if > 3 months, based on `composer.json` modification time)
 - **`usesSpatieBackup()`** - Validates Spatie Backup database backups with comprehensive config validation
 

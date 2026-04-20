@@ -18,6 +18,21 @@ src/Checks/
     └── ...
 ```
 
+## Check Size Guidelines
+
+Keep each check **focused on a single concern**. When designing a check, distinguish between:
+
+- **Setup** — installing the package, configuring schedules, adding required config files. These belong together since they're all needed before the feature works.
+- **Customization / individual requirements** — specific sub-settings or registered entries that can independently be missing and independently disabled. Split these into their own checks.
+
+A check with 3+ distinct conditions is a signal to review: ask whether any of those conditions are independently disableable or belong to a different concern. Good heuristics:
+- If skipping one sub-check but not another makes sense for a project → split them.
+- If all sub-checks are required together for the setup to function at all → keep them together.
+
+**Example:** `UsesSpatieHealthSetupCheck` (packages + schedules + filesystem disk + result store config) stays together because none of it makes sense without the others. But `LaravelVersionCheck` and `PhpVersionCheck` being registered in `Health::checks()` are independently disableable → separate checks.
+
+When multiple checks share structural logic (e.g., all parse the same file and run the same kind of visitor), extract a shared abstract base class rather than duplicating the parsing logic.
+
 ## When Adding a New Check
 
 ### 1. Create a New Check Class

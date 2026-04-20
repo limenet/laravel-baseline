@@ -44,7 +44,10 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReleaseItCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieBackupCheck;
-use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasCoreChecksCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasLaravelVersionCheckCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasPhpVersionCheckCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthSetupCheck;
 
 class CheckRegistry
 {
@@ -92,7 +95,10 @@ class CheckRegistry
         UsesRectorCheck::class,
         UsesReleaseItCheck::class,
         UsesSpatieBackupCheck::class,
-        UsesSpatieHealthCheck::class,
+        UsesSpatieHealthHasCoreChecksCheck::class,
+        UsesSpatieHealthHasLaravelVersionCheckCheck::class,
+        UsesSpatieHealthHasPhpVersionCheckCheck::class,
+        UsesSpatieHealthSetupCheck::class,
     ];
 
     /** @return list<class-string<CheckInterface>> */
