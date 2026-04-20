@@ -42,6 +42,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReleaseItCheck;
+use Limenet\LaravelBaseline\Checks\Checks\SpatieHealthReleaseAgeCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieBackupCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthCheck;
 
@@ -73,6 +74,7 @@ class CheckRegistry
         PhpstanLevelAtLeastEightCheck::class,
         PhpVersionMatchesCiCheck::class,
         PhpVersionMatchesDdevCheck::class,
+        SpatieHealthReleaseAgeCheck::class,
         UsesIdeHelpersCheck::class,
         UsesLarastanCheck::class,
         UsesLaravelAdminerCheck::class,
