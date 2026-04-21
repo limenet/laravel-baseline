@@ -10,8 +10,6 @@ use PhpParser\ParserFactory;
 
 abstract class AbstractHasRectorConfigCheck extends AbstractCheck
 {
-    abstract protected function makeVisitor(): AbstractRectorVisitor;
-
     public function check(): CheckResult
     {
         $rectorConfigFile = base_path('rector.php');
@@ -41,4 +39,6 @@ abstract class AbstractHasRectorConfigCheck extends AbstractCheck
 
         return CheckResult::PASS;
     }
+
+    abstract protected function makeVisitor(): AbstractRectorVisitor;
 }

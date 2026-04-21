@@ -8,11 +8,6 @@ use Limenet\LaravelBaseline\Rector\RectorVisitorArrayArgument;
 
 class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
 {
-    protected function makeVisitor(): AbstractRectorVisitor
-    {
-        return new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', ['TablePropertyToTableAttributeRector']);
-    }
-
     public function check(): CheckResult
     {
         if (!$this->composerPackageSatisfies('laravel/framework', '^13')) {
@@ -20,5 +15,10 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
         }
 
         return parent::check();
+    }
+
+    protected function makeVisitor(): AbstractRectorVisitor
+    {
+        return new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', ['TablePropertyToTableAttributeRector']);
     }
 }
