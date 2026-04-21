@@ -15,8 +15,17 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSimplifierCheck;
-use Limenet\LaravelBaseline\Checks\Checks\HasCompleteRectorConfigurationCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasDailyLoggingCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithAttributesSetsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithComposerBasedCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithImportNamesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPathsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPhpSetsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPreparedSetsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithRulesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetProvidersCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSkipCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasGuidelinesUpdateScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasNpmScriptsCheck;
@@ -66,8 +75,17 @@ class CheckRegistry
         DoesNotUseSailCheck::class,
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSimplifierCheck::class,
-        HasCompleteRectorConfigurationCheck::class,
         HasDailyLoggingCheck::class,
+        HasRectorConfigWithAttributesSetsCheck::class,
+        HasRectorConfigWithComposerBasedCheck::class,
+        HasRectorConfigWithImportNamesCheck::class,
+        HasRectorConfigWithPathsCheck::class,
+        HasRectorConfigWithPhpSetsCheck::class,
+        HasRectorConfigWithPreparedSetsCheck::class,
+        HasRectorConfigWithRulesCheck::class,
+        HasRectorConfigWithSetsCheck::class,
+        HasRectorConfigWithSetProvidersCheck::class,
+        HasRectorConfigWithSkipCheck::class,
         HasEncryptedEnvFileCheck::class,
         HasGuidelinesUpdateScriptCheck::class,
         HasNpmScriptsCheck::class,
