@@ -35,7 +35,6 @@ use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
-use Limenet\LaravelBaseline\Checks\Checks\ReleaseAgeCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesIdeHelpersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLarastanCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelAdminerCheck;
@@ -96,7 +95,6 @@ class CheckRegistry
         PhpstanLevelAtLeastEightCheck::class,
         PhpVersionMatchesCiCheck::class,
         PhpVersionMatchesDdevCheck::class,
-        ReleaseAgeCheck::class,
         UsesIdeHelpersCheck::class,
         UsesLarastanCheck::class,
         UsesLaravelAdminerCheck::class,
