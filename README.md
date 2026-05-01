@@ -72,6 +72,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesSpatieHealthHasLaravelVersionCheck()`** - Validates LaravelVersionCheck is registered in Health::checks()
 - **`usesSpatieHealthHasPhpVersionCheck()`** - Validates PhpVersionCheck is registered in Health::checks()
 - **`usesSpatieHealthHasReleaseAgeCheck()`** - Validates ReleaseAgeCheck is registered in Health::checks()
+- **`usesSpatieHealthScheduleCheckConfiguration()`** - Validates ScheduleCheck is configured with heartbeatMaxAgeInMinutes(2) to prevent false positives
 - **`usesSpatieBackup()`** - Validates Spatie Backup database backups with comprehensive config validation
 
 ### Infrastructure & Dependencies
