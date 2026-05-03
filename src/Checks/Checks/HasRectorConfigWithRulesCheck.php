@@ -9,6 +9,10 @@ class HasRectorConfigWithRulesCheck extends AbstractHasRectorConfigCheck
 {
     protected function makeVisitor(): AbstractRectorVisitor
     {
-        return new RectorVisitorArrayArgument($this->commentCollector, 'withRules', ['AddGenericReturnTypeToRelationsRector']);
+        return new RectorVisitorArrayArgument($this->commentCollector, 'withRules', [
+            'AddGenericReturnTypeToRelationsRector',
+            'MinutesToSecondsInCacheRector',
+            'UseForwardsCallsTraitRector',
+        ]);
     }
 }

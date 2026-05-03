@@ -45,15 +45,16 @@ This package validates your Laravel installation against the following checks:
 - **`usesPhpInsights()`** - Validates PHP Insights code quality analysis is configured
 - **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports
 - **`hasRectorConfigWithComposerBased()`** - Validates Rector `withComposerBased(phpunit, symfony, laravel)` is configured
+- **`hasRectorConfigWithConfiguredRules()`** - Validates Rector `withConfiguredRule()` calls are present for `RouteActionCallableRector` and `WhereToWhereLikeRector`
 - **`hasRectorConfigWithPreparedSets()`** - Validates Rector `withPreparedSets(deadCode, codeQuality, codingStyle, typeDeclarations, privatization, instanceOf, earlyReturn)` is configured
 - **`hasRectorConfigWithImportNames()`** - Validates Rector `withImportNames(importShortClasses: false)` is configured
 - **`hasRectorConfigWithPhpSets()`** - Validates Rector `withPhpSets()` is called
 - **`hasRectorConfigWithAttributesSets()`** - Validates Rector `withAttributesSets()` is called
 - **`hasRectorConfigWithSetProviders()`** - Validates Rector `withSetProviders(LaravelSetProvider)` is configured
-- **`hasRectorConfigWithRules()`** - Validates Rector `withRules([AddGenericReturnTypeToRelationsRector])` is configured
-- **`hasRectorConfigWithSets()`** - Validates Rector `withSets([LaravelBaselineSetList])` is configured
+- **`hasRectorConfigWithRules()`** - Validates Rector `withRules([AddGenericReturnTypeToRelationsRector, MinutesToSecondsInCacheRector, UseForwardsCallsTraitRector])` is configured
+- **`hasRectorConfigWithSets()`** - Validates Rector `withSets([LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS, LaravelSetList::LARAVEL_*])` is configured with all required sets
 - **`hasRectorConfigWithPaths()`** - Validates Rector `withPaths([app, database, routes, tests])` is configured
-- **`hasRectorConfigWithSkip()`** - Validates Rector `withSkip([TablePropertyToTableAttributeRector])` is configured
+- **`hasRectorConfigWithSkip()`** - Validates Rector `withSkip()` contains required skipped rules (always: 6 Laravel rules; Laravel 13+: TablePropertyToTableAttributeRector; when server.php exists: ServerVariableToRequestFacadeRector)
 
 ### IDE & Developer Tools
 - **`hasClaudeSettingsWithLaravelSimplifier()`** - Validates Claude Code settings include Laravel Simplifier plugin

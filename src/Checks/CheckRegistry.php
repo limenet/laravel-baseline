@@ -21,6 +21,7 @@ use Limenet\LaravelBaseline\Checks\Checks\HasGuidelinesUpdateScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasNpmScriptsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithAttributesSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithComposerBasedCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithConfiguredRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithImportNamesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPathsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPhpSetsCheck;
@@ -79,6 +80,7 @@ class CheckRegistry
         HasDailyLoggingCheck::class,
         HasRectorConfigWithAttributesSetsCheck::class,
         HasRectorConfigWithComposerBasedCheck::class,
+        HasRectorConfigWithConfiguredRulesCheck::class,
         HasRectorConfigWithImportNamesCheck::class,
         HasRectorConfigWithPathsCheck::class,
         HasRectorConfigWithPhpSetsCheck::class,

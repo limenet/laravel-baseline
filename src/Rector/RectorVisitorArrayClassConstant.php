@@ -4,7 +4,7 @@ namespace Limenet\LaravelBaseline\Rector;
 
 use PhpParser\Node;
 
-class RectorVisitorArrayArgument extends AbstractRectorVisitor
+class RectorVisitorArrayClassConstant extends AbstractRectorVisitor
 {
     public function getErrorMessage(): string
     {
@@ -30,25 +30,19 @@ class RectorVisitorArrayArgument extends AbstractRectorVisitor
             foreach ($arg0->items as $arg) {
                 if ($arg !== null
                     && $arg->value instanceof Node\Expr\ClassConstFetch
-                    && $arg->value->class instanceof Node\Name) {
-                    $args[] = $arg->value->class->toString();
-                }
-                if ($arg !== null
-                    && $arg->key instanceof Node\Expr\ClassConstFetch
-                    && $arg->key->class instanceof Node\Name) {
-                    $args[] = $arg->key->class->toString();
+                    && $arg->value->class instanceof Node\Name
+                    && $arg->value->name instanceof Node\Identifier) {
+                    $args[] = $arg->value->class->toString().'::'.$arg->value->name->toString();
                 }
             }
         }
 
-        $errors = 0;
-
-        foreach ($this->payload as $name) {
-            if (!in_array($name, $args, true)) {
-                $errors++;
+        foreach ($this->payload as $required) {
+            if (!in_array($required, $args, true)) {
+                return false;
             }
         }
 
-        return $errors === 0;
+        return true;
     }
 }

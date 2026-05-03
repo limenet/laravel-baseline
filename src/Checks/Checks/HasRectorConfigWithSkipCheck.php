@@ -10,15 +10,47 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
 {
     public function check(): CheckResult
     {
-        if (!$this->composerPackageSatisfies('laravel/framework', '^13')) {
-            return CheckResult::WARN;
+        $always = $this->runVisitorOnRector(
+            new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', [
+                'CarbonToDateFacadeRector',
+                'AppToResolveRector',
+                'RedirectBackToBackHelperRector',
+                'RedirectRouteToToRouteHelperRector',
+                'NowFuncWithStartOfDayMethodCallToTodayFuncRector',
+                'EloquentOrderByToLatestOrOldestRector',
+            ]),
+        );
+        if ($always !== null) {
+            return $always;
         }
 
-        return parent::check();
+        if ($this->composerPackageSatisfies('laravel/framework', '^13')) {
+            $l13 = $this->runVisitorOnRector(
+                new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', [
+                    'TablePropertyToTableAttributeRector',
+                ]),
+            );
+            if ($l13 !== null) {
+                return $l13;
+            }
+        }
+
+        if (file_exists(base_path('server.php'))) {
+            $server = $this->runVisitorOnRector(
+                new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', [
+                    'ServerVariableToRequestFacadeRector',
+                ]),
+            );
+            if ($server !== null) {
+                return $server;
+            }
+        }
+
+        return CheckResult::PASS;
     }
 
     protected function makeVisitor(): AbstractRectorVisitor
     {
-        return new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', ['TablePropertyToTableAttributeRector']);
+        return new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', []);
     }
 }

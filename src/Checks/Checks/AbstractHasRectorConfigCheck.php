@@ -12,6 +12,13 @@ abstract class AbstractHasRectorConfigCheck extends AbstractCheck
 {
     public function check(): CheckResult
     {
+        return $this->runVisitorOnRector($this->makeVisitor()) ?? CheckResult::PASS;
+    }
+
+    abstract protected function makeVisitor(): AbstractRectorVisitor;
+
+    protected function runVisitorOnRector(AbstractRectorVisitor $visitor): ?CheckResult
+    {
         $rectorConfigFile = base_path('rector.php');
 
         if (!file_exists($rectorConfigFile)) {
@@ -26,7 +33,6 @@ abstract class AbstractHasRectorConfigCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
-        $visitor = $this->makeVisitor();
         $traverser = new NodeTraverser();
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
@@ -37,8 +43,6 @@ abstract class AbstractHasRectorConfigCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
-        return CheckResult::PASS;
+        return null;
     }
-
-    abstract protected function makeVisitor(): AbstractRectorVisitor;
 }

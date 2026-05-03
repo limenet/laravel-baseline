@@ -8,6 +8,8 @@ $validRector = <<<'PHP'
 use Rector\Config\RectorConfig;
 use RectorLaravel\Set\LaravelSetProvider;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
+use RectorLaravel\Rector\MethodCall\MinutesToSecondsInCacheRector;
+use RectorLaravel\Rector\Class_\UseForwardsCallsTraitRector;
 use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
 
 return static function (RectorConfig $config): void {
@@ -18,7 +20,11 @@ return static function (RectorConfig $config): void {
         ->withPhpSets()
         ->withAttributesSets()
         ->withImportNames(importShortClasses: false)
-        ->withRules([AddGenericReturnTypeToRelationsRector::class])
+        ->withRules([
+            AddGenericReturnTypeToRelationsRector::class,
+            MinutesToSecondsInCacheRector::class,
+            UseForwardsCallsTraitRector::class,
+        ])
         ->withSets([LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS]);
     $config->withSetProviders(LaravelSetProvider::class);
 };
@@ -46,6 +52,23 @@ PHP;
     $check = makeCheck(HasRectorConfigWithRulesCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($check->getComments()[0])->toContain('withRules()')->toContain('AddGenericReturnTypeToRelationsRector');
+});
+
+it('hasRectorConfigWithRules fails when MinutesToSecondsInCacheRector is missing', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
+return static function (RectorConfig $config): void {
+    $config->withRules([AddGenericReturnTypeToRelationsRector::class]);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $check = makeCheck(HasRectorConfigWithRulesCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($check->getComments()[0])->toContain('withRules()')->toContain('MinutesToSecondsInCacheRector');
 });
 
 it('hasRectorConfigWithRules passes when correctly configured', function () use ($validRector): void {
