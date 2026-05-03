@@ -37,6 +37,16 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck
             return CheckResult::FAIL;
         }
 
+        $skipDirs = $trivyConfig['scan']['skip-dirs'] ?? [];
+        $requiredSkipDirs = ['.ddev', 'node_modules', 'storage/logs', 'vendor'];
+        $missingDirs = array_diff($requiredSkipDirs, $skipDirs);
+
+        if ($missingDirs !== []) {
+            $this->addComment('Missing skip-dirs in trivy.yaml: scan.skip-dirs must include '.implode(', ', $missingDirs));
+
+            return CheckResult::FAIL;
+        }
+
         return CheckResult::PASS;
     }
 

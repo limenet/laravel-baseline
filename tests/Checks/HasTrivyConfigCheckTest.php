@@ -14,6 +14,11 @@ scan:
   scanners:
     - secret
     - vuln
+  skip-dirs:
+    - .ddev
+    - node_modules
+    - storage/logs
+    - vendor
 severity:
   - CRITICAL
   - HIGH
@@ -118,4 +123,33 @@ YML;
     [$check, $collector] = makeCheckWithCollector(HasTrivyConfigCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($collector->all())->toContain("Missing required severity levels in trivy.yaml: severity must include 'CRITICAL' and 'HIGH'");
+});
+
+it('hasTrivyConfig fails when trivy.yaml is missing required skip-dirs', function (): void {
+    bindFakeComposer([]);
+    $ciYaml = <<<'YML'
+security:
+  extends: ['.lint_security']
+YML;
+    $trivyYaml = <<<'YML'
+scan:
+  scanners:
+    - secret
+    - vuln
+  skip-dirs:
+    - node_modules
+severity:
+  - CRITICAL
+  - HIGH
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        '.gitlab-ci.yml' => $ciYaml,
+        'trivy.yaml' => $trivyYaml,
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(HasTrivyConfigCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Missing skip-dirs in trivy.yaml: scan.skip-dirs must include .ddev, storage/logs, vendor');
 });
