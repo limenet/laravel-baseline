@@ -19,7 +19,7 @@
         "php": "^8.3",
         "ext-simplexml": "*",
         "composer/semver": "^3.4",
-        "illuminate/contracts": "^12.0|^13.0",
+        "illuminate/contracts": "^12.0 || ^13.0",
         "nikic/php-parser": "^5.7",
         "phpstan/phpstan": "^2.1.40",
         "rector/rector": "^2.3.8",
@@ -29,11 +29,11 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.9.6",
-        "laravel/framework": "^12.53.0|^13.7.0",
+        "laravel/framework": "^12.53.0 || ^13.7.0",
         "laravel/pint": "^1.29.1",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.9.4",
-        "orchestra/testbench": "^10.9.0|^11.1",
+        "orchestra/testbench": "^10.9.0 || ^11.1",
         "pestphp/pest": "^4.6.3",
         "pestphp/pest-plugin-arch": "^4.0.2",
         "pestphp/pest-plugin-laravel": "^4.1",
@@ -41,7 +41,8 @@
         "phpstan/phpstan-deprecation-rules": "^2.0.4",
         "phpstan/phpstan-phpunit": "^2.0.16",
         "spatie/laravel-health": "^1.39.2",
-        "spatie/temporary-directory": "^2.3.1"
+        "spatie/temporary-directory": "^2.3.1",
+        "symplify/rule-doc-generator-contracts": "^11.2"
     },
     "conflict": {
         "laravel/boost": "^1.0"

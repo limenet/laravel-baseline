@@ -29,6 +29,7 @@ use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetProvidersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSkipCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasTrivyConfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsCiLintCompleteCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
@@ -90,6 +91,7 @@ class CheckRegistry
         HasEncryptedEnvFileCheck::class,
         HasGuidelinesUpdateScriptCheck::class,
         HasNpmScriptsCheck::class,
+        HasTrivyConfigCheck::class,
         IsCiLintCompleteCheck::class,
         IsInstalledAsRegularDependencyCheck::class,
         IsLaravelVersionMaintainedCheck::class,

@@ -72,7 +72,7 @@ it('hasCiJobs fails when .gitlab-ci.yml is missing', function (): void {
 
     [$check, $collector] = makeCheckWithCollector(HasCiJobsCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('GitLab CI configuration missing: Create .gitlab-ci.yml in project root');
+    expect($collector->all())->toContain('.gitlab-ci.yml not found');
 });
 
 it('hasCiJobs fails when .gitlab-ci.yml is empty', function (): void {
@@ -81,5 +81,5 @@ it('hasCiJobs fails when .gitlab-ci.yml is empty', function (): void {
 
     [$check, $collector] = makeCheckWithCollector(HasCiJobsCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('GitLab CI configuration is empty or invalid: Check .gitlab-ci.yml');
+    expect($collector->all())->toContain('.gitlab-ci.yml is empty or invalid');
 });

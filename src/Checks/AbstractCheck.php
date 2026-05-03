@@ -258,20 +258,21 @@ abstract class AbstractCheck implements CheckInterface
     /**
      * @return array<string,mixed>|null
      */
-    protected function getGitlabCiData(): ?array
+    protected function loadYamlConfig(string $relativePath): ?array
     {
-        $ciFile = base_path('/.gitlab-ci.yml');
+        $file = base_path($relativePath);
+        $path = ltrim($relativePath, '/');
 
-        if (!file_exists($ciFile)) {
-            $this->addComment('GitLab CI configuration missing: Create .gitlab-ci.yml in project root');
+        if (!file_exists($file)) {
+            $this->addComment("{$path} not found");
 
             return null;
         }
 
-        $data = Yaml::parseFile($ciFile);
+        $data = Yaml::parseFile($file);
 
         if (!is_array($data)) {
-            $this->addComment('GitLab CI configuration is empty or invalid: Check .gitlab-ci.yml');
+            $this->addComment("{$path} is empty or invalid");
 
             return null;
         }
@@ -282,17 +283,17 @@ abstract class AbstractCheck implements CheckInterface
     /**
      * @return array<string,mixed>|null
      */
+    protected function getGitlabCiData(): ?array
+    {
+        return $this->loadYamlConfig('/.gitlab-ci.yml');
+    }
+
+    /**
+     * @return array<string,mixed>|null
+     */
     protected function getDdevConfig(): ?array
     {
-        $ddevConfigFile = base_path('.ddev/config.yaml');
-
-        if (!file_exists($ddevConfigFile)) {
-            $this->addComment('DDEV configuration missing: .ddev/config.yaml not found');
-
-            return null;
-        }
-
-        return Yaml::parseFile($ddevConfigFile);
+        return $this->loadYamlConfig('.ddev/config.yaml');
     }
 
     /**

@@ -84,6 +84,7 @@ This package validates your Laravel installation against the following checks:
 
 ### CI/CD & Deployment
 - **`hasCiJobs()`** - Validates GitLab CI pipeline jobs are properly configured
+- **`hasTrivyConfig()`** - Validates Trivy security scanning CI job and `trivy.yaml` configuration (scanners + severity)
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline

@@ -2,33 +2,23 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
-use Limenet\LaravelBaseline\Checks\AbstractCheck;
+use Limenet\LaravelBaseline\Checks\AbstractCiJobCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class HasCiJobsCheck extends AbstractCheck
+class HasCiJobsCheck extends AbstractCiJobCheck
 {
     public function check(): CheckResult
     {
-        $data = $this->getGitlabCiData();
+        return $this->checkRequiredCiJobs();
+    }
 
-        if ($data === null) {
-            return CheckResult::FAIL;
-        }
-
-        $jobs = [
+    protected function requiredCiJobs(): array
+    {
+        return [
             'build' => '.build',
             'php' => '.lint_php',
             'js' => '.lint_js',
             'test' => '.test',
         ];
-        foreach ($jobs as $jobName => $extends) {
-            if (!isset($data[$jobName]['extends']) || $data[$jobName]['extends'] !== [$extends]) {
-                $this->addComment("Missing or misconfigured CI job in .gitlab-ci.yml: Add job '$jobName' with 'extends: [$extends]'");
-
-                return CheckResult::FAIL;
-            }
-        }
-
-        return CheckResult::PASS;
     }
 }
