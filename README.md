@@ -102,6 +102,8 @@ This package validates your Laravel installation against the following checks:
 - **`hasNpmScripts()`** - Validates required npm build scripts
 
 ### Security & Configuration
+- **`modelShouldBeStrict()`** - Validates `Model::shouldBeStrict()` is called in AppServiceProvider with `true`, no argument, or a dynamic expression (not `false`)
+- **`formRequestFailOnUnknownFields()`** - Validates `FormRequest::failOnUnknownFields()` is called in AppServiceProvider (Laravel ≥13.6 only; warns on older versions)
 - **`hasDailyLogging()`** - Validates logging uses `daily` channel (directly or via `stack`)
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
 - **`hasGuidelinesUpdateScript()`** - Validates baseline guidelines update script

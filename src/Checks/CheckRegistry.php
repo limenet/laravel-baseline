@@ -13,6 +13,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraint
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
+use Limenet\LaravelBaseline\Checks\Checks\FormRequestFailOnUnknownFieldsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSimplifierCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasDailyLoggingCheck;
@@ -34,6 +35,7 @@ use Limenet\LaravelBaseline\Checks\Checks\HasTrivyConfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsCiLintCompleteCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
+use Limenet\LaravelBaseline\Checks\Checks\ModelShouldBeStrictCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
@@ -75,6 +77,7 @@ class CheckRegistry
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,
         DoesNotUseSailCheck::class,
+        FormRequestFailOnUnknownFieldsCheck::class,
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSimplifierCheck::class,
         HasDailyLoggingCheck::class,
@@ -96,6 +99,7 @@ class CheckRegistry
         IsCiLintCompleteCheck::class,
         IsInstalledAsRegularDependencyCheck::class,
         IsLaravelVersionMaintainedCheck::class,
+        ModelShouldBeStrictCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
         PhpVersionMatchesCiCheck::class,
         PhpVersionMatchesDdevCheck::class,
