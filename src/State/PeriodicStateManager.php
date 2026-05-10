@@ -24,7 +24,7 @@ class PeriodicStateManager
 
         file_put_contents(
             config_path('baseline.php'),
-            "<?php\n\nreturn " . var_export($config, true) . ";\n",
+            "<?php\n\nreturn ".var_export($config, true).";\n",
         );
     }
 
@@ -33,7 +33,7 @@ class PeriodicStateManager
     {
         $path = config_path('baseline.php');
 
-        if (! file_exists($path)) {
+        if (!file_exists($path)) {
             return [];
         }
 
