@@ -4,7 +4,7 @@ use Illuminate\Console\Command;
 use Limenet\LaravelBaseline\Checks\CheckInterface;
 use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Checks\CommentCollector;
-use Limenet\LaravelBaseline\Commands\LaravelBaselineCommand;
+use Limenet\LaravelBaseline\Commands\CheckCommand;
 
 it('registers all check classes that implement CheckInterface', function (): void {
     $registeredChecks = CheckRegistry::all();
@@ -31,12 +31,12 @@ it('all check classes have unique names', function (): void {
 })->group('command');
 
 it('has correct command signature', function (): void {
-    $command = new LaravelBaselineCommand();
+    $command = new CheckCommand();
     expect($command->signature)->toBe('limenet:laravel-baseline:check');
 })->group('command');
 
 it('has correct command description', function (): void {
-    $command = new LaravelBaselineCommand();
+    $command = new CheckCommand();
     expect($command->description)->toBe('Checks the project against a highly opinionated set of coding standards.');
 })->group('command');
 

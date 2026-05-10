@@ -6,19 +6,16 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Composer as IlluminateComposer;
 use Limenet\LaravelBaseline\Checks\CheckInterface;
 use Limenet\LaravelBaseline\Checks\CommentCollector;
-use Limenet\LaravelBaseline\Commands\LaravelBaselineCommand;
+use Limenet\LaravelBaseline\Commands\CheckCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-/**
- * Helper: create a LaravelBaselineCommand with initialized Output and container.
- */
-function makeCommand(): LaravelBaselineCommand
+function makeCommand(): CheckCommand
 {
     /** @var Application $app */
     $app = app();
 
-    $command = new LaravelBaselineCommand();
+    $command = new CheckCommand();
     $command->setLaravel($app);
     $output = new OutputStyle(new ArrayInput([]), new BufferedOutput());
     $command->setOutput($output);
