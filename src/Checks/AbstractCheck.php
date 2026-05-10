@@ -159,8 +159,10 @@ abstract class AbstractCheck implements CheckInterface
     /**
      * @param  string|list<string>  $packages
      */
-    protected function checkNpmPackages(string|array $packages, string $packageType = 'devDependencies'): bool
-    {
+    protected function checkNpmPackages(
+        string|array $packages,
+        string $packageType = 'devDependencies',
+    ): bool {
         $packageJson = $this->getPackageJson();
 
         if ($packageJson === null) {
@@ -314,6 +316,107 @@ abstract class AbstractCheck implements CheckInterface
             true,
             flags: JSON_THROW_ON_ERROR,
         );
+    }
+
+    // === Fix Helpers ===
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function writeComposerJson(array $data): void
+    {
+        file_put_contents(
+            base_path('composer.json'),
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
+        );
+    }
+
+    /**
+     * Append $value to scripts.$scriptName unless already present (matched by str_contains).
+     * If $insertBefore is given, insert before the first entry containing that substring; else append.
+     */
+    protected function addToComposerScript(
+        string $scriptName,
+        string $value,
+        ?string $insertBefore = null,
+    ): void {
+        $composerJson = $this->getComposerJson();
+
+        if ($composerJson === null) {
+            return;
+        }
+
+        $scripts = $composerJson['scripts'][$scriptName] ?? [];
+
+        foreach ($scripts as $script) {
+            if (str_contains($script, $value)) {
+                return;
+            }
+        }
+
+        if ($insertBefore !== null) {
+            foreach ($scripts as $i => $script) {
+                if (str_contains($script, $insertBefore)) {
+                    array_splice($scripts, $i, 0, [$value]);
+                    $composerJson['scripts'][$scriptName] = $scripts;
+                    $this->writeComposerJson($composerJson);
+
+                    return;
+                }
+            }
+        }
+
+        $composerJson['scripts'][$scriptName][] = $value;
+        $this->writeComposerJson($composerJson);
+    }
+
+    /**
+     * Add or overwrite an env var in the <php> section of phpunit.xml using DOMDocument.
+     */
+    protected function setPhpunitEnvVar(string $name, string $value): void
+    {
+        $xmlFile = base_path('phpunit.xml');
+
+        if (!file_exists($xmlFile)) {
+            return;
+        }
+
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+
+        if (!$dom->load($xmlFile)) {
+            return;
+        }
+
+        $xpath = new \DOMXPath($dom);
+
+        // Find existing <env name="$name" ...>
+        $existing = $xpath->query("//php/env[@name='{$name}']");
+
+        if ($existing !== false && $existing->length > 0) {
+            /** @var \DOMElement $node */
+            $node = $existing->item(0);
+            $node->setAttribute('value', $value);
+        } else {
+            // Find or create <php> element
+            $phpElements = $dom->getElementsByTagName('php');
+
+            if ($phpElements->length === 0) {
+                $root = $dom->documentElement;
+                $phpEl = $dom->createElement('php');
+                $root?->appendChild($phpEl);
+            } else {
+                $phpEl = $phpElements->item(0);
+            }
+
+            $env = $dom->createElement('env');
+            $env->setAttribute('name', $name);
+            $env->setAttribute('value', $value);
+            $phpEl?->appendChild($env);
+        }
+
+        $dom->save($xmlFile);
     }
 
     // === Schedule Helpers ===

@@ -11,4 +11,14 @@ class HasRectorConfigWithSetProvidersCheck extends AbstractHasRectorConfigCheck
     {
         return new RectorVisitorClassFetch($this->commentCollector, 'withSetProviders', ['LaravelSetProvider']);
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withSetProviders([LaravelSetProvider::class])';
+    }
+
+    protected function fixImports(): array
+    {
+        return ['RectorLaravel\\Set\\LaravelSetProvider'];
+    }
 }

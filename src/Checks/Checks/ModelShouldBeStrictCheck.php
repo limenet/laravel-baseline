@@ -23,4 +23,14 @@ class ModelShouldBeStrictCheck extends AbstractServiceProviderStaticCallCheck
     {
         return 'Do not pass false to Model::shouldBeStrict(); use true, no argument, or a dynamic expression';
     }
+
+    protected function fixStatement(): string
+    {
+        return 'Model::shouldBeStrict(! app()->isProduction());';
+    }
+
+    protected function fixImports(): array
+    {
+        return ['Illuminate\\Database\\Eloquent\\Model'];
+    }
 }

@@ -2,15 +2,18 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
-use Limenet\LaravelBaseline\Checks\AbstractCheck;
+use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Health\HealthChecksStaticCallVisitor;
+use PhpParser\Node;
+use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter;
 
-abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractCheck
+abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
 {
-    public function check(): CheckResult
+    public function fix(bool $dry = false): CheckResult
     {
         if (!$this->checkComposerPackages($this->requiredComposerPackages())) {
             return CheckResult::WARN;
@@ -37,13 +40,76 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractCheck
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
-        if (!$visitor->wasFound()) {
-            $this->addComment($this->missingChecksComment());
+        if ($visitor->wasFound()) {
+            return CheckResult::PASS;
+        }
 
+        $this->addComment($this->missingChecksComment());
+
+        if ($dry) {
             return CheckResult::FAIL;
         }
 
-        return CheckResult::PASS;
+        $finder = new NodeFinder();
+
+        // Find existing Health::checks([...]) call to extend
+        $healthCall = $finder->findFirst(
+            $ast,
+            fn ($n): bool => $n instanceof Node\Expr\StaticCall
+                && $n->class instanceof Node\Name
+                && $n->class->getLast() === 'Health'
+                && $n->name instanceof Node\Identifier
+                && $n->name->toString() === 'checks',
+        );
+
+        if ($healthCall instanceof Node\Expr\StaticCall) {
+            $firstArg = $healthCall->args[0] ?? null;
+
+            if ($firstArg instanceof Node\Arg && $firstArg->value instanceof Node\Expr\Array_) {
+                foreach ($visitor->getMissingClasses() as $shortName) {
+                    $firstArg->value->items[] = new Node\ArrayItem(
+                        new Node\Expr\StaticCall(
+                            new Node\Name($shortName),
+                            new Node\Identifier('new'),
+                        ),
+                    );
+                }
+            }
+        } else {
+            $bootMethod = $finder->findFirst(
+                $ast,
+                fn ($n): bool => $n instanceof Node\Stmt\ClassMethod
+                    && $n->name->toString() === 'boot',
+            );
+
+            if (!$bootMethod instanceof Node\Stmt\ClassMethod) {
+                return CheckResult::FAIL;
+            }
+
+            $items = array_map(
+                fn (string $shortName): Node\ArrayItem => new Node\ArrayItem(
+                    new Node\Expr\StaticCall(
+                        new Node\Name($shortName),
+                        new Node\Identifier('new'),
+                    ),
+                ),
+                $this->requiredHealthCheckClasses(),
+            );
+
+            $bootMethod->stmts[] = new Node\Stmt\Expression(
+                new Node\Expr\StaticCall(
+                    new Node\Name('Health'),
+                    new Node\Identifier('checks'),
+                    [new Node\Arg(new Node\Expr\Array_($items))],
+                ),
+            );
+        }
+
+        $this->addMissingUseStatements($ast, $this->healthCheckFqns());
+
+        file_put_contents($file, (new PrettyPrinter\Standard())->prettyPrintFile($ast));
+
+        return $this->fix(dry: true);
     }
 
     /** @return list<string> Short class names required in Health::checks([...]) */
@@ -60,5 +126,52 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractCheck
     protected function requiredComposerPackages(): array
     {
         return ['spatie/laravel-health'];
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function healthCheckFqns(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param  array<Node>  $ast
+     * @param  list<string>  $imports
+     */
+    private function addMissingUseStatements(array &$ast, array $imports): void
+    {
+        if ($imports === []) {
+            return;
+        }
+
+        $existingFqns = [];
+        $lastUseIdx = -1;
+
+        foreach ($ast as $i => $stmt) {
+            if ($stmt instanceof Node\Stmt\Use_) {
+                $lastUseIdx = $i;
+
+                foreach ($stmt->uses as $use) {
+                    $existingFqns[] = $use->name->toString();
+                }
+            }
+        }
+
+        $newUses = [];
+
+        foreach ($imports as $fqn) {
+            if (!in_array($fqn, $existingFqns, true)) {
+                $newUses[] = new Node\Stmt\Use_([
+                    new Node\UseItem(new Node\Name($fqn)),
+                ]);
+            }
+        }
+
+        if ($newUses !== []) {
+            $insertIdx = $lastUseIdx >= 0 ? $lastUseIdx + 1 : 1;
+            array_splice($ast, $insertIdx, 0, $newUses);
+        }
     }
 }

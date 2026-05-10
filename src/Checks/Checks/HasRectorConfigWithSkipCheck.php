@@ -8,8 +8,18 @@ use Limenet\LaravelBaseline\Rector\RectorVisitorArrayArgument;
 
 class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
 {
-    public function check(): CheckResult
+    public function fix(bool $dry = false): CheckResult
     {
+        $rectorFile = base_path('rector.php');
+
+        if (!file_exists($rectorFile)) {
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
+
+            file_put_contents($rectorFile, "<?php\n\nuse Rector\\Config\\RectorConfig;\n\nreturn RectorConfig::configure();\n");
+        }
+
         $always = $this->runVisitorOnRector(
             new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', [
                 'CarbonToDateFacadeRector',
@@ -20,8 +30,34 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
                 'EloquentOrderByToLatestOrOldestRector',
             ]),
         );
+
         if ($always !== null) {
-            return $always;
+            if ($dry) {
+                return $always;
+            }
+
+            if (!str_contains((file_get_contents($rectorFile) ?: ''), 'withSkip(')) {
+                $skipClasses = [
+                    'CarbonToDateFacadeRector::class',
+                    'AppToResolveRector::class',
+                    'RedirectBackToBackHelperRector::class',
+                    'RedirectRouteToToRouteHelperRector::class',
+                    'NowFuncWithStartOfDayMethodCallToTodayFuncRector::class',
+                    'EloquentOrderByToLatestOrOldestRector::class',
+                ];
+
+                if ($this->composerPackageSatisfies('laravel/framework', '^13')) {
+                    $skipClasses[] = 'TablePropertyToTableAttributeRector::class';
+                }
+
+                if (file_exists(base_path('server.php'))) {
+                    $skipClasses[] = 'ServerVariableToRequestFacadeRector::class';
+                }
+
+                $this->appendToRectorChain($rectorFile, '->withSkip(['.implode(', ', $skipClasses).'])');
+            }
+
+            return $this->fix(dry: true);
         }
 
         if ($this->composerPackageSatisfies('laravel/framework', '^13')) {
@@ -30,8 +66,10 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
                     'TablePropertyToTableAttributeRector',
                 ]),
             );
+
             if ($l13 !== null) {
-                return $l13;
+                // withSkip exists but missing L13 class — can't merge into existing call
+                return $dry ? $l13 : CheckResult::FAIL;
             }
         }
 
@@ -41,8 +79,9 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
                     'ServerVariableToRequestFacadeRector',
                 ]),
             );
+
             if ($server !== null) {
-                return $server;
+                return $dry ? $server : CheckResult::FAIL;
             }
         }
 
@@ -52,5 +91,10 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
     protected function makeVisitor(): AbstractRectorVisitor
     {
         return new RectorVisitorArrayArgument($this->commentCollector, 'withSkip', []);
+    }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withSkip([CarbonToDateFacadeRector::class, AppToResolveRector::class, RedirectBackToBackHelperRector::class, RedirectRouteToToRouteHelperRector::class, NowFuncWithStartOfDayMethodCallToTodayFuncRector::class, EloquentOrderByToLatestOrOldestRector::class])';
     }
 }

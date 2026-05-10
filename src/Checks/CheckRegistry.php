@@ -14,6 +14,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraint
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSpatiePasskeysWithFortifyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\FormRequestFailOnUnknownFieldsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSimplifierCheck;
@@ -80,6 +81,7 @@ class CheckRegistry
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,
         DoesNotUseSailCheck::class,
+        DoesNotUseSpatiePasskeysWithFortifyCheck::class,
         FormRequestFailOnUnknownFieldsCheck::class,
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSimplifierCheck::class,

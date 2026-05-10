@@ -11,4 +11,9 @@ class HasRectorConfigWithComposerBasedCheck extends AbstractHasRectorConfigCheck
     {
         return new RectorVisitorNamedArgument($this->commentCollector, 'withComposerBased', ['phpunit', 'symfony', 'laravel']);
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withComposerBased(phpunit: true, symfony: true, laravel: true)';
+    }
 }

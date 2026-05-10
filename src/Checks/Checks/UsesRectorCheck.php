@@ -2,19 +2,27 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
-use Limenet\LaravelBaseline\Checks\AbstractCheck;
+use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class UsesRectorCheck extends AbstractCheck
+class UsesRectorCheck extends AbstractFixableCheck
 {
-    public function check(): CheckResult
+    public function fix(bool $dry = false): CheckResult
     {
-        return $this->checkComposerPackages([
-            'rector/rector',
-            'driftingly/rector-laravel',
-        ])
-        && $this->checkComposerScript('ci-lint', 'rector')
-            ? CheckResult::PASS
-            : CheckResult::FAIL;
+        if (!$this->checkComposerPackages(['rector/rector', 'driftingly/rector-laravel'])) {
+            return CheckResult::FAIL;
+        }
+
+        if ($this->checkComposerScript('ci-lint', 'rector')) {
+            return CheckResult::PASS;
+        }
+
+        if ($dry) {
+            return CheckResult::FAIL;
+        }
+
+        $this->addToComposerScript('ci-lint', '@php vendor/bin/rector --dry-run');
+
+        return $this->fix(dry: true);
     }
 }

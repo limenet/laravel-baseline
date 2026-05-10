@@ -2,12 +2,12 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
-use Limenet\LaravelBaseline\Checks\AbstractCheck;
+use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class IsInstalledAsRegularDependencyCheck extends AbstractCheck
+class IsInstalledAsRegularDependencyCheck extends AbstractFixableCheck
 {
-    public function check(): CheckResult
+    public function fix(bool $dry = false): CheckResult
     {
         $composerJson = $this->getComposerJson();
 
@@ -18,7 +18,16 @@ class IsInstalledAsRegularDependencyCheck extends AbstractCheck
         if (isset($composerJson['require-dev']['limenet/laravel-baseline'])) {
             $this->addComment('limenet/laravel-baseline is in require-dev: Move it to require in composer.json');
 
-            return CheckResult::FAIL;
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
+
+            $version = $composerJson['require-dev']['limenet/laravel-baseline'];
+            unset($composerJson['require-dev']['limenet/laravel-baseline']);
+            $composerJson['require']['limenet/laravel-baseline'] = $version;
+            $this->writeComposerJson($composerJson);
+
+            return $this->fix(dry: true);
         }
 
         if (!isset($composerJson['require']['limenet/laravel-baseline'])) {

@@ -11,4 +11,9 @@ class HasRectorConfigWithPhpSetsCheck extends AbstractHasRectorConfigCheck
     {
         return new RectorVisitorHasCall($this->commentCollector, 'withPhpSets');
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withPhpSets()';
+    }
 }

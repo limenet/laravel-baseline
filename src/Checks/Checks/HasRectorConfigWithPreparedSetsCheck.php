@@ -11,4 +11,9 @@ class HasRectorConfigWithPreparedSetsCheck extends AbstractHasRectorConfigCheck
     {
         return new RectorVisitorNamedArgument($this->commentCollector, 'withPreparedSets', ['deadCode', 'codeQuality', 'codingStyle', 'typeDeclarations', 'privatization', 'instanceOf', 'earlyReturn']);
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withPreparedSets(deadCode: true, codeQuality: true, codingStyle: true, typeDeclarations: true, privatization: true, instanceOf: true, earlyReturn: true)';
+    }
 }

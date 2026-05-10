@@ -8,4 +8,12 @@ class UsesSpatieHealthHasLaravelVersionCheckCheck extends AbstractUsesSpatieHeal
     {
         return ['LaravelVersionCheck'];
     }
+
+    protected function healthCheckFqns(): array
+    {
+        return [
+            'Spatie\\Health\\Facades\\Health',
+            'Limenet\\LaravelBaseline\\Health\\LaravelVersionCheck',
+        ];
+    }
 }

@@ -212,12 +212,14 @@ XML;
     expect($check->check())->toBe(CheckResult::FAIL);
 });
 
-it('checkPhpunit throws on invalid XML', function (): void {
+it('checkPhpunit fails with comment on invalid XML', function (): void {
     bindFakeComposer([]);
 
     $this->withTempBasePath(['phpunit.xml' => '<phpunit>', 'composer.json' => json_encode(['name' => 'tmp'])]);
 
-    expect(fn () => makeCheck(CheckPhpunitCheck::class)->check())->toThrow(Exception::class);
+    [$check, $collector] = makeCheckWithCollector(CheckPhpunitCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('PHPUnit configuration invalid: Check phpunit.xml for XML syntax errors');
 });
 
 it('checkPhpunit fails with error comment when phpunit.xml is empty', function (): void {

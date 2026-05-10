@@ -8,4 +8,12 @@ class UsesSpatieHealthHasReleaseAgeCheckCheck extends AbstractUsesSpatieHealthCh
     {
         return ['ReleaseAgeCheck'];
     }
+
+    protected function healthCheckFqns(): array
+    {
+        return [
+            'Spatie\\Health\\Facades\\Health',
+            'Limenet\\LaravelBaseline\\Health\\ReleaseAgeCheck',
+        ];
+    }
 }

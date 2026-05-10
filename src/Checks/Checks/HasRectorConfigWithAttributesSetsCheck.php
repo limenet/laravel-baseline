@@ -11,4 +11,9 @@ class HasRectorConfigWithAttributesSetsCheck extends AbstractHasRectorConfigChec
     {
         return new RectorVisitorHasCall($this->commentCollector, 'withAttributesSets');
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withAttributesSets()';
+    }
 }

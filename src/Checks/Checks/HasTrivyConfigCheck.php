@@ -3,63 +3,108 @@
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractCiJobCheck;
+use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Symfony\Component\Yaml\Yaml;
 
-class HasTrivyConfigCheck extends AbstractCiJobCheck
+class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 {
     public function check(): CheckResult
     {
-        $result = $this->checkRequiredCiJobs();
+        return $this->fix(dry: true);
+    }
 
-        if ($result !== CheckResult::PASS) {
-            return $result;
+    public function fix(bool $dry = false): CheckResult
+    {
+        // Check CI job first
+        $ciResult = $this->checkRequiredCiJobs();
+
+        if ($ciResult !== CheckResult::PASS) {
+            if ($dry) {
+                return $ciResult;
+            }
+
+            // Fix: add security job to .gitlab-ci.yml
+            $ciFile = base_path('.gitlab-ci.yml');
+
+            if (file_exists($ciFile)) {
+                $ciData = $this->getGitlabCiData() ?? [];
+
+                if (!isset($ciData['security'])) {
+                    $ciData['security'] = ['extends' => ['.lint_security']];
+                    file_put_contents($ciFile, Yaml::dump($ciData, 4, 2));
+                }
+            }
         }
 
-        $trivyConfig = $this->getTrivyConfig();
-
-        if ($trivyConfig === null) {
-            return CheckResult::FAIL;
-        }
+        // Check trivy.yaml
+        $trivyConfig = $this->loadYamlConfig('trivy.yaml') ?? [];
 
         $scanners = $trivyConfig['scan']['scanners'] ?? [];
+        $missingScanners = array_diff(['secret', 'vuln'], $scanners);
 
-        if (!in_array('secret', $scanners, true) || !in_array('vuln', $scanners, true)) {
+        if ($missingScanners !== []) {
             $this->addComment("Missing required scanners in trivy.yaml: scan.scanners must include 'secret' and 'vuln'");
 
-            return CheckResult::FAIL;
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
         }
 
         $severity = $trivyConfig['severity'] ?? [];
+        $missingSeverity = array_diff(['CRITICAL', 'HIGH'], $severity);
 
-        if (!in_array('CRITICAL', $severity, true) || !in_array('HIGH', $severity, true)) {
+        if ($missingSeverity !== []) {
             $this->addComment("Missing required severity levels in trivy.yaml: severity must include 'CRITICAL' and 'HIGH'");
 
-            return CheckResult::FAIL;
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
         }
 
         $skipDirs = $trivyConfig['scan']['skip-dirs'] ?? [];
-        $requiredSkipDirs = ['.ddev', 'node_modules', 'storage/logs', 'vendor'];
-        $missingDirs = array_diff($requiredSkipDirs, $skipDirs);
+        $missingDirs = array_diff(['.ddev', 'node_modules', 'storage/logs', 'vendor'], $skipDirs);
 
         if ($missingDirs !== []) {
             $this->addComment('Missing skip-dirs in trivy.yaml: scan.skip-dirs must include '.implode(', ', $missingDirs));
 
-            return CheckResult::FAIL;
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
         }
 
-        return CheckResult::PASS;
+        if ($dry) {
+            return CheckResult::PASS;
+        }
+
+        // Apply trivy.yaml fixes
+        $trivyFile = base_path('trivy.yaml');
+
+        foreach (['secret', 'vuln'] as $scanner) {
+            if (!in_array($scanner, $trivyConfig['scan']['scanners'] ?? [], true)) {
+                $trivyConfig['scan']['scanners'][] = $scanner;
+            }
+        }
+
+        foreach (['CRITICAL', 'HIGH'] as $level) {
+            if (!in_array($level, $trivyConfig['severity'] ?? [], true)) {
+                $trivyConfig['severity'][] = $level;
+            }
+        }
+
+        foreach (['.ddev', 'node_modules', 'storage/logs', 'vendor'] as $dir) {
+            if (!in_array($dir, $trivyConfig['scan']['skip-dirs'] ?? [], true)) {
+                $trivyConfig['scan']['skip-dirs'][] = $dir;
+            }
+        }
+
+        file_put_contents($trivyFile, Yaml::dump($trivyConfig, 4, 2));
+
+        return $this->fix(dry: true);
     }
 
     protected function requiredCiJobs(): array
     {
         return ['security' => '.lint_security'];
-    }
-
-    /**
-     * @return array<string,mixed>|null
-     */
-    private function getTrivyConfig(): ?array
-    {
-        return $this->loadYamlConfig('trivy.yaml');
     }
 }

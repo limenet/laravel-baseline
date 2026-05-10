@@ -11,4 +11,9 @@ class HasRectorConfigWithImportNamesCheck extends AbstractHasRectorConfigCheck
     {
         return new RectorVisitorNamedArgument($this->commentCollector, 'withImportNames', ['!importShortClasses']);
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withImportNames(importShortClasses: false)';
+    }
 }

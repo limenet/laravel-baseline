@@ -11,4 +11,9 @@ class HasRectorConfigWithPathsCheck extends AbstractHasRectorConfigCheck
     {
         return new RectorVisitorPaths($this->commentCollector, 'withPaths', ['app', 'database', 'routes', 'tests']);
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return "->withPaths(['app', 'database', 'routes', 'tests'])";
+    }
 }

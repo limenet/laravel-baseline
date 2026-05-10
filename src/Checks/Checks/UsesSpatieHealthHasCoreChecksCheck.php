@@ -23,4 +23,20 @@ class UsesSpatieHealthHasCoreChecksCheck extends AbstractUsesSpatieHealthChecksC
     {
         return ['spatie/laravel-health', 'spatie/cpu-load-health-check'];
     }
+
+    protected function healthCheckFqns(): array
+    {
+        return [
+            'Spatie\\Health\\Facades\\Health',
+            'Spatie\\Health\\Checks\\Checks\\CacheCheck',
+            'Spatie\\CpuLoadHealthCheck\\CpuLoadCheck',
+            'Spatie\\Health\\Checks\\Checks\\DatabaseCheck',
+            'Spatie\\Health\\Checks\\Checks\\DebugModeCheck',
+            'Spatie\\Health\\Checks\\Checks\\EnvironmentCheck',
+            'Spatie\\Health\\Checks\\Checks\\HorizonCheck',
+            'Spatie\\Health\\Checks\\Checks\\RedisCheck',
+            'Spatie\\Health\\Checks\\Checks\\ScheduleCheck',
+            'Spatie\\Health\\Checks\\Checks\\UsedDiskSpaceCheck',
+        ];
+    }
 }

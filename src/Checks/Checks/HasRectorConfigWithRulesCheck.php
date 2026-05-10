@@ -15,4 +15,18 @@ class HasRectorConfigWithRulesCheck extends AbstractHasRectorConfigCheck
             'UseForwardsCallsTraitRector',
         ]);
     }
+
+    protected function fixCodeSnippet(): string
+    {
+        return '->withRules([AddGenericReturnTypeToRelationsRector::class, MinutesToSecondsInCacheRector::class, UseForwardsCallsTraitRector::class])';
+    }
+
+    protected function fixImports(): array
+    {
+        return [
+            'RectorLaravel\\Rector\\ClassMethod\\AddGenericReturnTypeToRelationsRector',
+            'RectorLaravel\\Rector\\MethodCall\\MinutesToSecondsInCacheRector',
+            'RectorLaravel\\Rector\\Class_\\UseForwardsCallsTraitRector',
+        ];
+    }
 }
