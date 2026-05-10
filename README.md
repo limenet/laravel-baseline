@@ -80,6 +80,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesPredis()`** - Validates Predis Redis client is installed
 - **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used
 - **`doesNotUseSail()`** - Validates Sail is NOT used
+- **`doesNotUseSpatiePasskeysWithFortify()`** - Fails if both `spatie/laravel-passkeys` and `laravel/fortify` are installed, as they overlap in authentication responsibility
 - **`doesNotUseHorizonWatcher()`** - Validates Spatie Horizon Watcher is NOT installed
 - **`doesNotUseGreaterThanOrEqualConstraints()`** - Validates no `>=` version constraints in composer.json (use `^` or `~` instead)
 
