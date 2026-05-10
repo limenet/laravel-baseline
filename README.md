@@ -61,6 +61,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured
 - **`usesLaravelAdminer()`** - Warns if Laravel Adminer database UI is missing (optional), validates TFA confirmation and configuration when installed
 - **`usesLaravelBoost()`** - Validates Laravel Boost AI development tool
+- **`runsBoostUpdate()`** *(periodic, every 30 days)* - Warns if Laravel Boost is not installed; when installed, fails until a developer confirms running `php artisan boost:update --discover` via `limenet:laravel-baseline:periodic`
 - **`usesLimenetPintConfig()`** - Validates custom Laravel Pint formatting standards
 
 ### Laravel Features & Monitoring
@@ -108,6 +109,7 @@ This package validates your Laravel installation against the following checks:
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
 - **`hasGuidelinesUpdateScript()`** - Validates baseline guidelines update script
 - **`callsBaseline()`** - Validates self-validation runs after updates
+- **`callsPeriodicBaseline()`** - Validates `php artisan limenet:laravel-baseline:periodic` is in the `post-update-cmd` scripts
 - **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`)
 - **`usesLaravelLang()`** - Validates `laravel-lang/lang` dev dependency is installed with `lang:update` and pint in post-update scripts
 

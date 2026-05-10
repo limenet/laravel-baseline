@@ -7,15 +7,23 @@
 The codebase uses a **one class per check** architecture:
 
 ```
-src/Checks/
-├── CheckInterface.php           # Contract for all checks
-├── AbstractCheck.php            # Base class with helper methods
-├── CheckRegistry.php            # Registry of all check classes
-├── CommentCollector.php         # Manages comments for a check run
-└── Checks/                      # Individual check classes (35 total)
-    ├── BumpsComposerCheck.php
-    ├── CallsBaselineCheck.php
-    └── ...
+src/
+├── Checks/
+│   ├── CheckInterface.php           # Contract for all checks
+│   ├── AbstractCheck.php            # Base class with helper methods
+│   ├── PeriodicCheckInterface.php   # Contract for periodic checks
+│   ├── AbstractPeriodicCheck.php    # Base class for periodic checks
+│   ├── CheckRegistry.php            # Registry of all check classes
+│   ├── CommentCollector.php         # Manages comments for a check run
+│   └── Checks/                      # Individual check classes
+│       ├── BumpsComposerCheck.php
+│       └── ...
+├── Commands/
+│   ├── LaravelBaselineCommand.php   # CI-safe check runner
+│   ├── PeriodicCheckCommand.php     # Interactive periodic check runner
+│   └── UpdateGuidelinesCommand.php
+└── State/
+    └── StateManager.php             # Reads/writes config/baseline.php for periodic state
 ```
 
 ## Check Size Guidelines
@@ -188,3 +196,53 @@ When **renaming** a check class, the `name()` return value changes automatically
 - `CheckResult::PASS` - Check passed successfully
 - `CheckResult::FAIL` - Check failed, will increment error count and fail the command
 - `CheckResult::WARN` - Optional check not configured (e.g., Pennant or Sentry if not installed)
+
+## Periodic Checks
+
+Some requirements can't be verified statically — they require a developer to perform a manual task on a schedule. Use `AbstractPeriodicCheck` for these.
+
+### Adding a Periodic Check
+
+Extend `AbstractPeriodicCheck` instead of `AbstractCheck`:
+
+```php
+class RunsMyTaskCheck extends AbstractPeriodicCheck
+{
+    // interval() defaults to 30 days — override only if a different period is needed
+    public function interval(): CarbonInterval
+    {
+        return CarbonInterval::days(14);
+    }
+
+    public function isApplicable(): bool
+    {
+        // Return false to skip the periodic check entirely (yields WARN)
+        // Use this to guard on optional packages:
+        return $this->checkComposerPackages('vendor/package');
+    }
+
+    public function promptDescription(): string
+    {
+        return "Run 'php artisan my:command' to keep X up to date.";
+    }
+}
+```
+
+- `interval()` — defaults to 30 days in `AbstractPeriodicCheck`; override to change
+- `isApplicable()` — defaults to `true`; return `false` to yield `WARN` (e.g., optional package not installed)
+- `promptDescription()` — shown to the developer in the interactive command
+- `check()` is `final` in `AbstractPeriodicCheck` — do not override; use `isApplicable()` for preconditions
+
+### How periodic state is stored
+
+Timestamps are persisted in `config/baseline.php` under a `periodic` key by `StateManager`. The file is rewritten using `var_export` each time a check is confirmed. `StateManager` reads directly via `require` (bypassing Laravel's config cache) so state is always fresh.
+
+### Running periodic checks
+
+```bash
+# Interactive: guides through all expired periodic checks
+php artisan limenet:laravel-baseline:periodic
+
+# CI: fails for any expired periodic check (non-interactive)
+php artisan limenet:laravel-baseline:check
+```

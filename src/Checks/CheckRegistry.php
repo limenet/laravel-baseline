@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks;
 
 use Limenet\LaravelBaseline\Checks\Checks\BumpsComposerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsBaselineCheck;
+use Limenet\LaravelBaseline\Checks\Checks\CallsPeriodicBaselineCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsSentryHookCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
@@ -54,6 +55,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesPhpInsightsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
+use Limenet\LaravelBaseline\Checks\Checks\RunsBoostUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReleaseItCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieBackupCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasCoreChecksCheck;
@@ -68,6 +70,7 @@ class CheckRegistry
     private static array $checks = [
         BumpsComposerCheck::class,
         CallsBaselineCheck::class,
+        CallsPeriodicBaselineCheck::class,
         CallsSentryHookCheck::class,
         CheckPhpunitCheck::class,
         DdevHasPcovPackageCheck::class,
@@ -117,6 +120,7 @@ class CheckRegistry
         UsesPhpInsightsCheck::class,
         UsesPhpstanExtensionsCheck::class,
         UsesPredisCheck::class,
+        RunsBoostUpdateCheck::class,
         UsesRectorCheck::class,
         UsesReleaseItCheck::class,
         UsesSpatieBackupCheck::class,

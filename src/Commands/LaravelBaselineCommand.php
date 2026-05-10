@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Limenet\LaravelBaseline\Checks\CheckInterface;
 use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Checks\CommentCollector;
+use Limenet\LaravelBaseline\Checks\PeriodicCheckInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class LaravelBaselineCommand extends Command
@@ -20,6 +21,7 @@ class LaravelBaselineCommand extends Command
 
         $errorCount = collect(CheckRegistry::createAll($collector))
             ->reject(fn (CheckInterface $check): bool => $this->isExcluded($check))
+            ->reject(fn (CheckInterface $check): bool => $check instanceof PeriodicCheckInterface && ! $check->isApplicable())
             ->map(fn (CheckInterface $check): CheckResult => $this->runCheck($check, $collector))
             ->filter(fn (CheckResult $result): bool => $result->isError())
             ->count();
