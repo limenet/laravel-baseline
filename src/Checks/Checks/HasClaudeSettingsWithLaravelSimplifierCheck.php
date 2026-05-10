@@ -43,6 +43,14 @@ class HasClaudeSettingsWithLaravelSimplifierCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
+        $laravelKey = 'laravel@laravel';
+
+        if (!isset($enabledPlugins[$laravelKey]) || $enabledPlugins[$laravelKey] !== true) {
+            $this->addComment('Claude settings incomplete: Add "laravel@laravel": true to enabledPlugins in .claude/settings.json');
+
+            return CheckResult::FAIL;
+        }
+
         return CheckResult::PASS;
     }
 }

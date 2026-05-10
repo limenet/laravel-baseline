@@ -8,6 +8,7 @@ it('hasClaudeSettingsWithLaravelSimplifier passes when settings file has correct
     $settings = [
         'enabledPlugins' => [
             'laravel-simplifier@laravel' => true,
+            'laravel@laravel' => true,
         ],
     ];
 
@@ -90,11 +91,53 @@ it('hasClaudeSettingsWithLaravelSimplifier fails when laravel-simplifier plugin 
     expect($comments)->toContain('Claude settings incomplete: Add "laravel-simplifier@laravel": true to enabledPlugins in .claude/settings.json');
 });
 
+it('hasClaudeSettingsWithLaravelSimplifier fails when laravel plugin is missing', function (): void {
+    bindFakeComposer([]);
+    $settings = [
+        'enabledPlugins' => [
+            'laravel-simplifier@laravel' => true,
+        ],
+    ];
+
+    $this->withTempBasePath([
+        '.claude/settings.json' => json_encode($settings),
+    ]);
+
+    $check = makeCheck(HasClaudeSettingsWithLaravelSimplifierCheck::class);
+    $result = $check->check();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $check->getComments();
+    expect($comments)->toContain('Claude settings incomplete: Add "laravel@laravel": true to enabledPlugins in .claude/settings.json');
+});
+
+it('hasClaudeSettingsWithLaravelSimplifier fails when laravel plugin is false', function (): void {
+    bindFakeComposer([]);
+    $settings = [
+        'enabledPlugins' => [
+            'laravel-simplifier@laravel' => true,
+            'laravel@laravel' => false,
+        ],
+    ];
+
+    $this->withTempBasePath([
+        '.claude/settings.json' => json_encode($settings),
+    ]);
+
+    $check = makeCheck(HasClaudeSettingsWithLaravelSimplifierCheck::class);
+    $result = $check->check();
+
+    expect($result)->toBe(CheckResult::FAIL);
+    $comments = $check->getComments();
+    expect($comments)->toContain('Claude settings incomplete: Add "laravel@laravel": true to enabledPlugins in .claude/settings.json');
+});
+
 it('hasClaudeSettingsWithLaravelSimplifier passes with additional plugins', function (): void {
     bindFakeComposer([]);
     $settings = [
         'enabledPlugins' => [
             'laravel-simplifier@laravel' => true,
+            'laravel@laravel' => true,
             'another-plugin' => true,
         ],
     ];
