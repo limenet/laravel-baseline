@@ -25,7 +25,7 @@ class HasRectorConfigWithRulesCheck extends AbstractHasRectorConfigCheck
     {
         return [
             'RectorLaravel\\Rector\\ClassMethod\\AddGenericReturnTypeToRelationsRector',
-            'RectorLaravel\\Rector\\MethodCall\\MinutesToSecondsInCacheRector',
+            'RectorLaravel\\Rector\\StaticCall\\MinutesToSecondsInCacheRector',
             'RectorLaravel\\Rector\\Class_\\UseForwardsCallsTraitRector',
         ];
     }

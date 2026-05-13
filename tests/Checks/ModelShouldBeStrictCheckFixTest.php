@@ -38,6 +38,31 @@ PHP;
     expect($content)->toContain('shouldBeStrict');
 });
 
+it('modelShouldBeStrict fix adds import inside namespace before class', function (): void {
+    bindFakeComposer([]);
+    $provider = <<<'PHP'
+<?php
+namespace App\Providers;
+use Illuminate\Support\ServiceProvider;
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+    }
+}
+PHP;
+    $this->withTempBasePath(['app/Providers/AppServiceProvider.php' => $provider]);
+
+    makeCheck(ModelShouldBeStrictCheck::class)->fix();
+
+    $content = file_get_contents(base_path('app/Providers/AppServiceProvider.php'));
+    $importPos = strpos($content, 'use Illuminate\\Database\\Eloquent\\Model');
+    $classPos = strpos($content, 'class AppServiceProvider');
+
+    expect($importPos)->not->toBeFalse()
+        ->and($importPos)->toBeLessThan($classPos);
+});
+
 it('modelShouldBeStrict fix is idempotent when already correct', function (): void {
     bindFakeComposer([]);
     $provider = <<<'PHP'

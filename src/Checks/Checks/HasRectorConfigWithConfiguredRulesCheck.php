@@ -65,7 +65,7 @@ class HasRectorConfigWithConfiguredRulesCheck extends AbstractHasRectorConfigChe
     protected function fixImports(): array
     {
         return [
-            'RectorLaravel\\Rector\\Route\\RouteActionCallableRector',
+            'RectorLaravel\\Rector\\StaticCall\\RouteActionCallableRector',
             'RectorLaravel\\Rector\\MethodCall\\WhereToWhereLikeRector',
         ];
     }

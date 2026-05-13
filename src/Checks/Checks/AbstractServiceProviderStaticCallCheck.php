@@ -110,10 +110,19 @@ abstract class AbstractServiceProviderStaticCallCheck extends AbstractFixableChe
             return;
         }
 
+        // Use statements live inside the Namespace_ node's stmts in namespaced files.
+        $target = &$ast;
+        foreach ($ast as $node) {
+            if ($node instanceof Node\Stmt\Namespace_) {
+                $target = &$node->stmts;
+                break;
+            }
+        }
+
         $existingFqns = [];
         $lastUseIdx = -1;
 
-        foreach ($ast as $i => $stmt) {
+        foreach ($target as $i => $stmt) {
             if ($stmt instanceof Node\Stmt\Use_) {
                 $lastUseIdx = $i;
 
@@ -134,8 +143,8 @@ abstract class AbstractServiceProviderStaticCallCheck extends AbstractFixableChe
         }
 
         if ($newUses !== []) {
-            $insertIdx = $lastUseIdx >= 0 ? $lastUseIdx + 1 : 1;
-            array_splice($ast, $insertIdx, 0, $newUses);
+            $insertIdx = $lastUseIdx >= 0 ? $lastUseIdx + 1 : 0;
+            array_splice($target, $insertIdx, 0, $newUses);
         }
     }
 }
