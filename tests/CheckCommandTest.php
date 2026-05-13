@@ -32,7 +32,7 @@ it('all check classes have unique names', function (): void {
 
 it('has correct command signature', function (): void {
     $command = new CheckCommand();
-    expect($command->signature)->toBe('limenet:laravel-baseline:check');
+    expect($command->signature)->toBe('limenet:laravel-baseline:check {--fix : Automatically fix issues where possible}');
 })->group('command');
 
 it('has correct command description', function (): void {
