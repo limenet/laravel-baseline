@@ -2,6 +2,8 @@
 
 namespace Limenet\LaravelBaseline\State;
 
+use Limenet\LaravelBaseline\PhpFile\PhpFileWriter;
+
 class PeriodicStateManager
 {
     public static function getLastRun(string $checkName): ?\DateTimeImmutable
@@ -22,10 +24,7 @@ class PeriodicStateManager
         $config = self::readConfig();
         $config['periodic'][$checkName] = $time->format(\DateTimeInterface::ATOM);
 
-        file_put_contents(
-            config_path('baseline.php'),
-            "<?php\n\nreturn ".var_export($config, true).";\n",
-        );
+        PhpFileWriter::writeConfig(config_path('baseline.php'), $config);
     }
 
     /** @return array<string,mixed> */

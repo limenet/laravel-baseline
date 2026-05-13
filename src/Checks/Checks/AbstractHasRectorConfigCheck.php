@@ -4,12 +4,12 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\PhpFile\PhpFileWriter;
 use Limenet\LaravelBaseline\Rector\AbstractRectorVisitor;
 use PhpParser\Node;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter;
 
 abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
 {
@@ -94,14 +94,8 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
      */
     protected function appendToRectorChain(string $rectorFile, string $snippet, array $imports = []): void
     {
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
-        $printer = new PrettyPrinter\Standard();
-
-        $code = file_get_contents($rectorFile) ?: '';
-        $ast = $parser->parse($code) ?? [];
-
         $snippetCode = '<?php $dummy'.$snippet.';';
-        $snippetAst = $parser->parse($snippetCode) ?? [];
+        $snippetAst = (new ParserFactory())->createForNewestSupportedVersion()->parse($snippetCode) ?? [];
 
         if ($snippetAst === [] || !$snippetAst[0] instanceof Node\Stmt\Expression) {
             return;
@@ -113,15 +107,16 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
             return;
         }
 
+        $writer = PhpFileWriter::open($rectorFile);
         $finder = new NodeFinder();
-        $return = $finder->findFirst($ast, fn ($n): bool => $n instanceof Node\Stmt\Return_);
+        $return = $finder->findFirst($writer->stmts, fn ($n): bool => $n instanceof Node\Stmt\Return_);
 
         if ($return instanceof Node\Stmt\Return_) {
             if ($return->expr instanceof Node\Expr\MethodCall || $return->expr instanceof Node\Expr\StaticCall) {
                 $methodCall->var = $return->expr;
                 $return->expr = $methodCall;
             } else {
-                $exprStmt = $finder->findFirst($ast, fn ($n): bool => $n instanceof Node\Stmt\Expression
+                $exprStmt = $finder->findFirst($writer->stmts, fn ($n): bool => $n instanceof Node\Stmt\Expression
                     && $n->expr instanceof Node\Expr\MethodCall);
 
                 if ($exprStmt instanceof Node\Stmt\Expression) {
@@ -131,46 +126,7 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
             }
         }
 
-        $this->addMissingUseStatements($ast, $imports);
-
-        file_put_contents($rectorFile, $printer->prettyPrintFile($ast));
-    }
-
-    /**
-     * @param  array<Node>  $ast
-     * @param  list<string>  $imports
-     */
-    private function addMissingUseStatements(array &$ast, array $imports): void
-    {
-        if ($imports === []) {
-            return;
-        }
-
-        $existingFqns = [];
-        $lastUseIdx = -1;
-
-        foreach ($ast as $i => $stmt) {
-            if ($stmt instanceof Node\Stmt\Use_) {
-                $lastUseIdx = $i;
-
-                foreach ($stmt->uses as $use) {
-                    $existingFqns[] = $use->name->toString();
-                }
-            }
-        }
-
-        $newUses = [];
-
-        foreach ($imports as $fqn) {
-            if (!in_array($fqn, $existingFqns, true)) {
-                $newUses[] = new Node\Stmt\Use_([
-                    new Node\UseItem(new Node\Name($fqn)),
-                ]);
-            }
-        }
-
-        if ($newUses !== []) {
-            array_splice($ast, $lastUseIdx + 1, 0, $newUses);
-        }
+        $writer->addMissingUseStatements($imports);
+        $writer->save();
     }
 }

@@ -5,11 +5,10 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Health\HealthChecksStaticCallVisitor;
+use Limenet\LaravelBaseline\PhpFile\PhpFileWriter;
 use PhpParser\Node;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter;
 
 abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
 {
@@ -27,18 +26,12 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
-
-        try {
-            $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
-        } catch (\Throwable) {
-            return CheckResult::FAIL;
-        }
+        $writer = PhpFileWriter::open($file);
 
         $visitor = new HealthChecksStaticCallVisitor($this->requiredHealthCheckClasses());
         $traverser = new NodeTraverser();
         $traverser->addVisitor($visitor);
-        $traverser->traverse($ast);
+        $traverser->traverse($writer->stmts);
 
         if ($visitor->wasFound()) {
             return CheckResult::PASS;
@@ -54,7 +47,7 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
 
         // Find existing Health::checks([...]) call to extend
         $healthCall = $finder->findFirst(
-            $ast,
+            $writer->stmts,
             fn ($n): bool => $n instanceof Node\Expr\StaticCall
                 && $n->class instanceof Node\Name
                 && $n->class->getLast() === 'Health'
@@ -77,7 +70,7 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
             }
         } else {
             $bootMethod = $finder->findFirst(
-                $ast,
+                $writer->stmts,
                 fn ($n): bool => $n instanceof Node\Stmt\ClassMethod
                     && $n->name->toString() === 'boot',
             );
@@ -105,9 +98,8 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
             );
         }
 
-        $this->addMissingUseStatements($ast, $this->healthCheckFqns());
-
-        file_put_contents($file, (new PrettyPrinter\Standard())->prettyPrintFile($ast));
+        $writer->addMissingUseStatements($this->healthCheckFqns());
+        $writer->save();
 
         return $this->fix(dry: true);
     }
@@ -134,44 +126,5 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
     protected function healthCheckFqns(): array
     {
         return [];
-    }
-
-    /**
-     * @param  array<Node>  $ast
-     * @param  list<string>  $imports
-     */
-    private function addMissingUseStatements(array &$ast, array $imports): void
-    {
-        if ($imports === []) {
-            return;
-        }
-
-        $existingFqns = [];
-        $lastUseIdx = -1;
-
-        foreach ($ast as $i => $stmt) {
-            if ($stmt instanceof Node\Stmt\Use_) {
-                $lastUseIdx = $i;
-
-                foreach ($stmt->uses as $use) {
-                    $existingFqns[] = $use->name->toString();
-                }
-            }
-        }
-
-        $newUses = [];
-
-        foreach ($imports as $fqn) {
-            if (!in_array($fqn, $existingFqns, true)) {
-                $newUses[] = new Node\Stmt\Use_([
-                    new Node\UseItem(new Node\Name($fqn)),
-                ]);
-            }
-        }
-
-        if ($newUses !== []) {
-            $insertIdx = $lastUseIdx >= 0 ? $lastUseIdx + 1 : 1;
-            array_splice($ast, $insertIdx, 0, $newUses);
-        }
     }
 }
