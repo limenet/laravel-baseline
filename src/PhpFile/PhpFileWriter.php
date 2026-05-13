@@ -35,7 +35,7 @@ class PhpFileWriter
     {
         $source = file_exists($path) ? (string) file_get_contents($path) : $fallback;
 
-        $parser = (new ParserFactory)->createForNewestSupportedVersion();
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
         $originalStmts = $parser->parse($source) ?? [];
         $tokens = $parser->getTokens();
 
@@ -52,11 +52,12 @@ class PhpFileWriter
      * config files (e.g., config/baseline.php) where the whole content is derived
      * from a PHP array.
      *
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public static function writeConfig(string $path, array $config): void
     {
-        $printer = new class extends Standard {
+        $printer = new class() extends Standard
+        {
             /** @param Node[] $nodes */
             protected function pMaybeMultiline(array $nodes, bool $trailingComma = false): string
             {
@@ -79,7 +80,7 @@ class PhpFileWriter
      * Handles both namespaced and global files. Inserts after the last existing
      * use-statement, or at the top of the statement list if none exist.
      *
-     * @param list<string> $imports Fully-qualified class names to add if missing
+     * @param  list<string>  $imports  Fully-qualified class names to add if missing
      */
     public function addMissingUseStatements(array $imports): void
     {
@@ -128,7 +129,7 @@ class PhpFileWriter
     {
         file_put_contents(
             $this->path,
-            (new Standard)->printFormatPreserving($this->stmts, $this->originalStmts, $this->tokens),
+            (new Standard())->printFormatPreserving($this->stmts, $this->originalStmts, $this->tokens),
         );
     }
 
