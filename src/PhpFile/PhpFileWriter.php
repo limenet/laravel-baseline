@@ -11,12 +11,18 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use PhpParser\Token;
 
 class PhpFileWriter
 {
     /** @var Node\Stmt[] Mutable AST — modify this, then call save() */
     public array $stmts;
 
+    /**
+     * @param  Node\Stmt[]  $originalStmts
+     * @param  Token[]  $tokens
+     * @param  Node\Stmt[]  $stmts
+     */
     private function __construct(
         private readonly string $path,
         private readonly array $originalStmts,
@@ -40,6 +46,7 @@ class PhpFileWriter
         $tokens = $parser->getTokens();
 
         $traverser = new NodeTraverser(new CloningVisitor());
+        /** @var Node\Stmt[] $stmts */
         $stmts = $traverser->traverse($originalStmts);
 
         return new self($path, $originalStmts, $tokens, $stmts);
