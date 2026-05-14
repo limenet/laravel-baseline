@@ -11,8 +11,6 @@ use PhpParser\ParserFactory;
 
 abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractCheck
 {
-    abstract protected function healthCheckClassName(): string;
-
     public function check(): CheckResult
     {
         if (!$this->checkComposerPackages('spatie/laravel-health')) {
@@ -35,6 +33,8 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
 
         return CheckResult::PASS;
     }
+
+    abstract protected function healthCheckClassName(): string;
 
     private function checkUsesCacheStore(string $class): bool
     {

@@ -13,6 +13,11 @@ class HealthCheckCacheStoreVisitor extends AbstractHealthChecksVisitor
         private readonly string $cacheStoreName,
     ) {}
 
+    public function wasFound(): bool
+    {
+        return $this->found;
+    }
+
     protected function processChecksArray(Node\Expr\Array_ $array): void
     {
         foreach ($array->items as $item) {
@@ -26,11 +31,6 @@ class HealthCheckCacheStoreVisitor extends AbstractHealthChecksVisitor
                 return;
             }
         }
-    }
-
-    public function wasFound(): bool
-    {
-        return $this->found;
     }
 
     private function isTargetCheckWithCacheStore(Node\Expr $expr): bool

@@ -9,6 +9,12 @@ class QueueCheckHorizonQueuesVisitor extends AbstractHealthChecksVisitor
     /** @var list<string>|null null = QueueCheck not found or no onQueue call */
     private ?array $queues = null;
 
+    /** @return list<string>|null null means QueueCheck not found or onQueue not called */
+    public function getQueues(): ?array
+    {
+        return $this->queues;
+    }
+
     protected function processChecksArray(Node\Expr\Array_ $array): void
     {
         foreach ($array->items as $item) {
@@ -28,12 +34,6 @@ class QueueCheckHorizonQueuesVisitor extends AbstractHealthChecksVisitor
 
             return;
         }
-    }
-
-    /** @return list<string>|null null means QueueCheck not found or onQueue not called */
-    public function getQueues(): ?array
-    {
-        return $this->queues;
     }
 
     /** @return list<string>|null */

@@ -16,6 +16,17 @@ class HealthChecksStaticCallVisitor extends AbstractHealthChecksVisitor
      */
     public function __construct(private readonly array $requiredClassNames) {}
 
+    public function wasFound(): bool
+    {
+        return $this->found;
+    }
+
+    /** @return list<string> */
+    public function getMissingClasses(): array
+    {
+        return $this->missingClasses;
+    }
+
     protected function processChecksArray(Node\Expr\Array_ $array): void
     {
         $foundClasses = [];
@@ -34,16 +45,5 @@ class HealthChecksStaticCallVisitor extends AbstractHealthChecksVisitor
 
         $this->missingClasses = array_values(array_diff($this->requiredClassNames, $foundClasses));
         $this->found = $this->missingClasses === [];
-    }
-
-    public function wasFound(): bool
-    {
-        return $this->found;
-    }
-
-    /** @return list<string> */
-    public function getMissingClasses(): array
-    {
-        return $this->missingClasses;
     }
 }
