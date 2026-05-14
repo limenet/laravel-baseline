@@ -19,6 +19,7 @@ use Limenet\LaravelBaseline\Checks\Checks\FormRequestFailOnUnknownFieldsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSimplifierCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasDailyLoggingCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasEditorconfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasGuidelinesUpdateScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasNpmScriptsCheck;
@@ -89,6 +90,7 @@ class CheckRegistry
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSimplifierCheck::class,
         HasDailyLoggingCheck::class,
+        HasEditorconfigCheck::class,
         HasRectorConfigWithAttributesSetsCheck::class,
         HasRectorConfigWithComposerBasedCheck::class,
         HasRectorConfigWithConfiguredRulesCheck::class,

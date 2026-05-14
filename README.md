@@ -74,6 +74,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`hasRectorConfigWithSkip()`** - Validates Rector `withSkip()` contains required skipped rules (always: 6 Laravel rules; Laravel 13+: TablePropertyToTableAttributeRector; when server.php exists: ServerVariableToRequestFacadeRector) *(appends call to rector.php)*
 
 ### IDE & Developer Tools
+- 🔧 **`hasEditorconfig()`** - Validates `.editorconfig` exists with required settings (`root = true`, `charset`, `end_of_line`, `indent_style`, `insert_final_newline`, `trim_trailing_whitespace`) *(creates `.editorconfig` with canonical content if missing or incomplete)*
 - 🔧 **`hasClaudeSettingsWithLaravelSimplifier()`** - Validates Claude Code settings include Laravel Simplifier plugin *(creates/merges `.claude/settings.json`)*
 - 🔧 **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured *(partial: adds post-update scripts if package installed)*
 - **`usesLaravelAdminer()`** - Warns if Laravel Adminer database UI is missing (optional), validates TFA confirmation and configuration when installed
