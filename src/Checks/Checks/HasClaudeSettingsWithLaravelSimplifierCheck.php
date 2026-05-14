@@ -60,15 +60,20 @@ class HasClaudeSettingsWithLaravelSimplifierCheck extends AbstractFixableCheck
             return CheckResult::PASS;
         }
 
-        // Apply fix
-        if (!is_dir(base_path('.claude'))) {
-            mkdir(base_path('.claude'), 0755, true);
+        // Apply fix only if needed
+        $alreadyCorrect = ($settings['enabledPlugins']['laravel-simplifier@laravel'] ?? null) === true
+            && ($settings['enabledPlugins']['laravel@laravel'] ?? null) === true;
+
+        if (!$alreadyCorrect) {
+            if (!is_dir(base_path('.claude'))) {
+                mkdir(base_path('.claude'), 0755, true);
+            }
+
+            $settings['enabledPlugins']['laravel-simplifier@laravel'] = true;
+            $settings['enabledPlugins']['laravel@laravel'] = true;
+
+            file_put_contents($settingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
         }
-
-        $settings['enabledPlugins']['laravel-simplifier@laravel'] = true;
-        $settings['enabledPlugins']['laravel@laravel'] = true;
-
-        file_put_contents($settingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
 
         return $this->fix(dry: true);
     }

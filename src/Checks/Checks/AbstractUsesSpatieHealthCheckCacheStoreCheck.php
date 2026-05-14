@@ -17,12 +17,6 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return CheckResult::WARN;
         }
 
-        $extra = $this->extraChecks();
-
-        if ($extra !== null) {
-            return $extra;
-        }
-
         $class = $this->healthCheckClassName();
 
         if (!$this->checkUsesCacheStore($class)) {
@@ -42,12 +36,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
 
     abstract protected function healthCheckClassName(): string;
 
-    protected function extraChecks(): ?CheckResult
-    {
-        return null;
-    }
-
-    private function checkUsesCacheStore(string $class): bool
+    protected function checkUsesCacheStore(string $class): bool
     {
         $file = base_path('app/Providers/AppServiceProvider.php');
 
@@ -71,7 +60,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
         return $visitor->wasFound();
     }
 
-    private function hasHealthChecksCacheStore(): bool
+    protected function hasHealthChecksCacheStore(): bool
     {
         $file = base_path('config/cache.php');
 

@@ -72,7 +72,20 @@ class CheckCommand extends Command
         $collector->reset();
 
         $useFix = $fix && $check instanceof FixableInterface;
-        $result = $useFix ? $check->fix() : $check->check();
+        $wasFixed = false;
+
+        if ($useFix) {
+            $dryResult = $check->check();
+            if ($dryResult->isError()) {
+                $collector->reset();
+                $result = $check->fix();
+                $wasFixed = !$result->isError();
+            } else {
+                $result = $dryResult;
+            }
+        } else {
+            $result = $check->check();
+        }
 
         $checkName = $check::name();
         $displayName = str($checkName)->ucsplit()->implode(' ');
@@ -80,14 +93,14 @@ class CheckCommand extends Command
         $hasOutput = $result->isError() || $this->getOutput()->isVerbose();
         $hasComments = $result->isError() || $this->getOutput()->isVeryVerbose();
 
-        if ($useFix && !$result->isError()) {
+        if ($wasFixed) {
             $hasOutput = true;
         }
 
         if ($hasOutput) {
             $this->newLine();
-            $icon = ($useFix && !$result->isError()) ? '🔧' : $result->icon();
-            $suffix = ($useFix && !$result->isError()) ? ' (fixed)' : '';
+            $icon = $wasFixed ? '🔧' : $result->icon();
+            $suffix = $wasFixed ? ' (fixed)' : '';
             $this->line(sprintf(
                 '%s %s%s',
                 $icon,
