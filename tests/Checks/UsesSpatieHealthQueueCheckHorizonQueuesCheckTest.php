@@ -61,7 +61,7 @@ it('usesSpatieHealthQueueCheckHorizonQueues fails when QueueCheck has no onQueue
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthQueueCheckHorizonQueuesCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('QueueCheck must register all Horizon queues: add ->onQueue([default, notifications]) to QueueCheck in AppServiceProvider');
+    expect($collector->all())->toContain("QueueCheck must register all Horizon queues: add ->onQueue(['default', 'notifications']) to QueueCheck in AppServiceProvider");
 });
 
 it('usesSpatieHealthQueueCheckHorizonQueues fails when onQueue is missing a Horizon queue', function () use ($validHorizon): void {
@@ -80,7 +80,7 @@ it('usesSpatieHealthQueueCheckHorizonQueues fails when onQueue is missing a Hori
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthQueueCheckHorizonQueuesCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('QueueCheck is missing Horizon queues: add [notifications] to the onQueue call in AppServiceProvider');
+    expect($collector->all())->toContain("QueueCheck is missing Horizon queues: add ['notifications'] to the onQueue call in AppServiceProvider");
 });
 
 it('usesSpatieHealthQueueCheckHorizonQueues passes when all Horizon queues are covered', function () use ($validHorizon, $validAppServiceProvider): void {

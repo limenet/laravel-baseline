@@ -28,7 +28,7 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
         $onQueueQueues = $this->getQueueCheckOnQueueQueues();
 
         if ($onQueueQueues === null) {
-            $missing = implode(', ', $horizonQueues);
+            $missing = implode(', ', array_map(fn (string $q): string => "'{$q}'", $horizonQueues));
             $this->addComment("QueueCheck must register all Horizon queues: add ->onQueue([{$missing}]) to QueueCheck in AppServiceProvider");
 
             return CheckResult::FAIL;
@@ -37,7 +37,7 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
         $missingQueues = array_values(array_diff($horizonQueues, $onQueueQueues));
 
         if ($missingQueues !== []) {
-            $missing = implode(', ', $missingQueues);
+            $missing = implode(', ', array_map(fn (string $q): string => "'{$q}'", $missingQueues));
             $this->addComment("QueueCheck is missing Horizon queues: add [{$missing}] to the onQueue call in AppServiceProvider");
 
             return CheckResult::FAIL;

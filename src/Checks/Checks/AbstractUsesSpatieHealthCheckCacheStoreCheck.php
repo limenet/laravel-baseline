@@ -17,6 +17,12 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return CheckResult::WARN;
         }
 
+        $extra = $this->extraChecks();
+
+        if ($extra !== null) {
+            return $extra;
+        }
+
         $class = $this->healthCheckClassName();
 
         if (!$this->checkUsesCacheStore($class)) {
@@ -26,7 +32,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
         }
 
         if (!$this->hasHealthChecksCacheStore()) {
-            $this->addComment("Missing health-checks cache store: add a 'health-checks' entry under 'stores' in config/cache.php");
+            $this->addComment("Missing health-checks cache store: add a 'health-checks' entry with driver 'file' under 'stores' in config/cache.php");
 
             return CheckResult::FAIL;
         }
@@ -35,6 +41,11 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
     }
 
     abstract protected function healthCheckClassName(): string;
+
+    protected function extraChecks(): ?CheckResult
+    {
+        return null;
+    }
 
     private function checkUsesCacheStore(string $class): bool
     {
@@ -81,6 +92,8 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
-        return isset($visitor->getConfig()['stores']['health-checks']);
+        $store = $visitor->getConfig()['stores']['health-checks'] ?? null;
+
+        return is_array($store) && ($store['driver'] ?? null) === 'file';
     }
 }

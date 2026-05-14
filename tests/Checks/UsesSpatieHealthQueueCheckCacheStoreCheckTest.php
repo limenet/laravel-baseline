@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckCacheStoreCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
@@ -12,7 +13,7 @@ PHP;
 
 $validCache = <<<'PHP'
 <?php
-return ['stores' => ['health-checks' => ['driver' => 'redis']]];
+return ['stores' => ['health-checks' => ['driver' => 'file']]];
 PHP;
 
 it('usesSpatieHealthQueueCheckCacheStore warns when package is not installed', function (): void {
@@ -22,9 +23,19 @@ it('usesSpatieHealthQueueCheckCacheStore warns when package is not installed', f
     expect(makeCheck(UsesSpatieHealthQueueCheckCacheStoreCheck::class)->check())->toBe(CheckResult::WARN);
 });
 
+it('usesSpatieHealthQueueCheckCacheStore fails when health:queue-check-heartbeat is not scheduled', function (): void {
+    bindFakeComposer(['spatie/laravel-health' => true]);
+    $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
+
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthQueueCheckCacheStoreCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Missing schedule: add DispatchQueueCheckJobsCommand::class scheduled everyMinute() in your scheduler');
+});
+
 it('usesSpatieHealthQueueCheckCacheStore fails when AppServiceProvider is missing', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
+    Schedule::command('health:queue-check-heartbeat');
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthQueueCheckCacheStoreCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
@@ -33,6 +44,7 @@ it('usesSpatieHealthQueueCheckCacheStore fails when AppServiceProvider is missin
 
 it('usesSpatieHealthQueueCheckCacheStore fails when QueueCheck has no useCacheStore call', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
+    Schedule::command('health:queue-check-heartbeat');
 
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
@@ -51,6 +63,7 @@ it('usesSpatieHealthQueueCheckCacheStore fails when QueueCheck has no useCacheSt
 
 it('usesSpatieHealthQueueCheckCacheStore fails when useCacheStore uses the wrong store name', function (): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
+    Schedule::command('health:queue-check-heartbeat');
 
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
@@ -69,6 +82,7 @@ it('usesSpatieHealthQueueCheckCacheStore fails when useCacheStore uses the wrong
 
 it('usesSpatieHealthQueueCheckCacheStore fails when config/cache.php is missing the health-checks store', function () use ($validAppServiceProvider): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
+    Schedule::command('health:queue-check-heartbeat');
 
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
@@ -78,11 +92,27 @@ it('usesSpatieHealthQueueCheckCacheStore fails when config/cache.php is missing 
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthQueueCheckCacheStoreCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain("Missing health-checks cache store: add a 'health-checks' entry under 'stores' in config/cache.php");
+    expect($collector->all())->toContain("Missing health-checks cache store: add a 'health-checks' entry with driver 'file' under 'stores' in config/cache.php");
 });
 
-it('usesSpatieHealthQueueCheckCacheStore passes when both are correctly configured', function () use ($validAppServiceProvider, $validCache): void {
+it('usesSpatieHealthQueueCheckCacheStore fails when health-checks store uses the wrong driver', function () use ($validAppServiceProvider): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
+    Schedule::command('health:queue-check-heartbeat');
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $validAppServiceProvider,
+        'config/cache.php' => '<?php return ["stores" => ["health-checks" => ["driver" => "redis"]]];',
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthQueueCheckCacheStoreCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Missing health-checks cache store: add a 'health-checks' entry with driver 'file' under 'stores' in config/cache.php");
+});
+
+it('usesSpatieHealthQueueCheckCacheStore passes when fully configured', function () use ($validAppServiceProvider, $validCache): void {
+    bindFakeComposer(['spatie/laravel-health' => true]);
+    Schedule::command('health:queue-check-heartbeat');
 
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
@@ -95,6 +125,7 @@ it('usesSpatieHealthQueueCheckCacheStore passes when both are correctly configur
 
 it('usesSpatieHealthQueueCheckCacheStore passes when QueueCheck has additional chained methods', function () use ($validCache): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
+    Schedule::command('health:queue-check-heartbeat');
 
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),

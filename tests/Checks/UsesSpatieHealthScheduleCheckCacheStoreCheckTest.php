@@ -12,7 +12,7 @@ PHP;
 
 $validCache = <<<'PHP'
 <?php
-return ['stores' => ['health-checks' => ['driver' => 'redis']]];
+return ['stores' => ['health-checks' => ['driver' => 'file']]];
 PHP;
 
 it('usesSpatieHealthScheduleCheckCacheStore warns when package is not installed', function (): void {
@@ -78,7 +78,21 @@ it('usesSpatieHealthScheduleCheckCacheStore fails when config/cache.php is missi
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthScheduleCheckCacheStoreCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain("Missing health-checks cache store: add a 'health-checks' entry under 'stores' in config/cache.php");
+    expect($collector->all())->toContain("Missing health-checks cache store: add a 'health-checks' entry with driver 'file' under 'stores' in config/cache.php");
+});
+
+it('usesSpatieHealthScheduleCheckCacheStore fails when health-checks store uses the wrong driver', function () use ($validAppServiceProvider): void {
+    bindFakeComposer(['spatie/laravel-health' => true]);
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $validAppServiceProvider,
+        'config/cache.php' => '<?php return ["stores" => ["health-checks" => ["driver" => "redis"]]];',
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthScheduleCheckCacheStoreCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Missing health-checks cache store: add a 'health-checks' entry with driver 'file' under 'stores' in config/cache.php");
 });
 
 it('usesSpatieHealthScheduleCheckCacheStore passes when both are correctly configured', function () use ($validAppServiceProvider, $validCache): void {
