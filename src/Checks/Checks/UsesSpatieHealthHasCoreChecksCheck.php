@@ -10,6 +10,7 @@ class UsesSpatieHealthHasCoreChecksCheck extends AbstractUsesSpatieHealthChecksC
             'CacheCheck',
             'CpuLoadCheck',
             'DatabaseCheck',
+            'DatabaseConnectionCountCheck',
             'DebugModeCheck',
             'EnvironmentCheck',
             'HorizonCheck',
@@ -22,7 +23,7 @@ class UsesSpatieHealthHasCoreChecksCheck extends AbstractUsesSpatieHealthChecksC
 
     protected function requiredComposerPackages(): array
     {
-        return ['spatie/laravel-health', 'spatie/cpu-load-health-check'];
+        return ['spatie/laravel-health', 'spatie/cpu-load-health-check', 'doctrine/dbal'];
     }
 
     protected function healthCheckFqns(): array
@@ -32,6 +33,7 @@ class UsesSpatieHealthHasCoreChecksCheck extends AbstractUsesSpatieHealthChecksC
             'Spatie\\Health\\Checks\\Checks\\CacheCheck',
             'Spatie\\CpuLoadHealthCheck\\CpuLoadCheck',
             'Spatie\\Health\\Checks\\Checks\\DatabaseCheck',
+            'Spatie\\Health\\Checks\\Checks\\DatabaseConnectionCountCheck',
             'Spatie\\Health\\Checks\\Checks\\DebugModeCheck',
             'Spatie\\Health\\Checks\\Checks\\EnvironmentCheck',
             'Spatie\\Health\\Checks\\Checks\\HorizonCheck',

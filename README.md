@@ -87,7 +87,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`usesLaravelPulse()`** - Validates Laravel Pulse application monitoring *(partial: adds PULSE_ENABLED=false to phpunit.xml if package installed)*
 - 🔧 **`usesLaravelTelescope()`** - Validates Laravel Telescope request debugging *(partial: adds post-update script and TELESCOPE_ENABLED=false to phpunit.xml if package installed)*
 - **`usesSpatieHealthSetup()`** - Validates Spatie Health packages, schedules, s3_health disk, and result store configuration
-- 🔧 **`usesSpatieHealthHasCoreChecks()`** - Validates core health checks (CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, QueueCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck) are registered *(adds missing checks to Health::checks() in AppServiceProvider)*
+- 🔧 **`usesSpatieHealthHasCoreChecks()`** - Validates core health checks (CacheCheck, CpuLoadCheck, DatabaseCheck, DatabaseConnectionCountCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, QueueCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck) are registered *(adds missing checks to Health::checks() in AppServiceProvider)*
 - 🔧 **`usesSpatieHealthHasLaravelVersionCheck()`** - Validates LaravelVersionCheck is registered in Health::checks() *(adds to AppServiceProvider)*
 - 🔧 **`usesSpatieHealthHasPhpVersionCheck()`** - Validates PhpVersionCheck is registered in Health::checks() *(adds to AppServiceProvider)*
 - 🔧 **`usesSpatieHealthHasReleaseAgeCheck()`** - Validates ReleaseAgeCheck is registered in Health::checks() *(adds to AppServiceProvider)*
