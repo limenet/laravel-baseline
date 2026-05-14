@@ -6,11 +6,6 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class UsesSpatieHealthQueueCheckCacheStoreCheck extends AbstractUsesSpatieHealthCheckCacheStoreCheck
 {
-    protected function healthCheckClassName(): string
-    {
-        return 'QueueCheck';
-    }
-
     public function check(): CheckResult
     {
         if (!$this->checkComposerPackages('spatie/laravel-health')) {
@@ -36,5 +31,10 @@ class UsesSpatieHealthQueueCheckCacheStoreCheck extends AbstractUsesSpatieHealth
         }
 
         return CheckResult::PASS;
+    }
+
+    protected function healthCheckClassName(): string
+    {
+        return 'QueueCheck';
     }
 }
