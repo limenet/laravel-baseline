@@ -9,6 +9,7 @@ Health::checks([
     CacheCheck::new(),
     CpuLoadCheck::new(),
     DatabaseCheck::new(),
+    DatabaseConnectionCountCheck::new(),
     DebugModeCheck::new(),
     EnvironmentCheck::new(),
     HorizonCheck::new(),
@@ -20,23 +21,23 @@ Health::checks([
 PHP;
 
 it('usesSpatieHealthHasCoreChecks warns when packages are not installed', function (): void {
-    bindFakeComposer(['spatie/laravel-health' => false, 'spatie/cpu-load-health-check' => false]);
+    bindFakeComposer(['spatie/laravel-health' => false, 'spatie/cpu-load-health-check' => false, 'doctrine/dbal' => false]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect(makeCheck(UsesSpatieHealthHasCoreChecksCheck::class)->check())->toBe(CheckResult::WARN);
 });
 
 it('usesSpatieHealthHasCoreChecks fails when health checks are not registered in AppServiceProvider', function (): void {
-    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true, 'doctrine/dbal' => true]);
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthHasCoreChecksCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, QueueCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
+    expect($collector->all())->toContain('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DatabaseConnectionCountCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, QueueCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
 });
 
 it('usesSpatieHealthHasCoreChecks fails when a required health check class is missing from AppServiceProvider', function (): void {
-    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true, 'doctrine/dbal' => true]);
 
     $incompleteProvider = <<<'PHP'
 <?php
@@ -55,7 +56,7 @@ PHP;
 });
 
 it('usesSpatieHealthHasCoreChecks passes when EnvironmentCheck uses a ternary expression', function (): void {
-    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true, 'doctrine/dbal' => true]);
 
     $providerWithTernaryEnvironmentCheck = <<<'PHP'
 <?php
@@ -63,6 +64,7 @@ Health::checks([
     CacheCheck::new(),
     CpuLoadCheck::new(),
     DatabaseCheck::new(),
+    DatabaseConnectionCountCheck::new(),
     DebugModeCheck::new(),
     $this->app->environment('staging')
         ? EnvironmentCheck::new()->expectEnvironment('staging')
@@ -84,7 +86,7 @@ PHP;
 });
 
 it('usesSpatieHealthHasCoreChecks passes when CpuLoadCheck has chained method calls', function (): void {
-    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true, 'doctrine/dbal' => true]);
 
     $providerWithChainedCpuLoad = <<<'PHP'
 <?php
@@ -94,6 +96,7 @@ Health::checks([
         ->failWhenLoadIsHigherInTheLast5Minutes(2.0)
         ->failWhenLoadIsHigherInTheLast15Minutes(1.5),
     DatabaseCheck::new(),
+    DatabaseConnectionCountCheck::new(),
     DebugModeCheck::new(),
     EnvironmentCheck::new(),
     HorizonCheck::new(),
@@ -113,7 +116,7 @@ PHP;
 });
 
 it('usesSpatieHealthHasCoreChecks passes when fully configured', function () use ($validAppServiceProvider): void {
-    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true]);
+    bindFakeComposer(['spatie/laravel-health' => true, 'spatie/cpu-load-health-check' => true, 'doctrine/dbal' => true]);
 
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
