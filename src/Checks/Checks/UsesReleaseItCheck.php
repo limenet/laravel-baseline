@@ -53,16 +53,22 @@ class UsesReleaseItCheck extends AbstractFixableCheck
             return CheckResult::PASS;
         }
 
-        // Apply .release-it.json fix
+        // Apply .release-it.json fix only if needed
         $releaseItFile = base_path('.release-it.json');
         $config = file_exists($releaseItFile)
             ? (json_decode(file_get_contents($releaseItFile) ?: '{}', true, flags: JSON_THROW_ON_ERROR) ?? [])
             : [];
 
-        $config['plugins']['@release-it/bumper']['out']['file'] = 'composer.json';
-        $config['plugins']['@release-it/bumper']['out']['path'] = 'version';
+        $currentBumper = $config['plugins']['@release-it/bumper'] ?? null;
+        $alreadyCorrect = ($currentBumper['out']['file'] ?? null) === 'composer.json'
+            && ($currentBumper['out']['path'] ?? null) === 'version';
 
-        file_put_contents($releaseItFile, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+        if (!$alreadyCorrect) {
+            $config['plugins']['@release-it/bumper']['out']['file'] = 'composer.json';
+            $config['plugins']['@release-it/bumper']['out']['path'] = 'version';
+
+            file_put_contents($releaseItFile, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+        }
 
         return $this->fix(dry: true);
     }

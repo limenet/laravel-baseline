@@ -70,12 +70,18 @@ class UsesLaravelBoostCheck extends AbstractFixableCheck
             return CheckResult::PASS;
         }
 
-        // Apply boost.json fix
-        $boostConfig['agents'] = array_values(array_unique(array_merge($boostConfig['agents'] ?? [], $requiredAgents)));
-        $boostConfig['guidelines'] = true;
-        $boostConfig['mcp'] = true;
+        // Apply boost.json fix only if needed
+        $alreadyCorrect = $missingAgents === []
+            && ($boostConfig['guidelines'] ?? null) === true
+            && ($boostConfig['mcp'] ?? null) === true;
 
-        file_put_contents($boostJsonFile, json_encode($boostConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+        if (!$alreadyCorrect) {
+            $boostConfig['agents'] = array_values(array_unique(array_merge($boostConfig['agents'] ?? [], $requiredAgents)));
+            $boostConfig['guidelines'] = true;
+            $boostConfig['mcp'] = true;
+
+            file_put_contents($boostJsonFile, json_encode($boostConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+        }
 
         return $this->fix(dry: true);
     }

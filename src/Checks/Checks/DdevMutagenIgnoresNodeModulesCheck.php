@@ -54,8 +54,11 @@ class DdevMutagenIgnoresNodeModulesCheck extends AbstractFixableCheck
             }
 
             if (!$dry) {
-                $filtered = array_filter($gitignoreLines, fn (string $line): bool => !in_array($line, $removePatterns, true));
-                file_put_contents($ddevGitignore, implode("\n", $filtered));
+                $filtered = array_values(array_filter($gitignoreLines, fn (string $line): bool => !in_array($line, $removePatterns, true)));
+
+                if ($filtered !== $gitignoreLines) {
+                    file_put_contents($ddevGitignore, implode("\n", $filtered));
+                }
             }
         }
 

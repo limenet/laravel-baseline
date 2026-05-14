@@ -77,28 +77,34 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
             return CheckResult::PASS;
         }
 
-        // Apply trivy.yaml fixes
+        // Apply trivy.yaml fixes only if needed
         $trivyFile = base_path('trivy.yaml');
+        $changed = false;
 
         foreach (['secret', 'vuln'] as $scanner) {
             if (!in_array($scanner, $trivyConfig['scan']['scanners'] ?? [], true)) {
                 $trivyConfig['scan']['scanners'][] = $scanner;
+                $changed = true;
             }
         }
 
         foreach (['CRITICAL', 'HIGH'] as $level) {
             if (!in_array($level, $trivyConfig['severity'] ?? [], true)) {
                 $trivyConfig['severity'][] = $level;
+                $changed = true;
             }
         }
 
         foreach (['.ddev', 'node_modules', 'storage/logs', 'vendor'] as $dir) {
             if (!in_array($dir, $trivyConfig['scan']['skip-dirs'] ?? [], true)) {
                 $trivyConfig['scan']['skip-dirs'][] = $dir;
+                $changed = true;
             }
         }
 
-        file_put_contents($trivyFile, Yaml::dump($trivyConfig, 4, 2));
+        if ($changed) {
+            file_put_contents($trivyFile, Yaml::dump($trivyConfig, 4, 2));
+        }
 
         return $this->fix(dry: true);
     }
