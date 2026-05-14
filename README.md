@@ -87,10 +87,13 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`usesLaravelPulse()`** - Validates Laravel Pulse application monitoring *(partial: adds PULSE_ENABLED=false to phpunit.xml if package installed)*
 - 🔧 **`usesLaravelTelescope()`** - Validates Laravel Telescope request debugging *(partial: adds post-update script and TELESCOPE_ENABLED=false to phpunit.xml if package installed)*
 - **`usesSpatieHealthSetup()`** - Validates Spatie Health packages, schedules, s3_health disk, and result store configuration
-- 🔧 **`usesSpatieHealthHasCoreChecks()`** - Validates core health checks (CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck) are registered *(adds missing checks to Health::checks() in AppServiceProvider)*
+- 🔧 **`usesSpatieHealthHasCoreChecks()`** - Validates core health checks (CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, QueueCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck) are registered *(adds missing checks to Health::checks() in AppServiceProvider)*
 - 🔧 **`usesSpatieHealthHasLaravelVersionCheck()`** - Validates LaravelVersionCheck is registered in Health::checks() *(adds to AppServiceProvider)*
 - 🔧 **`usesSpatieHealthHasPhpVersionCheck()`** - Validates PhpVersionCheck is registered in Health::checks() *(adds to AppServiceProvider)*
 - 🔧 **`usesSpatieHealthHasReleaseAgeCheck()`** - Validates ReleaseAgeCheck is registered in Health::checks() *(adds to AppServiceProvider)*
+- **`usesSpatieHealthQueueCheckCacheStore()`** - Validates QueueCheck uses the dedicated 'health-checks' cache store in both AppServiceProvider and config/cache.php
+- **`usesSpatieHealthQueueCheckHorizonQueues()`** - Validates QueueCheck registers all queues from config/horizon.php via onQueue() (requires laravel/horizon)
+- **`usesSpatieHealthScheduleCheckCacheStore()`** - Validates ScheduleCheck uses the dedicated 'health-checks' cache store in both AppServiceProvider and config/cache.php
 - **`usesSpatieBackup()`** - Validates Spatie Backup database backups with comprehensive config validation
 
 ### Infrastructure & Dependencies

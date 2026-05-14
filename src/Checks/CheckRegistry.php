@@ -63,6 +63,9 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasCoreChecksCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasLaravelVersionCheckCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasPhpVersionCheckCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasReleaseAgeCheckCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckCacheStoreCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckHorizonQueuesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckCacheStoreCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthSetupCheck;
 
 class CheckRegistry
@@ -130,6 +133,9 @@ class CheckRegistry
         UsesSpatieHealthHasLaravelVersionCheckCheck::class,
         UsesSpatieHealthHasPhpVersionCheckCheck::class,
         UsesSpatieHealthHasReleaseAgeCheckCheck::class,
+        UsesSpatieHealthQueueCheckCacheStoreCheck::class,
+        UsesSpatieHealthQueueCheckHorizonQueuesCheck::class,
+        UsesSpatieHealthScheduleCheckCacheStoreCheck::class,
         UsesSpatieHealthSetupCheck::class,
     ];
 

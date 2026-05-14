@@ -12,6 +12,7 @@ Health::checks([
     DebugModeCheck::new(),
     EnvironmentCheck::new(),
     HorizonCheck::new(),
+    QueueCheck::new(),
     RedisCheck::new(),
     ScheduleCheck::new(),
     UsedDiskSpaceCheck::new(),
@@ -31,7 +32,7 @@ it('usesSpatieHealthHasCoreChecks fails when health checks are not registered in
 
     [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthHasCoreChecksCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
+    expect($collector->all())->toContain('Health checks not registered: Add Health::checks([CacheCheck, CpuLoadCheck, DatabaseCheck, DebugModeCheck, EnvironmentCheck, HorizonCheck, QueueCheck, RedisCheck, ScheduleCheck, UsedDiskSpaceCheck]) in AppServiceProvider');
 });
 
 it('usesSpatieHealthHasCoreChecks fails when a required health check class is missing from AppServiceProvider', function (): void {
@@ -67,6 +68,7 @@ Health::checks([
         ? EnvironmentCheck::new()->expectEnvironment('staging')
         : EnvironmentCheck::new(),
     HorizonCheck::new(),
+    QueueCheck::new(),
     RedisCheck::new(),
     ScheduleCheck::new(),
     UsedDiskSpaceCheck::new(),
@@ -95,6 +97,7 @@ Health::checks([
     DebugModeCheck::new(),
     EnvironmentCheck::new(),
     HorizonCheck::new(),
+    QueueCheck::new(),
     RedisCheck::new(),
     ScheduleCheck::new(),
     UsedDiskSpaceCheck::new(),
