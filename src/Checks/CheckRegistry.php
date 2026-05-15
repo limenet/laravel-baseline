@@ -4,12 +4,12 @@ namespace Limenet\LaravelBaseline\Checks;
 
 use Limenet\LaravelBaseline\Checks\Checks\BumpsComposerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsBaselineCheck;
-use Limenet\LaravelBaseline\Checks\Checks\CallsPeriodicBaselineCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsSentryHookCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasRedisAddonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
@@ -75,7 +75,7 @@ class CheckRegistry
     private static array $checks = [
         BumpsComposerCheck::class,
         CallsBaselineCheck::class,
-        CallsPeriodicBaselineCheck::class,
+        DoesNotCallPeriodicBaselineOnUpdateCheck::class,
         CallsSentryHookCheck::class,
         CheckPhpunitCheck::class,
         DdevHasPcovPackageCheck::class,
