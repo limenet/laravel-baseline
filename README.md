@@ -79,6 +79,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured *(partial: adds post-update scripts if package installed)*
 - **`usesLaravelAdminer()`** - Warns if Laravel Adminer database UI is missing (optional), validates TFA confirmation and configuration when installed
 - 🔧 **`usesLaravelBoost()`** - Validates Laravel Boost AI development tool *(partial: fixes boost.json and post-update script if package installed)*
+- 🔧 **`laravelBoostMcpUsesDdev()`** - Validates `.mcp.json` configures the `laravel-boost` MCP server to use `ddev artisan boost:mcp` *(creates/fixes `.mcp.json`; warns if `laravel/boost` not installed)*
 - **`runsBoostUpdate()`** *(periodic, every 30 days)* - Warns if Laravel Boost is not installed; when installed, fails until a developer confirms running `php artisan boost:update --discover` via `limenet:laravel-baseline:periodic`
 - 🔧 **`usesLimenetPintConfig()`** - Validates custom Laravel Pint formatting standards *(partial: adds post-update script if package installed)*
 
