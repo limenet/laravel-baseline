@@ -75,7 +75,8 @@ This package validates your Laravel installation against the following checks:
 
 ### IDE & Developer Tools
 - 🔧 **`hasEditorconfig()`** - Validates `.editorconfig` exists with required settings (`root = true`, `charset`, `end_of_line`, `indent_style`, `insert_final_newline`, `trim_trailing_whitespace`) *(creates `.editorconfig` with canonical content if missing or incomplete)*
-- 🔧 **`hasClaudeSettingsWithLaravelSimplifier()`** - Validates Claude Code settings include Laravel Simplifier plugin *(creates/merges `.claude/settings.json`)*
+- 🔧 **`hasClaudeSettingsWithLaravelSkills()`** - Validates Claude Code settings include the Laravel agent skills plugin and marketplace *(creates/merges `.claude/settings.json`)*
+- 🔧 **`doesNotHaveLaravelSimplifierInClaudeSettings()`** - Fails if the deprecated `laravel-simplifier@laravel` plugin is still enabled in `.claude/settings.json` *(removes the entry)*
 - 🔧 **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured *(partial: adds post-update scripts if package installed)*
 - **`usesLaravelAdminer()`** - Warns if Laravel Adminer database UI is missing (optional), validates TFA confirmation and configuration when installed
 - 🔧 **`usesLaravelBoost()`** - Validates Laravel Boost AI development tool *(partial: fixes boost.json and post-update script if package installed)*

@@ -10,6 +10,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasRedisAddonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
@@ -17,7 +18,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSpatiePasskeysWithFortifyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\FormRequestFailOnUnknownFieldsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
-use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSimplifierCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSkillsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasDailyLoggingCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEditorconfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEncryptedEnvFileCheck;
@@ -77,6 +78,7 @@ class CheckRegistry
         BumpsComposerCheck::class,
         CallsBaselineCheck::class,
         DoesNotCallPeriodicBaselineOnUpdateCheck::class,
+        DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
         CallsSentryHookCheck::class,
         CheckPhpunitCheck::class,
         DdevHasPcovPackageCheck::class,
@@ -89,7 +91,7 @@ class CheckRegistry
         DoesNotUseSpatiePasskeysWithFortifyCheck::class,
         FormRequestFailOnUnknownFieldsCheck::class,
         HasCiJobsCheck::class,
-        HasClaudeSettingsWithLaravelSimplifierCheck::class,
+        HasClaudeSettingsWithLaravelSkillsCheck::class,
         HasDailyLoggingCheck::class,
         HasEditorconfigCheck::class,
         HasRectorConfigWithAttributesSetsCheck::class,

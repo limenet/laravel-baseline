@@ -5,8 +5,10 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class HasClaudeSettingsWithLaravelSimplifierCheck extends AbstractFixableCheck
+class HasClaudeSettingsWithLaravelSkillsCheck extends AbstractFixableCheck
 {
+    private const MARKETPLACE = ['source' => ['source' => 'github', 'repo' => 'laravel/agent-skills']];
+
     public function fix(bool $dry = false): CheckResult
     {
         $settingsFile = base_path('.claude/settings.json');
@@ -23,8 +25,6 @@ class HasClaudeSettingsWithLaravelSimplifierCheck extends AbstractFixableCheck
                 if ($dry) {
                     return CheckResult::FAIL;
                 }
-
-                // Fall through to write correct content
             } else {
                 $settings = json_decode($content, true, flags: JSON_THROW_ON_ERROR) ?? [];
             }
@@ -37,16 +37,11 @@ class HasClaudeSettingsWithLaravelSimplifierCheck extends AbstractFixableCheck
         }
 
         $enabledPlugins = $settings['enabledPlugins'] ?? null;
+        $extraKnownMarketplaces = $settings['extraKnownMarketplaces'] ?? null;
 
         if ($dry) {
             if ($enabledPlugins === null) {
                 $this->addComment('Claude settings incomplete: Add "enabledPlugins" section to .claude/settings.json');
-
-                return CheckResult::FAIL;
-            }
-
-            if (!isset($enabledPlugins['laravel-simplifier@laravel']) || $enabledPlugins['laravel-simplifier@laravel'] !== true) {
-                $this->addComment('Claude settings incomplete: Add "laravel-simplifier@laravel": true to enabledPlugins in .claude/settings.json');
 
                 return CheckResult::FAIL;
             }
@@ -57,20 +52,25 @@ class HasClaudeSettingsWithLaravelSimplifierCheck extends AbstractFixableCheck
                 return CheckResult::FAIL;
             }
 
+            if (($extraKnownMarketplaces['laravel'] ?? null) !== self::MARKETPLACE) {
+                $this->addComment('Claude settings incomplete: Add laravel marketplace to extraKnownMarketplaces in .claude/settings.json');
+
+                return CheckResult::FAIL;
+            }
+
             return CheckResult::PASS;
         }
 
-        // Apply fix only if needed
-        $alreadyCorrect = ($settings['enabledPlugins']['laravel-simplifier@laravel'] ?? null) === true
-            && ($settings['enabledPlugins']['laravel@laravel'] ?? null) === true;
+        $alreadyCorrect = ($settings['enabledPlugins']['laravel@laravel'] ?? null) === true
+            && ($settings['extraKnownMarketplaces']['laravel'] ?? null) === self::MARKETPLACE;
 
         if (!$alreadyCorrect) {
             if (!is_dir(base_path('.claude'))) {
                 mkdir(base_path('.claude'), 0755, true);
             }
 
-            $settings['enabledPlugins']['laravel-simplifier@laravel'] = true;
             $settings['enabledPlugins']['laravel@laravel'] = true;
+            $settings['extraKnownMarketplaces']['laravel'] = self::MARKETPLACE;
 
             file_put_contents($settingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
         }
