@@ -76,31 +76,46 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
 
         $queues = [];
 
+        if (isset($config['defaults']) && is_array($config['defaults'])) {
+            $queues = $this->collectQueuesFromSupervisors($config['defaults']);
+        }
+
         foreach ($config['environments'] as $supervisors) {
             if (!is_array($supervisors)) {
                 continue;
             }
 
-            foreach ($supervisors as $supervisor) {
-                if (!is_array($supervisor) || !isset($supervisor['queue'])) {
-                    continue;
-                }
+            $queues = array_merge($queues, $this->collectQueuesFromSupervisors($supervisors));
+        }
 
-                $queue = $supervisor['queue'];
+        return array_values(array_unique($queues));
+    }
 
-                if (is_string($queue)) {
-                    $queues[] = $queue;
-                } elseif (is_array($queue)) {
-                    foreach ($queue as $q) {
-                        if (is_string($q)) {
-                            $queues[] = $q;
-                        }
+    /** @param array<string, mixed> $supervisors
+     *  @return list<string> */
+    private function collectQueuesFromSupervisors(array $supervisors): array
+    {
+        $queues = [];
+
+        foreach ($supervisors as $supervisor) {
+            if (!is_array($supervisor) || !isset($supervisor['queue'])) {
+                continue;
+            }
+
+            $queue = $supervisor['queue'];
+
+            if (is_string($queue)) {
+                $queues[] = $queue;
+            } elseif (is_array($queue)) {
+                foreach ($queue as $q) {
+                    if (is_string($q)) {
+                        $queues[] = $q;
                     }
                 }
             }
         }
 
-        return array_values(array_unique($queues));
+        return $queues;
     }
 
     /** @return list<string>|null null if QueueCheck not found or has no onQueue call */
