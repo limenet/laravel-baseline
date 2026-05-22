@@ -30,6 +30,18 @@ class UsesSpatieHealthQueueCheckCacheStoreCheck extends AbstractUsesSpatieHealth
             return CheckResult::FAIL;
         }
 
+        if (!$this->hasHealthChecksCacheStorePath()) {
+            $this->addComment("Incorrect path in health-checks cache store in config/cache.php: set 'path' to storage_path('...')");
+
+            return CheckResult::FAIL;
+        }
+
+        if (!$this->hasHealthChecksCacheStoreGitignore()) {
+            $this->addComment("Missing or invalid .gitignore at the health-checks cache store path: create the file with '*' on the first line and '!.gitignore' on the second");
+
+            return CheckResult::FAIL;
+        }
+
         return CheckResult::PASS;
     }
 

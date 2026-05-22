@@ -12,8 +12,10 @@ PHP;
 
 $validCache = <<<'PHP'
 <?php
-return ['stores' => ['health-checks' => ['driver' => 'file']]];
+return ['stores' => ['health-checks' => ['driver' => 'file', 'path' => storage_path('framework/cache/health-checks')]]];
 PHP;
+
+$validGitignore = "*\n!.gitignore\n";
 
 it('usesSpatieHealthScheduleCheckCacheStore warns when package is not installed', function (): void {
     bindFakeComposer(['spatie/laravel-health' => false]);
@@ -95,7 +97,35 @@ it('usesSpatieHealthScheduleCheckCacheStore fails when health-checks store uses 
     expect($collector->all())->toContain("Missing health-checks cache store: add a 'health-checks' entry with driver 'file' under 'stores' in config/cache.php");
 });
 
-it('usesSpatieHealthScheduleCheckCacheStore passes when both are correctly configured', function () use ($validAppServiceProvider, $validCache): void {
+it('usesSpatieHealthScheduleCheckCacheStore fails when health-checks store has no path', function () use ($validAppServiceProvider): void {
+    bindFakeComposer(['spatie/laravel-health' => true]);
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $validAppServiceProvider,
+        'config/cache.php' => '<?php return ["stores" => ["health-checks" => ["driver" => "file"]]];',
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthScheduleCheckCacheStoreCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Incorrect path in health-checks cache store in config/cache.php: set 'path' to storage_path('...')");
+});
+
+it('usesSpatieHealthScheduleCheckCacheStore fails when health-checks store path is not a storage_path call', function () use ($validAppServiceProvider): void {
+    bindFakeComposer(['spatie/laravel-health' => true]);
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $validAppServiceProvider,
+        'config/cache.php' => '<?php return ["stores" => ["health-checks" => ["driver" => "file", "path" => "/absolute/path"]]];',
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthScheduleCheckCacheStoreCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Incorrect path in health-checks cache store in config/cache.php: set 'path' to storage_path('...')");
+});
+
+it('usesSpatieHealthScheduleCheckCacheStore fails when .gitignore is missing', function () use ($validAppServiceProvider, $validCache): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
 
     $this->withTempBasePath([
@@ -104,10 +134,40 @@ it('usesSpatieHealthScheduleCheckCacheStore passes when both are correctly confi
         'config/cache.php' => $validCache,
     ]);
 
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthScheduleCheckCacheStoreCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Missing or invalid .gitignore at the health-checks cache store path: create the file with '*' on the first line and '!.gitignore' on the second");
+});
+
+it('usesSpatieHealthScheduleCheckCacheStore fails when .gitignore has wrong content', function () use ($validAppServiceProvider, $validCache): void {
+    bindFakeComposer(['spatie/laravel-health' => true]);
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $validAppServiceProvider,
+        'config/cache.php' => $validCache,
+        'storage/framework/cache/health-checks/.gitignore' => "*.log\n",
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(UsesSpatieHealthScheduleCheckCacheStoreCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Missing or invalid .gitignore at the health-checks cache store path: create the file with '*' on the first line and '!.gitignore' on the second");
+});
+
+it('usesSpatieHealthScheduleCheckCacheStore passes when both are correctly configured', function () use ($validAppServiceProvider, $validCache, $validGitignore): void {
+    bindFakeComposer(['spatie/laravel-health' => true]);
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'app/Providers/AppServiceProvider.php' => $validAppServiceProvider,
+        'config/cache.php' => $validCache,
+        'storage/framework/cache/health-checks/.gitignore' => $validGitignore,
+    ]);
+
     expect(makeCheck(UsesSpatieHealthScheduleCheckCacheStoreCheck::class)->check())->toBe(CheckResult::PASS);
 });
 
-it('usesSpatieHealthScheduleCheckCacheStore passes when ScheduleCheck has additional chained methods', function () use ($validCache): void {
+it('usesSpatieHealthScheduleCheckCacheStore passes when ScheduleCheck has additional chained methods', function () use ($validCache, $validGitignore): void {
     bindFakeComposer(['spatie/laravel-health' => true]);
 
     $this->withTempBasePath([
@@ -119,6 +179,7 @@ it('usesSpatieHealthScheduleCheckCacheStore passes when ScheduleCheck has additi
             ]);
             PHP,
         'config/cache.php' => $validCache,
+        'storage/framework/cache/health-checks/.gitignore' => $validGitignore,
     ]);
 
     expect(makeCheck(UsesSpatieHealthScheduleCheckCacheStoreCheck::class)->check())->toBe(CheckResult::PASS);
