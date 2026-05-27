@@ -97,6 +97,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesSpatieHealthQueueCheckCacheStore()`** - Validates QueueCheck: DispatchQueueCheckJobsCommand is scheduled everyMinute(), uses the dedicated 'health-checks' file cache store in AppServiceProvider and config/cache.php
 - **`usesSpatieHealthQueueCheckHorizonQueues()`** - Validates QueueCheck registers all queues from config/horizon.php via onQueue() (requires laravel/horizon)
 - **`usesSpatieHealthScheduleCheckCacheStore()`** - Validates ScheduleCheck uses the dedicated 'health-checks' cache store in both AppServiceProvider and config/cache.php
+- 🔧 **`usesSpatieHealthScheduleCheckHeartbeat()`** - Validates ScheduleCheck is configured with `heartbeatMaxAgeInMinutes(2)` to prevent false positives *(appends the call to ScheduleCheck in AppServiceProvider)*
 - **`usesSpatieBackup()`** - Validates Spatie Backup database backups with comprehensive config validation
 
 ### Infrastructure & Dependencies

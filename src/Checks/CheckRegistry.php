@@ -69,6 +69,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthHasReleaseAgeCheckChec
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckCacheStoreCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckHorizonQueuesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckCacheStoreCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckHeartbeatCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthSetupCheck;
 
 class CheckRegistry
@@ -142,6 +143,7 @@ class CheckRegistry
         UsesSpatieHealthQueueCheckCacheStoreCheck::class,
         UsesSpatieHealthQueueCheckHorizonQueuesCheck::class,
         UsesSpatieHealthScheduleCheckCacheStoreCheck::class,
+        UsesSpatieHealthScheduleCheckHeartbeatCheck::class,
         UsesSpatieHealthSetupCheck::class,
     ];
 
