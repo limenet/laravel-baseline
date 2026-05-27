@@ -31,7 +31,7 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.9.6",
-        "laravel/framework": "^12.53.0 || ^13.8.0",
+        "laravel/framework": "^12.53.0 || ^13.12.0",
         "laravel/pint": "^1.29.1",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.9.4",
@@ -42,7 +42,7 @@
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan-deprecation-rules": "^2.0.4",
         "phpstan/phpstan-phpunit": "^2.0.16",
-        "spatie/laravel-health": "^1.39.2",
+        "spatie/laravel-health": "^1.39.3",
         "spatie/temporary-directory": "^2.3.1",
         "symplify/rule-doc-generator-contracts": "^11.2"
     },
