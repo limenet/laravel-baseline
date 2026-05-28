@@ -303,3 +303,28 @@ it('hasTrivyConfig passes when trivy.yaml has no severity key', function (): voi
 
     expect(makeCheck(HasTrivyConfigCheck::class)->check())->toBe(CheckResult::PASS);
 });
+
+it('hasTrivyConfig fails when trivy.yaml has a severity key', function (): void {
+    bindFakeComposer([]);
+    $config = Yaml::parse(canonicalTrivyYaml());
+    $config['severity'] = ['CRITICAL', 'HIGH'];
+    $this->withTempBasePath(canonicalLayout(['trivy.yaml' => Yaml::dump($config, 4, 2)]));
+
+    [$check, $collector] = makeCheckWithCollector(HasTrivyConfigCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Forbidden key in trivy.yaml: 'severity' must not be set (use Trivy's default severity behavior)");
+});
+
+it('hasTrivyConfig auto-fix removes a severity key', function (): void {
+    bindFakeComposer([]);
+    $config = Yaml::parse(canonicalTrivyYaml());
+    $config['severity'] = ['CRITICAL'];
+    $this->withTempBasePath(canonicalLayout(['trivy.yaml' => Yaml::dump($config, 4, 2)]));
+
+    $check = makeCheck(HasTrivyConfigCheck::class);
+    $check->fix();
+
+    expect(makeCheck(HasTrivyConfigCheck::class)->check())->toBe(CheckResult::PASS);
+    $fixed = Yaml::parseFile(base_path('trivy.yaml'));
+    expect($fixed)->not->toHaveKey('severity');
+});

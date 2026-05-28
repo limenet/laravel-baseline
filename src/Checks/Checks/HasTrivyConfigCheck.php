@@ -74,6 +74,17 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 
         $changed = false;
 
+        if (array_key_exists('severity', $trivyConfig)) {
+            $this->addComment("Forbidden key in trivy.yaml: 'severity' must not be set (use Trivy's default severity behavior)");
+
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
+
+            unset($trivyConfig['severity']);
+            $changed = true;
+        }
+
         $scalarRules = [
             [['ignorefile'], '.trivyignore.yaml', 'ignorefile'],
             [['cache', 'dir'], '.trivycache', 'cache.dir'],
