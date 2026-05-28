@@ -1,0 +1,15 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(vendor/bin/pest:*)",
+            "Bash(vendor/bin/pint:*)",
+            "Bash(vendor/bin/phpstan analyze:*)",
+            "Bash(composer analyse:*)",
+            "Bash(composer test:*)",
+            "WebFetch(domain:github.com)",
+            "WebFetch(domain:packagist.org)"
+        ],
+        "deny": [],
+        "ask": []
+    }
+}
