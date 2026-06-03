@@ -2,6 +2,7 @@
 
 namespace Limenet\LaravelBaseline\Checks;
 
+use Limenet\LaravelBaseline\Checks\Checks\AllowsToolingInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\BumpsComposerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsBaselineCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsSentryHookCheck;
@@ -9,6 +10,7 @@ use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasRedisAddonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DeniesEnvReadsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
@@ -45,6 +47,7 @@ use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsBoostUpdateCheck;
+use Limenet\LaravelBaseline\Checks\Checks\RunsCiLintHookInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UpdatesDdevAddonsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesIdeHelpersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLarastanCheck;
@@ -77,8 +80,10 @@ class CheckRegistry
 {
     /** @var list<class-string<CheckInterface>> */
     private static array $checks = [
+        AllowsToolingInClaudeSettingsCheck::class,
         BumpsComposerCheck::class,
         CallsBaselineCheck::class,
+        DeniesEnvReadsInClaudeSettingsCheck::class,
         DoesNotCallPeriodicBaselineOnUpdateCheck::class,
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
         CallsSentryHookCheck::class,
@@ -134,6 +139,7 @@ class CheckRegistry
         UsesPhpstanExtensionsCheck::class,
         UsesPredisCheck::class,
         RunsBoostUpdateCheck::class,
+        RunsCiLintHookInClaudeSettingsCheck::class,
         UpdatesDdevAddonsCheck::class,
         UsesRectorCheck::class,
         UsesReleaseItCheck::class,

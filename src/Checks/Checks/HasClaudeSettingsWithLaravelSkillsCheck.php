@@ -2,39 +2,32 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
-use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
+use Limenet\LaravelBaseline\Checks\AbstractClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class HasClaudeSettingsWithLaravelSkillsCheck extends AbstractFixableCheck
+class HasClaudeSettingsWithLaravelSkillsCheck extends AbstractClaudeSettingsCheck
 {
     private const MARKETPLACE = ['source' => ['source' => 'github', 'repo' => 'laravel/agent-skills']];
 
     public function fix(bool $dry = false): CheckResult
     {
-        $settingsFile = base_path('.claude/settings.json');
+        $state = $this->claudeSettingsState();
 
-        $settings = [];
-        $fileExists = file_exists($settingsFile);
+        if ($state === 'empty') {
+            $this->addComment('Claude settings empty: Add content to .claude/settings.json');
 
-        if ($fileExists) {
-            $content = file_get_contents($settingsFile);
-
-            if ($content === false || trim($content) === '') {
-                $this->addComment('Claude settings empty: Add content to .claude/settings.json');
-
-                if ($dry) {
-                    return CheckResult::FAIL;
-                }
-            } else {
-                $settings = json_decode($content, true, flags: JSON_THROW_ON_ERROR) ?? [];
+            if ($dry) {
+                return CheckResult::FAIL;
             }
-        } else {
+        } elseif ($state === 'missing') {
             $this->addComment('Claude settings missing: Create .claude/settings.json with enabledPlugins configuration');
 
             if ($dry) {
                 return CheckResult::FAIL;
             }
         }
+
+        $settings = $this->readClaudeSettings() ?? [];
 
         $enabledPlugins = $settings['enabledPlugins'] ?? null;
         $extraKnownMarketplaces = $settings['extraKnownMarketplaces'] ?? null;
@@ -65,14 +58,10 @@ class HasClaudeSettingsWithLaravelSkillsCheck extends AbstractFixableCheck
             && ($settings['extraKnownMarketplaces']['laravel'] ?? null) === self::MARKETPLACE;
 
         if (!$alreadyCorrect) {
-            if (!is_dir(base_path('.claude'))) {
-                mkdir(base_path('.claude'), 0755, true);
-            }
-
             $settings['enabledPlugins']['laravel@laravel'] = true;
             $settings['extraKnownMarketplaces']['laravel'] = self::MARKETPLACE;
 
-            file_put_contents($settingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+            $this->writeClaudeSettings($settings);
         }
 
         return $this->fix(dry: true);

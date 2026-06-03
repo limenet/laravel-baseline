@@ -2,26 +2,18 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
-use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
+use Limenet\LaravelBaseline\Checks\AbstractClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class DoesNotHaveLaravelSimplifierInClaudeSettingsCheck extends AbstractFixableCheck
+class DoesNotHaveLaravelSimplifierInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $settingsFile = base_path('.claude/settings.json');
+        $settings = $this->readClaudeSettings();
 
-        if (!file_exists($settingsFile)) {
+        if ($settings === null) {
             return CheckResult::PASS;
         }
-
-        $content = file_get_contents($settingsFile);
-
-        if ($content === false || trim($content) === '') {
-            return CheckResult::PASS;
-        }
-
-        $settings = json_decode($content, true, flags: JSON_THROW_ON_ERROR) ?? [];
 
         if (($settings['enabledPlugins']['laravel-simplifier@laravel'] ?? false) !== true) {
             return CheckResult::PASS;
@@ -35,7 +27,7 @@ class DoesNotHaveLaravelSimplifierInClaudeSettingsCheck extends AbstractFixableC
 
         unset($settings['enabledPlugins']['laravel-simplifier@laravel']);
 
-        file_put_contents($settingsFile, json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+        $this->writeClaudeSettings($settings);
 
         return CheckResult::PASS;
     }
