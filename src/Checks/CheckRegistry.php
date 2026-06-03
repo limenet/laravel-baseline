@@ -45,6 +45,7 @@ use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsBoostUpdateCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UpdatesDdevAddonsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesIdeHelpersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLarastanCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelAdminerCheck;
@@ -133,6 +134,7 @@ class CheckRegistry
         UsesPhpstanExtensionsCheck::class,
         UsesPredisCheck::class,
         RunsBoostUpdateCheck::class,
+        UpdatesDdevAddonsCheck::class,
         UsesRectorCheck::class,
         UsesReleaseItCheck::class,
         UsesSpatieBackupCheck::class,
