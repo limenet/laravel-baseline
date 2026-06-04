@@ -18,6 +18,13 @@ $requiredAllow = [
     'Bash(ddev artisan config:clear:*)',
     'Bash(ddev artisan route:clear:*)',
     'Bash(ddev artisan view:clear:*)',
+    'Bash(ddev composer show:*)',
+    'Bash(ddev composer outdated:*)',
+    'Bash(ddev composer why:*)',
+    'Bash(npm info:*)',
+    'Bash(npm view:*)',
+    'Bash(npm ls:*)',
+    'Bash(npm outdated:*)',
 ];
 
 it('allowsToolingInClaudeSettings implements FixableInterface', function (): void {

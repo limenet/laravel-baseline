@@ -12,6 +12,9 @@ class AllowsToolingInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
      * artisan rules are scoped to read-only / dev-loop commands only — a blanket
      * `ddev artisan:*` would auto-allow destructive commands (migrate:fresh, db:wipe,
      * tinker, …), so each safe command is listed individually instead.
+     *
+     * composer/npm rules cover read-only package inspection (show, outdated, why,
+     * info, view, ls) — these query metadata and never mutate the project.
      */
     private const array REQUIRED_ALLOW = [
         'Bash(ddev composer run ci-lint:*)',
@@ -27,6 +30,13 @@ class AllowsToolingInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
         'Bash(ddev artisan config:clear:*)',
         'Bash(ddev artisan route:clear:*)',
         'Bash(ddev artisan view:clear:*)',
+        'Bash(ddev composer show:*)',
+        'Bash(ddev composer outdated:*)',
+        'Bash(ddev composer why:*)',
+        'Bash(npm info:*)',
+        'Bash(npm view:*)',
+        'Bash(npm ls:*)',
+        'Bash(npm outdated:*)',
     ];
 
     public function fix(bool $dry = false): CheckResult
