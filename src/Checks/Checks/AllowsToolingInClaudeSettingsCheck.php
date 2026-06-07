@@ -15,6 +15,9 @@ class AllowsToolingInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
      *
      * composer/npm rules cover read-only package inspection (show, outdated, why,
      * info, view, ls) — these query metadata and never mutate the project.
+     *
+     * Skill rules allow code-review without a permission prompt (both the bare form
+     * and the parameterised `code-review:<effort/flags>` form).
      */
     private const array REQUIRED_ALLOW = [
         'Bash(ddev composer run ci-lint:*)',
@@ -37,6 +40,8 @@ class AllowsToolingInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
         'Bash(npm view:*)',
         'Bash(npm ls:*)',
         'Bash(npm outdated:*)',
+        'Skill(code-review)',
+        'Skill(code-review:*)',
     ];
 
     public function fix(bool $dry = false): CheckResult

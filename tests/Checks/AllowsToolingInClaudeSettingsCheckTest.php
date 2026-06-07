@@ -25,6 +25,8 @@ $requiredAllow = [
     'Bash(npm view:*)',
     'Bash(npm ls:*)',
     'Bash(npm outdated:*)',
+    'Skill(code-review)',
+    'Skill(code-review:*)',
 ];
 
 it('allowsToolingInClaudeSettings implements FixableInterface', function (): void {
