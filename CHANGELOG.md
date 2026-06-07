@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-baseline` will be documented in this file.
 
+## v2.0.13 - 2026-06-07
+
+**Full Changelog**: https://github.com/limenet/laravel-baseline/compare/v2.0.12...v2.0.13
+
 ## v2.0.12 - 2026-06-03
 
 **Full Changelog**: https://github.com/limenet/laravel-baseline/compare/v2.0.11...v2.0.12
