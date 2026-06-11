@@ -21,7 +21,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
         $class = $this->healthCheckClassName();
 
         if (!$this->checkUsesCacheStore($class)) {
-            $this->addComment("{$class} must use the dedicated cache store: change {$class}::new() to {$class}::new()->useCacheStore('health-checks') in AppServiceProvider");
+            $this->addComment("{$class} must use the dedicated cache store: change {$class}::new() to {$class}::new()->{$this->cacheStoreMethod()}('health-checks') in AppServiceProvider");
 
             return CheckResult::FAIL;
         }
@@ -49,6 +49,11 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
 
     abstract protected function healthCheckClassName(): string;
 
+    protected function cacheStoreMethod(): string
+    {
+        return 'useCacheStore';
+    }
+
     protected function checkUsesCacheStore(string $class): bool
     {
         $file = base_path('app/Providers/AppServiceProvider.php');
@@ -65,7 +70,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return false;
         }
 
-        $visitor = new HealthCheckCacheStoreVisitor($class, 'health-checks');
+        $visitor = new HealthCheckCacheStoreVisitor($class, 'health-checks', $this->cacheStoreMethod());
         $traverser = new NodeTraverser();
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);

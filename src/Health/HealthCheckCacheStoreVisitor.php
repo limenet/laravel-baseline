@@ -11,6 +11,7 @@ class HealthCheckCacheStoreVisitor extends AbstractHealthChecksVisitor
     public function __construct(
         private readonly string $checkClassName,
         private readonly string $cacheStoreName,
+        private readonly string $methodName = 'useCacheStore',
     ) {}
 
     public function wasFound(): bool
@@ -47,7 +48,7 @@ class HealthCheckCacheStoreVisitor extends AbstractHealthChecksVisitor
 
         if (
             $expr->name instanceof Node\Identifier
-            && $expr->name->toString() === 'useCacheStore'
+            && $expr->name->toString() === $this->methodName
         ) {
             $arg = $expr->args[0] ?? null;
 
