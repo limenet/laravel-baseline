@@ -31,7 +31,7 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.10.0",
-        "laravel/framework": "^12.53.0 || ^13.13.0",
+        "laravel/framework": "^12.53.0 || ^13.15.0",
         "laravel/pint": "^1.29.1",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.9.4",
