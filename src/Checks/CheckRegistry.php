@@ -24,7 +24,6 @@ use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSkillsChec
 use Limenet\LaravelBaseline\Checks\Checks\HasDailyLoggingCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEditorconfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEncryptedEnvFileCheck;
-use Limenet\LaravelBaseline\Checks\Checks\HasGuidelinesUpdateScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasNpmScriptsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithAttributesSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithComposerBasedCheck;
@@ -114,7 +113,6 @@ class CheckRegistry
         HasRectorConfigWithSetProvidersCheck::class,
         HasRectorConfigWithSkipCheck::class,
         HasEncryptedEnvFileCheck::class,
-        HasGuidelinesUpdateScriptCheck::class,
         HasNpmScriptsCheck::class,
         HasTrivyConfigCheck::class,
         IsCiLintCompleteCheck::class,

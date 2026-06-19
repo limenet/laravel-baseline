@@ -4,7 +4,6 @@ namespace Limenet\LaravelBaseline;
 
 use Limenet\LaravelBaseline\Commands\CheckCommand;
 use Limenet\LaravelBaseline\Commands\PeriodicCheckCommand;
-use Limenet\LaravelBaseline\Commands\UpdateGuidelinesCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -23,7 +22,6 @@ class LaravelBaselineServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 CheckCommand::class,
                 PeriodicCheckCommand::class,
-                UpdateGuidelinesCommand::class,
             ]);
     }
 }

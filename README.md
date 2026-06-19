@@ -49,6 +49,14 @@ php artisan limenet:laravel-baseline:check --fix
 - Partially fixable checks *(requires package installed first)*: configuration/script entries are fixed once the package is installed via `composer require`.
 - Non-fixable checks: report the issue with an actionable message.
 
+### AI guidelines & skills
+
+The package also ships [Laravel Boost](https://laravel.com/docs/boost) resources under
+`resources/boost/`: an always-on guideline (the dev loop — `ci-lint`, tests, DDEV-first
+conventions) and on-demand skills (e.g. `creating-a-release`). When a project that has
+`laravel/boost` installed runs `php artisan boost:install` or `php artisan boost:update --discover`,
+Boost discovers and publishes these to the consuming project's coding agents automatically.
+
 ## Checks
 
 This package validates your Laravel installation against the following checks:
@@ -137,7 +145,6 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`formRequestFailOnUnknownFields()`** - Validates `FormRequest::failOnUnknownFields()` is called in AppServiceProvider (Laravel ≥13.6 only; warns on older versions) *(adds `FormRequest::failOnUnknownFields(! app()->isProduction())` to boot())*
 - **`hasDailyLogging()`** - Validates logging uses `daily` channel (directly or via `stack`)
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
-- 🔧 **`hasGuidelinesUpdateScript()`** - Validates baseline guidelines update script *(adds to post-update-cmd, ordered before boost:update)*
 - 🔧 **`callsBaseline()`** - Validates self-validation runs after updates *(adds/upgrades post-update-cmd entry to include `--fix`)*
 - **`doesNotCallPeriodicBaselineOnUpdate()`** - Fails if `php artisan limenet:laravel-baseline:periodic` is in the `post-update-cmd` scripts (it shouldn't be — periodic checks fail CI automatically when expired)
 - 🔧 **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`) *(moves from require-dev to require in composer.json)*

@@ -20,10 +20,14 @@ src/
 │       └── ...
 ├── Commands/
 │   ├── LaravelBaselineCommand.php   # CI-safe check runner
-│   ├── PeriodicCheckCommand.php     # Interactive periodic check runner
-│   └── UpdateGuidelinesCommand.php
+│   └── PeriodicCheckCommand.php     # Interactive periodic check runner
 └── State/
     └── StateManager.php             # Reads/writes config/baseline.php for periodic state
+
+resources/
+└── boost/                          # Laravel Boost resources shipped to consumers
+    ├── guidelines/core.blade.php   # Always-on AI guideline (dev loop, conventions)
+    └── skills/<name>/SKILL.md      # On-demand AI skills (e.g. creating-a-release)
 ```
 
 ## Check Size Guidelines
