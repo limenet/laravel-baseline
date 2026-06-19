@@ -61,6 +61,23 @@ ddev artisan ide-helper:meta
 3. **Review changes:** use the `/code-review` skill to review recent changes for correctness
    bugs and simplification opportunities.
 
+### Commit messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/). Releases are cut with
+release-it, which derives the next version number **and** the `CHANGELOG.md` entry directly from
+the commit messages since the last tag — so the format is not cosmetic, it drives the release.
+
+Format: `<type>(<optional scope>): <description>` (imperative mood).
+
+- `feat:` — a new feature → **minor** bump, listed under "Features".
+- `fix:` — a bug fix → **patch** bump, listed under "Bug Fixes".
+- `feat!:` / a `BREAKING CHANGE:` footer → **major** bump.
+- `chore:` / `docs:` / `test:` / `refactor:` / `ci:` / `build:` / `style:` / `perf:` — no release
+  on their own (only `perf:` shows in the changelog).
+
+Keep non-user-facing work under a non-releasing type so it doesn't inflate the version or clutter
+the changelog.
+
 ### Best practices
 
 - Follow the code style enforced by Laravel Pint.

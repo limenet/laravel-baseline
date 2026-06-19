@@ -250,3 +250,51 @@ php artisan limenet:laravel-baseline:periodic
 # CI: fails for any expired periodic check (non-interactive)
 php artisan limenet:laravel-baseline:check
 ```
+
+## Commit Conventions
+
+**Use [Conventional Commits](https://www.conventionalcommits.org/).** The release tooling derives the
+next version number *and* the changelog directly from commit messages, so the message format is not
+cosmetic — it drives the release.
+
+Format: `<type>(<optional scope>): <description>`
+
+Common types:
+
+- `feat:` — a new feature → triggers a **minor** bump and appears under "Features" in the changelog.
+- `fix:` — a bug fix → triggers a **patch** bump and appears under "Bug Fixes".
+- `chore:`, `docs:`, `test:`, `refactor:`, `ci:`, `build:`, `style:`, `perf:` — no release on their
+  own; `perf:` is listed in the changelog.
+- Breaking change → append `!` after the type (e.g. `feat!:`) or add a `BREAKING CHANGE:` footer →
+  triggers a **major** bump.
+
+Guidelines:
+
+- Write the description in the imperative mood ("add check", not "added check").
+- When adding a check, prefer `feat: add <checkName> check`; when fixing check behaviour, `fix: ...`.
+- Anything not user-facing (internal tooling, tests, formatting) should use a non-releasing type so
+  it doesn't inflate the version or clutter the changelog.
+
+## Releases
+
+Releases are cut with [release-it](https://github.com/release-it/release-it) — this repo dogfoods the
+same `creating-a-release` skill it ships to consumers. Install the Node tooling once
+(`npm install`), then run:
+
+```bash
+GITHUB_TOKEN=… npm run release
+```
+
+This single command, driven by `.release-it.json`:
+
+1. **Picks the version** from the conventional commits since the last tag (via
+   `@release-it/conventional-changelog`) — override only if needed.
+2. **Writes the version** into `composer.json` (`@release-it/bumper`); `composer.json` is the single
+   source of truth.
+3. **Writes `CHANGELOG.md`** — the new section is generated from the conventional commits and
+   committed *in the same release commit*, so each tag is self-contained.
+4. **Tags** as `v${version}` (always `v`-prefixed) and pushes.
+5. **Creates the GitHub release** with the generated notes as its body.
+
+A valid `GITHUB_TOKEN` (with `repo` scope) must be in the environment, otherwise release-it can't
+create the GitHub release via the API and falls back to opening a browser.
