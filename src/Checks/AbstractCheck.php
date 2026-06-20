@@ -6,8 +6,11 @@ use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Schedule;
+use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
 use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractCheck implements CheckInterface
@@ -316,6 +319,51 @@ abstract class AbstractCheck implements CheckInterface
             true,
             flags: JSON_THROW_ON_ERROR,
         );
+    }
+
+    /**
+     * @return array<string|int, mixed>|null
+     */
+    protected function parsePhpConfigFile(string $relativePath): ?array
+    {
+        $file = base_path($relativePath);
+        $path = ltrim($relativePath, '/');
+
+        if (!file_exists($file)) {
+            $this->addComment("{$path} not found");
+
+            return null;
+        }
+
+        $code = file_get_contents($file);
+        if ($code === false) {
+            $this->addComment("{$path} is unreadable");
+
+            return null;
+        }
+
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+
+        try {
+            $ast = $parser->parse($code);
+        } catch (\Throwable) {
+            $this->addComment("{$path} could not be parsed");
+
+            return null;
+        }
+
+        if ($ast === null) {
+            $this->addComment("{$path} could not be parsed");
+
+            return null;
+        }
+
+        $visitor = new BackupConfigVisitor();
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        return $visitor->getConfig();
     }
 
     // === Fix Helpers ===

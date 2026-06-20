@@ -13,9 +13,12 @@ class UsesPhpInsightsCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        if ($this->checkComposerScript('ci-lint', 'insights --summary --no-interaction')
-            && $this->checkComposerScript('ci-lint', 'insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null')
-        ) {
+        $scriptsOk = $this->checkComposerScript('ci-lint', 'insights --summary --no-interaction')
+            && $this->checkComposerScript('ci-lint', 'insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null');
+
+        $configOk = $this->hasDisableSecurityCheck();
+
+        if ($scriptsOk && $configOk) {
             return CheckResult::PASS;
         }
 
@@ -23,9 +26,29 @@ class UsesPhpInsightsCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $this->addToComposerScript('ci-lint', '@php artisan insights --summary --no-interaction');
-        $this->addToComposerScript('ci-lint', '@php artisan insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null');
+        if (!$scriptsOk) {
+            $this->addToComposerScript('ci-lint', '@php artisan insights --summary --no-interaction');
+            $this->addToComposerScript('ci-lint', '@php artisan insights -n --ansi --format=codeclimate > codeclimate-report.json 2>/dev/null');
+        }
 
+        // PHP config file cannot be auto-fixed; comment added by hasDisableSecurityCheck()
         return $this->fix(dry: true);
+    }
+
+    private function hasDisableSecurityCheck(): bool
+    {
+        $config = $this->parsePhpConfigFile('config/insights.php');
+
+        if ($config === null) {
+            return false;
+        }
+
+        if (($config['requirements']['disable-security-check'] ?? null) !== true) {
+            $this->addComment("Set 'disable-security-check' => true in the requirements section of config/insights.php");
+
+            return false;
+        }
+
+        return true;
     }
 }

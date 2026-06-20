@@ -67,7 +67,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
-- 🔧 **`usesPhpInsights()`** - Validates PHP Insights code quality analysis is configured *(partial: fixes ci-lint scripts if package installed)*
+- 🔧 **`usesPhpInsights()`** - Validates PHP Insights is configured: ci-lint scripts and `disable-security-check => true` in `config/insights.php` *(partial: fixes ci-lint scripts if package installed)*
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*
 - 🔧 **`hasRectorConfigWithComposerBased()`** - Validates Rector `withComposerBased(phpunit, symfony, laravel)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithConfiguredRules()`** - Validates Rector `withConfiguredRule()` calls are present for `RouteActionCallableRector` and `WhereToWhereLikeRector` *(appends calls to rector.php)*
