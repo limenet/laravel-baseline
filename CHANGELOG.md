@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.1.4](https://github.com/limenet/laravel-baseline/compare/v2.1.3...v2.1.4) (2026-06-20)
+
+### Bug Fixes
+
+* **boost:** discourage conventional commits and command chaining in core guideline ([2faa8bd](https://github.com/limenet/laravel-baseline/commit/2faa8bdc236530f441f4bdcad8c9efb70769102d))
+
 ## [2.1.3](https://github.com/limenet/laravel-baseline/compare/v2.1.2...v2.1.3) (2026-06-20)
 
 ### Bug Fixes
