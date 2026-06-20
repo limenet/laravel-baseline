@@ -3,6 +3,14 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.1.2](https://github.com/limenet/laravel-baseline/compare/v2.1.1...v2.1.2) (2026-06-20)
+
+### Bug Fixes
+
+* **boost:** remove repo-specific release details from skill ([b7eeaa9](https://github.com/limenet/laravel-baseline/commit/b7eeaa9815cce8c4fd8b6c229618ebceea7b78b5))
+* **doesNotHaveGuidelinesScript:** detect and remove stale post-update-cmd entry ([d0bc4b7](https://github.com/limenet/laravel-baseline/commit/d0bc4b73065d549e44153fef9a7adf9c7ecc25e0))
+* **usesPhpInsights:** auto-fix disable-security-check via AST rewrite ([11be4b6](https://github.com/limenet/laravel-baseline/commit/11be4b63327852de8e54d8440fde049ee85bdee2))
+
 ## [2.1.1](https://github.com/limenet/laravel-baseline/compare/v2.1.0...v2.1.1) (2026-06-20)
 
 ### Bug Fixes
