@@ -2,7 +2,7 @@
     "name": "laravel-baseline",
     "private": true,
     "scripts": {
-        "release": "release-it"
+        "release": "GITHUB_TOKEN=$(gh auth token) release-it"
     },
     "devDependencies": {
         "@release-it/bumper": "^7.0.6",
