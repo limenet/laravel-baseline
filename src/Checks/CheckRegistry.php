@@ -12,6 +12,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DdevHasRedisAddonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DeniesEnvReadsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveGuidelinesScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
@@ -85,6 +86,7 @@ class CheckRegistry
         CallsBaselineCheck::class,
         DeniesEnvReadsInClaudeSettingsCheck::class,
         DoesNotCallPeriodicBaselineOnUpdateCheck::class,
+        DoesNotHaveGuidelinesScriptCheck::class,
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
         CallsSentryHookCheck::class,
         CheckPhpunitCheck::class,

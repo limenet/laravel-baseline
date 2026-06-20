@@ -147,6 +147,7 @@ This package validates your Laravel installation against the following checks:
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
 - 🔧 **`callsBaseline()`** - Validates self-validation runs after updates *(adds/upgrades post-update-cmd entry to include `--fix`)*
 - **`doesNotCallPeriodicBaselineOnUpdate()`** - Fails if `php artisan limenet:laravel-baseline:periodic` is in the `post-update-cmd` scripts (it shouldn't be — periodic checks fail CI automatically when expired)
+- 🔧 **`doesNotHaveGuidelinesScript()`** - Fails if the removed `php artisan limenet:laravel-baseline:guidelines` command is still in `post-update-cmd` (removed in v2.1.0) *(removes the entry from composer.json)*
 - 🔧 **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`) *(moves from require-dev to require in composer.json)*
 - 🔧 **`usesLaravelLang()`** - Validates `laravel-lang/lang` dev dependency is installed with `lang:update` and pint in post-update scripts *(partial: adds post-update scripts if package in require-dev)*
 
