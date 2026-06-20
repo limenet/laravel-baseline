@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-baseline` will be documented in this file.
 
+
+## [2.1.1](https://github.com/limenet/laravel-baseline/compare/v2.1.0...v2.1.1) (2026-06-20)
+
+### Bug Fixes
+
+* **usesPhpInsights:** enforce disable-security-check in insights config ([45006f4](https://github.com/limenet/laravel-baseline/commit/45006f4f350df822ee2196ac4d743398ff44d9dd))
+
 ## [2.1.0](https://github.com/limenet/laravel-baseline/compare/v2.0.13...v2.1.0) (2026-06-19)
 
 ### What's Changed
@@ -650,4 +657,3 @@ All notable changes to `laravel-baseline` will be documented in this file.
 * Ship the initial package with the `limenet:laravel-baseline` command that runs a suite of convention checks against a Laravel project, each reporting `PASS`/`FAIL`/`WARN` with an icon, and exiting non-zero on any failure.
 * Include the first set of checks covering Rector configuration, encrypted env file, CI lint completeness, maintained Laravel version, IDE helpers, Larastan, Laravel Boost, Horizon, Pennant, Telescope, `limenet/laravel-pint-config`, Pest, PHPStan extensions, Predis, Rector, and Spatie Backup/Health.
 * Add Rector AST visitor helpers (`AbstractRectorVisitor`, `RectorVisitorClassFetch`, `RectorVisitorHasCall`, `RectorVisitorNamedArgument`) for parsing Rector config, plus the `CheckResult` enum, facade, service provider, and a publishable `config/baseline.php`.
-

@@ -1,7 +1,7 @@
 {
     "name": "limenet/laravel-baseline",
     "description": "A highly opinionated Laravel baseline.",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "keywords": [
         "Linus Metzler",
         "laravel",
