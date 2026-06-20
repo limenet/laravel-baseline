@@ -32,6 +32,23 @@ ddev artisan <command>
 ddev composer run <script>
 ```
 
+DDEV resolves the project from the current directory, so run commands as-is — do **not** prefix
+them with `cd <project-dir>`. Changing directories breaks command whitelisting and is never
+necessary here.
+
+### Run commands separately, not chained
+
+Run each command as its own invocation rather than chaining them with `&&` or `;`. For example,
+run `ci-lint` and `test` as two separate commands:
+
+```bash
+ddev composer run ci-lint
+ddev composer run test
+```
+
+not `ddev composer run ci-lint && ddev composer run test`. Separate, whitelisted commands keep
+each step independently approvable and make failures easier to attribute.
+
 ### Testing
 
 Tests use Pest. Run the suite with:
@@ -60,6 +77,13 @@ ddev artisan ide-helper:meta
    `ddev composer run test`.
 3. **Review changes:** use the `/code-review` skill to review recent changes for correctness
    bugs and simplification opportunities.
+
+### Git and commits
+
+- Work happens directly on `main`/`master` by default. Don't create a feature branch unless the
+  task explicitly calls for one.
+- Do **not** use Conventional Commits. Write plain, descriptive commit messages in the imperative
+  mood (e.g. "Add invoice export", not "feat: add invoice export").
 
 ### Best practices
 
