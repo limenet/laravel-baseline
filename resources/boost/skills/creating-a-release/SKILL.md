@@ -21,29 +21,19 @@ Run the release script — it drives release-it interactively (choose the next v
 tags, commits, and publishes):
 
 ```bash
-GITHUB_TOKEN=… npm run release
+npm run release
 ```
 
-`release-it` handles the version bump, git tag, commit, and (if configured) the GitHub/GitLab
-release. The `@release-it/bumper` plugin writes the chosen version into the `version` field of
+`release-it` handles the version bump, git tag, commit, and (if configured) the remote release.
+The `@release-it/bumper` plugin writes the chosen version into the `version` field of
 `composer.json`, keeping it the single source of truth.
-
-A `GITHUB_TOKEN` (with `repo` scope) must be in the environment for release-it to create the
-GitHub release via the API — without it, it falls back to opening a browser.
-
-If the project also configures the `@release-it/conventional-changelog` plugin, the recommended
-version bump **and** the `CHANGELOG.md` entry are derived from the [Conventional
-Commits](https://www.conventionalcommits.org/) since the last tag — so the quality of the release
-depends on well-formed commit messages (see the always-on guideline).
 
 ## Conventions
 
 - **Semantic versioning.** Pick the next version per semver (patch / minor / major) based on the
-  changes since the last tag — or let conventional commits drive it automatically.
+  changes since the last tag.
 - **`composer.json` `version` is authoritative.** Do not hand-edit it for a release — let
   `npm run release` / `@release-it/bumper` set it.
-- **Conventional commits.** Use `feat:` / `fix:` / `feat!:` etc. so the version and changelog can
-  be inferred automatically.
 
 ## Configuration reference
 
