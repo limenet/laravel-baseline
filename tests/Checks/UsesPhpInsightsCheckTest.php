@@ -83,3 +83,15 @@ it('usesPhpInsights provides comment when disable-security-check is not true', f
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($collector->all())->toContain("Set 'disable-security-check' => true in the requirements section of config/insights.php");
 });
+
+it('usesPhpInsights fix sets disable-security-check to true', function (): void {
+    bindFakeComposer(['nunomaduro/phpinsights' => true]);
+    $this->withTempBasePath([
+        'composer.json' => json_encode(composerWithScripts()),
+        'config/insights.php' => insightsConfigWith(false),
+    ]);
+
+    $check = makeCheck(UsesPhpInsightsCheck::class);
+    expect($check->fix())->toBe(CheckResult::PASS);
+    expect(file_get_contents(base_path('config/insights.php')))->toContain("'disable-security-check' => true");
+});
