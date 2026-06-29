@@ -3,6 +3,8 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.1.5](https://github.com/limenet/laravel-baseline/compare/v2.1.4...v2.1.5) (2026-06-29)
+
 ## [2.1.4](https://github.com/limenet/laravel-baseline/compare/v2.1.3...v2.1.4) (2026-06-20)
 
 ### Bug Fixes
