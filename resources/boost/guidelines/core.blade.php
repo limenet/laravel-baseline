@@ -32,9 +32,13 @@ ddev artisan <command>
 ddev composer run <script>
 ```
 
-DDEV resolves the project from the current directory, so run commands as-is — do **not** prefix
-them with `cd <project-dir>`. Changing directories breaks command whitelisting and is never
-necessary here.
+### Use project-relative paths
+
+Commands run from the project root. Reference files with paths relative to the project root
+(e.g. `app/Models/User.php`), not absolute paths. Do **not** change directories or target the
+repo from elsewhere — avoid `cd <dir>` and `git -C <dir>`. Run `git`, `artisan`, and `composer`
+from the project root as-is. Changing directories or redirecting the working tree breaks command
+whitelisting and is never necessary here.
 
 ### Run commands separately, not chained
 
