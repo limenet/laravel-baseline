@@ -63,6 +63,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesPestCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpInsightsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesReadableEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReleaseItCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieBackupCheck;
@@ -143,6 +144,7 @@ class CheckRegistry
         RunsCiLintHookInClaudeSettingsCheck::class,
         UpdatesDdevAddonsCheck::class,
         UsesRectorCheck::class,
+        UsesReadableEncryptedEnvFileCheck::class,
         UsesReleaseItCheck::class,
         UsesSpatieBackupCheck::class,
         UsesSpatieHealthHasCoreChecksCheck::class,

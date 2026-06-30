@@ -145,6 +145,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`formRequestFailOnUnknownFields()`** - Validates `FormRequest::failOnUnknownFields()` is called in AppServiceProvider (Laravel ≥13.6 only; warns on older versions) *(adds `FormRequest::failOnUnknownFields(! app()->isProduction())` to boot())*
 - **`hasDailyLogging()`** - Validates logging uses `daily` channel (directly or via `stack`)
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
+- **`usesReadableEncryptedEnvFile()`** - Validates the encrypted env file uses the readable line-per-variable format produced by `ddev artisan env:encrypt --readable` (variable names stay visible in diffs), not the opaque blob format. Passes when no encrypted file exists (existence is `hasEncryptedEnvFile`'s concern).
 - 🔧 **`callsBaseline()`** - Validates self-validation runs after updates *(adds/upgrades post-update-cmd entry to include `--fix`)*
 - **`doesNotCallPeriodicBaselineOnUpdate()`** - Fails if `php artisan limenet:laravel-baseline:periodic` is in the `post-update-cmd` scripts (it shouldn't be — periodic checks fail CI automatically when expired)
 - 🔧 **`doesNotHaveGuidelinesScript()`** - Fails if the removed `php artisan limenet:laravel-baseline:guidelines` command is still in `post-update-cmd` (removed in v2.1.0) *(removes the entry from composer.json)*
