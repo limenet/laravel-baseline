@@ -24,7 +24,7 @@ abstract class AbstractPeriodicCheck extends AbstractCheck implements PeriodicCh
         $lastRun = PeriodicStateManager::getLastRun(static::name());
 
         if ($lastRun === null || Carbon::instance($lastRun)->add($this->interval())->isPast()) {
-            $this->addComment('Run `php artisan limenet:laravel-baseline:periodic` to complete this periodic check');
+            $this->addComment('Run `ddev artisan limenet:laravel-baseline:periodic` to complete this periodic check');
 
             return CheckResult::FAIL;
         }

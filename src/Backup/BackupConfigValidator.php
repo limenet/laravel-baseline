@@ -32,7 +32,7 @@ class BackupConfigValidator
         $this->errors = [];
 
         if (!file_exists($configPath)) {
-            $this->errors[] = 'Backup configuration missing: Create config/backup.php by running "php artisan vendor:publish --provider=\"Spatie\\Backup\\BackupServiceProvider\""';
+            $this->errors[] = 'Backup configuration missing: Create config/backup.php by running "ddev artisan vendor:publish --provider=\"Spatie\\Backup\\BackupServiceProvider\""';
 
             return $this->errors;
         }

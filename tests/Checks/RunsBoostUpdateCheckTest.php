@@ -48,5 +48,5 @@ it('runsBoostUpdate provides helpful comment when expired', function (): void {
 
     [$check, $collector] = makeCheckWithCollector(RunsBoostUpdateCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Run `php artisan limenet:laravel-baseline:periodic` to complete this periodic check');
+    expect($collector->all())->toContain('Run `ddev artisan limenet:laravel-baseline:periodic` to complete this periodic check');
 });

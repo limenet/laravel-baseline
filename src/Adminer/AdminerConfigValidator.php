@@ -38,7 +38,7 @@ class AdminerConfigValidator
     private function validateAdminerConfig(string $configPath): void
     {
         if (!file_exists($configPath)) {
-            $this->errors[] = 'Adminer configuration missing: Create config/adminer.php by running "php artisan vendor:publish --provider=\"Onecentlin\\Adminer\\ServiceProvider\""';
+            $this->errors[] = 'Adminer configuration missing: Create config/adminer.php by running "ddev artisan vendor:publish --provider=\"Onecentlin\\Adminer\\ServiceProvider\""';
 
             return;
         }

@@ -14,7 +14,7 @@ it('returns error when config file cannot be read', function (): void {
         base_path('app/Http/Kernel.php'),
     );
 
-    expect($errors)->toContain('Adminer configuration missing: Create config/adminer.php by running "php artisan vendor:publish --provider=\"Onecentlin\\Adminer\\ServiceProvider\""');
+    expect($errors)->toContain('Adminer configuration missing: Create config/adminer.php by running "ddev artisan vendor:publish --provider=\"Onecentlin\\Adminer\\ServiceProvider\""');
 });
 
 it('returns error when config is empty/unparsable', function (): void {

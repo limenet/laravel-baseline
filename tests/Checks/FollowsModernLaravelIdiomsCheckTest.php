@@ -63,5 +63,5 @@ it('followsModernLaravelIdioms provides a helpful comment when expired', functio
 
     [$check, $collector] = makeCheckWithCollector(FollowsModernLaravelIdiomsCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Run `php artisan limenet:laravel-baseline:periodic` to complete this periodic check');
+    expect($collector->all())->toContain('Run `ddev artisan limenet:laravel-baseline:periodic` to complete this periodic check');
 });

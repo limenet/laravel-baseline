@@ -13,6 +13,6 @@ class RunsBoostUpdateCheck extends AbstractPeriodicCheck
 
     public function promptDescription(): string
     {
-        return "Run 'php artisan boost:update --discover' to keep Boost definitions up to date.";
+        return "Run 'ddev artisan boost:update --discover' to keep Boost definitions up to date.";
     }
 }

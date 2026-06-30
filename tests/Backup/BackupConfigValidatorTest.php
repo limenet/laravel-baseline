@@ -8,7 +8,7 @@ it('returns error when backup config file is missing', function (): void {
 
     $errors = $validator->validate(base_path('config/backup.php'));
 
-    expect($errors)->toContain('Backup configuration missing: Create config/backup.php by running "php artisan vendor:publish --provider=\"Spatie\\Backup\\BackupServiceProvider\""');
+    expect($errors)->toContain('Backup configuration missing: Create config/backup.php by running "ddev artisan vendor:publish --provider=\"Spatie\\Backup\\BackupServiceProvider\""');
 });
 
 it('returns error when backup config has no return statement', function (): void {

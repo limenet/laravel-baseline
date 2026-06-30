@@ -32,7 +32,7 @@ it('usesLaravelAdminer fails when config file missing', function (): void {
 
     [$check, $collector] = makeCheckWithCollector(UsesLaravelAdminerCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Adminer configuration missing: Create config/adminer.php by running "php artisan vendor:publish --provider=\"Onecentlin\\Adminer\\ServiceProvider\""');
+    expect($collector->all())->toContain('Adminer configuration missing: Create config/adminer.php by running "ddev artisan vendor:publish --provider=\"Onecentlin\\Adminer\\ServiceProvider\""');
 });
 
 it('usesLaravelAdminer fails when middleware not set to adminer', function (): void {

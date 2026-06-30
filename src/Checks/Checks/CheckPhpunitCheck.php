@@ -79,7 +79,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
             && str_starts_with($appKey->item(0)->getAttribute('value'), 'base64:');
 
         if (!$appKeyValid) {
-            $this->addComment('APP_KEY missing in phpunit.xml: Add <env name="APP_KEY" value="base64:..."/> to <php> section (generate with "php artisan key:generate")');
+            $this->addComment('APP_KEY missing in phpunit.xml: Add <env name="APP_KEY" value="base64:..."/> to <php> section (generate with "ddev artisan key:generate")');
 
             if ($dry) {
                 return CheckResult::FAIL;
