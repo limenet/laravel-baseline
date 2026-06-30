@@ -144,6 +144,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`modelShouldBeStrict()`** - Validates `Model::shouldBeStrict()` is called in AppServiceProvider with `true`, no argument, or a dynamic expression (not `false`) *(adds `Model::shouldBeStrict(! app()->isProduction())` to boot())*
 - 🔧 **`formRequestFailOnUnknownFields()`** - Validates `FormRequest::failOnUnknownFields()` is called in AppServiceProvider (Laravel ≥13.6 only; warns on older versions) *(adds `FormRequest::failOnUnknownFields(! app()->isProduction())` to boot())*
 - **`hasDailyLogging()`** - Validates logging uses `daily` channel (directly or via `stack`)
+- 🔧 **`logsAsJson()`** - Validates at least one log channel in `config/logging.php` uses a JSON formatter (e.g. `Illuminate\Log\Formatters\JsonFormatter::class`) for structured logs (Laravel ≥13.6 only; warns on older versions) *(adds a `json` monolog channel writing JSON to stderr)*
 - **`hasEncryptedEnvFile()`** - Validates encrypted environment file exists
 - **`usesReadableEncryptedEnvFile()`** - Validates the encrypted env file uses the readable line-per-variable format produced by `ddev artisan env:encrypt --readable` (variable names stay visible in diffs), not the opaque blob format. Passes when no encrypted file exists (existence is `hasEncryptedEnvFile`'s concern).
 - 🔧 **`callsBaseline()`** - Validates self-validation runs after updates *(adds/upgrades post-update-cmd entry to include `--fix`)*

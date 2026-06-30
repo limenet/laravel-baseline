@@ -42,6 +42,7 @@ use Limenet\LaravelBaseline\Checks\Checks\IsCiLintCompleteCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\LaravelBoostMcpUsesDdevCheck;
+use Limenet\LaravelBaseline\Checks\Checks\LogsAsJsonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\ModelShouldBeStrictCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
@@ -122,6 +123,7 @@ class CheckRegistry
         IsInstalledAsRegularDependencyCheck::class,
         IsLaravelVersionMaintainedCheck::class,
         LaravelBoostMcpUsesDdevCheck::class,
+        LogsAsJsonCheck::class,
         ModelShouldBeStrictCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
         PhpVersionMatchesCiCheck::class,
