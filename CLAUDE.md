@@ -253,6 +253,12 @@ php artisan limenet:laravel-baseline:check
 
 ## Commit Conventions
 
+> **Note:** `resources/boost/guidelines/core.blade.php` is the guideline this package *ships to
+> consumer projects* — including its "do not use Conventional Commits" rule. That rule applies to
+> those consumers, **not** to this repository. For commits in *this* repo, follow the Conventional
+> Commits convention below; it drives the release tooling. Wherever `core.blade.php` and this
+> `CLAUDE.md` disagree, `CLAUDE.md` governs work on this repo.
+
 **Use [Conventional Commits](https://www.conventionalcommits.org/).** The release tooling derives the
 next version number *and* the changelog directly from commit messages, so the message format is not
 cosmetic — it drives the release.
