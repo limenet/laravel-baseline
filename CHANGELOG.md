@@ -3,6 +3,16 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.3.0](https://github.com/limenet/laravel-baseline/compare/v2.2.0...v2.3.0) (2026-06-30)
+
+### Features
+
+* remove logsAsJson check ([efc48a5](https://github.com/limenet/laravel-baseline/commit/efc48a58a4b083edb69c5907db0a16e034ca6d24))
+
+### Bug Fixes
+
+* use ddev artisan in runnable check messages ([ba627de](https://github.com/limenet/laravel-baseline/commit/ba627dec93c38ad08728800b00e26e82f027e14d))
+
 ## [2.2.0](https://github.com/limenet/laravel-baseline/compare/v2.1.5...v2.2.0) (2026-06-30)
 
 ### Features
