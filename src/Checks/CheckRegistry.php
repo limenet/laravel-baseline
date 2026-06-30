@@ -14,6 +14,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DeniesEnvReadsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveGuidelinesScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotPinOldMailTemplateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
@@ -100,6 +101,7 @@ class CheckRegistry
         DoesNotUseIgnitionCheck::class,
         DoesNotUseSailCheck::class,
         DoesNotUseSpatiePasskeysWithFortifyCheck::class,
+        DoesNotPinOldMailTemplateCheck::class,
         FormRequestFailOnUnknownFieldsCheck::class,
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSkillsCheck::class,
