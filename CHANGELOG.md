@@ -5,6 +5,13 @@ All notable changes to `laravel-baseline` will be documented in this file.
 
 ## [2.2.0](https://github.com/limenet/laravel-baseline/compare/v2.1.5...v2.2.0) (2026-06-30)
 
+### Features
+
+* add doesNotPinOldMailTemplate check ([e888a32](https://github.com/limenet/laravel-baseline/commit/e888a320029771feda5800041faf91b89b9b4d95))
+* add followsModernLaravelIdioms periodic check with audit skill ([5ccc729](https://github.com/limenet/laravel-baseline/commit/5ccc729079c701f08f731b497ec5e667f522bd8c))
+* add logsAsJson check ([4aa9686](https://github.com/limenet/laravel-baseline/commit/4aa96860b21499ebddf740af669cca14dc44a5b6))
+* add usesReadableEncryptedEnvFile check ([0b3adb4](https://github.com/limenet/laravel-baseline/commit/0b3adb47cf237acaeac772a60a6d6c041a7fca45))
+
 ## [2.1.5](https://github.com/limenet/laravel-baseline/compare/v2.1.4...v2.1.5) (2026-06-29)
 
 ## [2.1.4](https://github.com/limenet/laravel-baseline/compare/v2.1.3...v2.1.4) (2026-06-20)
