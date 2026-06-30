@@ -89,6 +89,33 @@ ddev artisan ide-helper:meta
 - Do **not** use Conventional Commits. Write plain, descriptive commit messages in the imperative
   mood (e.g. "Add invoice export", not "feat: add invoice export").
 
+### Modern Laravel idioms
+
+Prefer the current framework idioms — they keep static analysis clean and read more clearly.
+Both of the following require Laravel 12.45+ / 13.x.
+
+**Typed cache getters.** When you read a cached value you expect to be a specific scalar or array
+type, use the typed getter instead of `Cache::get()`. The typed getters return a properly-typed
+value (and throw on a type mismatch) rather than `mixed`, so PHPStan stays happy:
+
+```php
+$name = Cache::string('user:display_name', 'Guest');
+// not: Cache::get('user:display_name', 'Guest')
+```
+
+The full set is `Cache::string()`, `Cache::integer()`, `Cache::float()`, `Cache::boolean()`, and
+`Cache::array()`, each taking `($key, $default)`.
+
+**BackedEnum keys for cache and session.** Pass a `BackedEnum` case directly as a cache or session
+key — Laravel resolves it to its backing value automatically, so there's no need to unwrap
+`->value` by hand:
+
+```php
+Cache::put(CacheKey::Profile, $data);
+session()->put(CheckoutSession::Cart, $items);
+// not: CacheKey::Profile->value / CheckoutSession::Cart->value
+```
+
 ### Best practices
 
 - Follow the code style enforced by Laravel Pint.

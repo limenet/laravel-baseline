@@ -20,6 +20,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSpatiePasskeysWithFortifyCheck;
+use Limenet\LaravelBaseline\Checks\Checks\FollowsModernLaravelIdiomsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\FormRequestFailOnUnknownFieldsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSkillsCheck;
@@ -102,6 +103,7 @@ class CheckRegistry
         DoesNotUseSailCheck::class,
         DoesNotUseSpatiePasskeysWithFortifyCheck::class,
         DoesNotPinOldMailTemplateCheck::class,
+        FollowsModernLaravelIdiomsCheck::class,
         FormRequestFailOnUnknownFieldsCheck::class,
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSkillsCheck::class,
