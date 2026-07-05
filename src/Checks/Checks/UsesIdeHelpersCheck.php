@@ -19,16 +19,26 @@ class UsesIdeHelpersCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        if (!$this->hasPostUpdateScript('ide-helper:generate') || !$this->hasPostUpdateScript('ide-helper:models') || !$this->hasPostUpdateScript('ide-helper:meta')) {
+        $hasGenerate = $this->hasPostUpdateScript('ide-helper:generate');
+        $hasModels = $this->hasPostUpdateScript('ide-helper:models');
+        $hasMeta = $this->hasPostUpdateScript('ide-helper:meta');
+
+        if (!$hasGenerate || !$hasModels || !$hasMeta) {
             if ($dry) {
                 return CheckResult::FAIL;
             }
 
-            $this->addToComposerScript('post-update-cmd', '@php artisan ide-helper:generate');
-            $this->addToComposerScript('post-update-cmd', '@php artisan ide-helper:models --nowrite');
-            $this->addToComposerScript('post-update-cmd', '@php artisan ide-helper:meta');
+            if (!$hasGenerate) {
+                $this->addToComposerScript('post-update-cmd', '@php artisan ide-helper:generate');
+            }
 
-            return $this->fix(dry: true);
+            if (!$hasModels) {
+                $this->addToComposerScript('post-update-cmd', '@php artisan ide-helper:models --nowrite', insertBefore: 'ide-helper:meta');
+            }
+
+            if (!$hasMeta) {
+                $this->addToComposerScript('post-update-cmd', '@php artisan ide-helper:meta');
+            }
         }
 
         foreach (self::GENERATED_FILES as $entry) {
