@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.3.1](https://github.com/limenet/laravel-baseline/compare/v2.3.0...v2.3.1) (2026-07-05)
+
+### Bug Fixes
+
+* check ide-helper:models script and gitignore generated files in usesIdeHelpers ([4e78bd6](https://github.com/limenet/laravel-baseline/commit/4e78bd67e528759f92356d572196cd1f0efed9f6))
+
 ## [2.3.0](https://github.com/limenet/laravel-baseline/compare/v2.2.0...v2.3.0) (2026-06-30)
 
 ### Features
