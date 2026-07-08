@@ -132,6 +132,7 @@ This package validates your Laravel installation against the following checks:
 
 ### Local Development
 - **`phpVersionMatchesDdev()`** - Validates PHP version consistency with DDEV
+- 🔧 **`nodeVersionMatchesDdev()`** - Validates the project pins a Node version in both `package.json` `engines.node` and `.nvmrc` (compatible with each other) and that `.ddev/config.yaml` sets `nodejs_version: auto` so DDEV derives the Node version from the project *(creates the missing constraint — defaulting to Node 26 when none is declared — and sets `nodejs_version: auto`; a conflict between existing `engines.node` and `.nvmrc` is reported, not auto-resolved)*
 - 🔧 **`ddevHasPcovPackage()`** - Validates DDEV coverage configuration *(adds pcov to webimage_extra_packages and creates .ddev/php/90-custom.ini)*
 - **`ddevHasRedisAddon()`** - Validates DDEV Redis addon is installed and at minimum version 2.2.0
 - 🔧 **`ddevMutagenIgnoresNodeModules()`** - Validates DDEV Mutagen sync configuration *(creates mutagen.yml and fixes .gitignore)*

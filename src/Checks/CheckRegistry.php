@@ -45,6 +45,7 @@ use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\LaravelBoostMcpUsesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\ModelShouldBeStrictCheck;
+use Limenet\LaravelBaseline\Checks\Checks\NodeVersionMatchesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
@@ -128,6 +129,7 @@ class CheckRegistry
         IsLaravelVersionMaintainedCheck::class,
         LaravelBoostMcpUsesDdevCheck::class,
         ModelShouldBeStrictCheck::class,
+        NodeVersionMatchesDdevCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
         PhpVersionMatchesCiCheck::class,
         PhpVersionMatchesDdevCheck::class,

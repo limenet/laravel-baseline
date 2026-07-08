@@ -224,6 +224,38 @@ abstract class AbstractCheck implements CheckInterface
         );
     }
 
+    /**
+     * The raw `engines.node` constraint from package.json (e.g. "^22"), or null if absent.
+     */
+    protected function getPackageJsonNodeVersion(): ?string
+    {
+        $packageJson = $this->getPackageJson();
+
+        if ($packageJson === null) {
+            return null;
+        }
+
+        $constraint = $packageJson['engines']['node'] ?? null;
+
+        return is_string($constraint) && $constraint !== '' ? $constraint : null;
+    }
+
+    /**
+     * The raw, trimmed version from the project's .nvmrc (e.g. "22"), or null if absent/empty.
+     */
+    protected function getNvmrcNodeVersion(): ?string
+    {
+        $nvmrcFile = base_path('.nvmrc');
+
+        if (!file_exists($nvmrcFile)) {
+            return null;
+        }
+
+        $version = trim(file_get_contents($nvmrcFile) ?: '');
+
+        return $version !== '' ? $version : null;
+    }
+
     // === Config File Helpers ===
 
     protected function getPhpunitXml(): \SimpleXMLElement|false|null
@@ -375,6 +407,17 @@ abstract class AbstractCheck implements CheckInterface
     {
         file_put_contents(
             base_path('composer.json'),
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function writePackageJson(array $data): void
+    {
+        file_put_contents(
+            base_path('package.json'),
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
         );
     }
