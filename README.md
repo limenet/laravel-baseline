@@ -94,6 +94,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`laravelBoostMcpUsesDdev()`** - Validates `.mcp.json` configures the `laravel-boost` MCP server to use `ddev artisan boost:mcp` *(creates/fixes `.mcp.json`; warns if `laravel/boost` not installed)*
 - **`runsBoostUpdate()`** *(periodic, every 30 days)* - Warns if Laravel Boost is not installed; when installed, fails until a developer confirms running `php artisan boost:update --discover` via `limenet:laravel-baseline:periodic`
 - **`followsModernLaravelIdioms()`** *(periodic, every 30 days)* - On Laravel ≥12.45, fails until a developer confirms (via `limenet:laravel-baseline:periodic`) that cache/session calls use typed getters (`Cache::string()` etc.) and pass BackedEnum cases directly as keys, by running the `auditing-laravel-idioms` skill
+- **`updatesDependencies()`** *(periodic, every 30 days)* - Fails until a developer confirms (via `limenet:laravel-baseline:periodic`) that composer & npm dependencies were updated by running the `updating-dependencies` skill — which updates in-constraint packages, reviews changelogs for project impact, and reports semver-blocked majors
 - 🔧 **`usesLimenetPintConfig()`** - Validates custom Laravel Pint formatting standards *(partial: adds post-update script if package installed)*
 
 ### Laravel Features & Monitoring
