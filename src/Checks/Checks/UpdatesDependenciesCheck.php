@@ -8,6 +8,6 @@ class UpdatesDependenciesCheck extends AbstractPeriodicCheck
 {
     public function promptDescription(): string
     {
-        return "Run the `updating-dependencies` skill to update composer & npm dependencies, review changelogs, and check for semver-blocked majors.";
+        return 'Run the `updating-dependencies` skill to update composer & npm dependencies, review changelogs, and check for semver-blocked majors.';
     }
 }
