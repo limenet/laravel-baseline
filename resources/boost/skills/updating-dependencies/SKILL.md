@@ -51,6 +51,9 @@ ddev composer update
 npm update
 ```
 
+If `biome` moved (here or in step 4), sync the `$schema` in `biome.json` to the new version — see
+the Biome convention below.
+
 ### 3. Review changelogs against this project
 
 For each package with a meaningful bump (from the survey and from step 2), fetch its changelog or
@@ -111,5 +114,9 @@ Produce a written summary:
   package — do not assume a change is relevant or irrelevant without looking.
 - **Recommend, then apply approved.** Survey and recommend beyond-constraint bumps; apply only the
   ones the developer approves. Never cross a version constraint automatically.
+- **Keep Biome's `$schema` in sync.** If `biome` is installed and its version changed, update the
+  `$schema` URL in `biome.json` to match the new version (e.g.
+  `https://biomejs.dev/schemas/<new-version>/schema.json`). Skip this if there is no `biome.json` or
+  Biome was not bumped.
 - **Plain commit messages.** If asked to commit, write a plain, descriptive message in the
   imperative mood (this project does not use Conventional Commits).
