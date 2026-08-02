@@ -63,6 +63,8 @@ This package validates your Laravel installation against the following checks:
 
 ### Testing & Quality Tools
 - **`usesPest()`** - Validates Pest testing framework is configured (not PHPUnit directly)
+- **`usesPestPhpstanPlugin()`** - Validates `pestphp/pest-plugin-phpstan` is installed when Pest 5+ and PHPStan are both present (warns if not applicable)
+- **`usesPestRectorPlugin()`** - Validates `pestphp/pest-plugin-rector` is installed when Pest 5+ and Rector are both present (warns if not applicable)
 - 🔧 **`usesRector()`** - Validates Rector automated code modernization is installed *(partial: fixes ci-lint script if packages installed)*
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
@@ -79,6 +81,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`hasRectorConfigWithRules()`** - Validates Rector `withRules([AddGenericReturnTypeToRelationsRector, MinutesToSecondsInCacheRector, UseForwardsCallsTraitRector])` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithSets()`** - Validates Rector `withSets([LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS, LaravelSetList::LARAVEL_*])` is configured with all required sets *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithPaths()`** - Validates Rector `withPaths([app, database, routes, tests])` is configured *(appends call to rector.php)*
+- 🔧 **`hasRectorConfigWithPestSet()`** - Validates Rector `withSets([PestSetList::CODING_STYLE])` is configured when Pest 5+ and Rector are both present *(appends call to rector.php; warns if not applicable)*
 - 🔧 **`hasRectorConfigWithSkip()`** - Validates Rector `withSkip()` contains required skipped rules (always: 6 Laravel rules; Laravel 13+: TablePropertyToTableAttributeRector; when server.php exists: ServerVariableToRequestFacadeRector) *(appends call to rector.php)*
 
 ### IDE & Developer Tools

@@ -33,6 +33,7 @@ use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithComposerBasedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithConfiguredRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithImportNamesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPathsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPestSetCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPhpSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPreparedSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithRulesCheck;
@@ -64,6 +65,8 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelPulseCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelTelescopeCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLimenetPintConfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesPestPhpstanPluginCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesPestRectorPluginCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpInsightsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
@@ -115,6 +118,7 @@ class CheckRegistry
         HasRectorConfigWithConfiguredRulesCheck::class,
         HasRectorConfigWithImportNamesCheck::class,
         HasRectorConfigWithPathsCheck::class,
+        HasRectorConfigWithPestSetCheck::class,
         HasRectorConfigWithPhpSetsCheck::class,
         HasRectorConfigWithPreparedSetsCheck::class,
         HasRectorConfigWithRulesCheck::class,
@@ -144,6 +148,8 @@ class CheckRegistry
         UsesLaravelTelescopeCheck::class,
         UsesLimenetPintConfigCheck::class,
         UsesPestCheck::class,
+        UsesPestPhpstanPluginCheck::class,
+        UsesPestRectorPluginCheck::class,
         UsesPhpInsightsCheck::class,
         UsesPhpstanExtensionsCheck::class,
         UsesPredisCheck::class,
