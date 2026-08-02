@@ -21,7 +21,7 @@ class PeriodicCheckCommand extends Command
 
     public function handle(): int
     {
-        $collector = new CommentCollector();
+        $collector = new CommentCollector;
 
         $expired = collect(CheckRegistry::createAll($collector))
             ->filter(fn ($check) => $check instanceof PeriodicCheckInterface)
@@ -41,7 +41,7 @@ class PeriodicCheckCommand extends Command
             $this->newLine();
 
             if (confirm('Have you completed this task?', default: false)) {
-                PeriodicStateManager::setLastRun($check::name(), new DateTimeImmutable());
+                PeriodicStateManager::setLastRun($check::name(), new DateTimeImmutable);
                 $this->line('✅ Marked as done.');
             } else {
                 $this->line('⏭ Skipped.');

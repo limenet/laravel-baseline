@@ -55,7 +55,7 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
             return null;
         }
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
@@ -63,8 +63,8 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
             return null;
         }
 
-        $visitor = new BackupConfigVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new BackupConfigVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
@@ -127,7 +127,7 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
             return null;
         }
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
@@ -135,8 +135,8 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
             return null;
         }
 
-        $visitor = new QueueCheckHorizonQueuesVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new QueueCheckHorizonQueuesVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 

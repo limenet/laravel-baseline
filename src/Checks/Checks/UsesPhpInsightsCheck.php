@@ -50,7 +50,7 @@ class UsesPhpInsightsCheck extends AbstractFixableCheck
         }
 
         $writer = PhpFileWriter::open($file);
-        $finder = new NodeFinder();
+        $finder = new NodeFinder;
 
         $return = $finder->findFirst($writer->stmts, fn ($n): bool => $n instanceof Node\Stmt\Return_);
 

@@ -101,7 +101,7 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         return json_decode(
-            file_get_contents($composerFile) ?: throw new \RuntimeException(),
+            file_get_contents($composerFile) ?: throw new \RuntimeException,
             true,
             flags: JSON_THROW_ON_ERROR,
         );
@@ -123,7 +123,7 @@ abstract class AbstractCheck implements CheckInterface
             return false;
         }
 
-        $parser = new VersionParser();
+        $parser = new VersionParser;
 
         return Intervals::haveIntersections(
             $parser->parseConstraints($installedConstraint),
@@ -218,7 +218,7 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         return json_decode(
-            file_get_contents($packageFile) ?: throw new \RuntimeException(),
+            file_get_contents($packageFile) ?: throw new \RuntimeException,
             true,
             flags: JSON_THROW_ON_ERROR,
         );
@@ -347,7 +347,7 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         return json_decode(
-            file_get_contents($releaseItFile) ?: throw new \RuntimeException(),
+            file_get_contents($releaseItFile) ?: throw new \RuntimeException,
             true,
             flags: JSON_THROW_ON_ERROR,
         );
@@ -374,7 +374,7 @@ abstract class AbstractCheck implements CheckInterface
             return null;
         }
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse($code);
@@ -390,8 +390,8 @@ abstract class AbstractCheck implements CheckInterface
             return null;
         }
 
-        $visitor = new BackupConfigVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new BackupConfigVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 

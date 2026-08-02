@@ -41,11 +41,11 @@ class PhpFileWriter
     {
         $source = file_exists($path) ? (string) file_get_contents($path) : $fallback;
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
         $originalStmts = $parser->parse($source) ?? [];
         $tokens = $parser->getTokens();
 
-        $traverser = new NodeTraverser(new CloningVisitor());
+        $traverser = new NodeTraverser(new CloningVisitor);
         /** @var Node\Stmt[] $stmts */
         $stmts = $traverser->traverse($originalStmts);
 
@@ -63,7 +63,7 @@ class PhpFileWriter
      */
     public static function writeConfig(string $path, array $config): void
     {
-        $printer = new class() extends Standard
+        $printer = new class extends Standard
         {
             /** @param Node[] $nodes */
             protected function pMaybeMultiline(array $nodes, bool $trailingComma = false): string
@@ -136,7 +136,7 @@ class PhpFileWriter
     {
         file_put_contents(
             $this->path,
-            (new Standard())->printFormatPreserving($this->stmts, $this->originalStmts, $this->tokens),
+            (new Standard)->printFormatPreserving($this->stmts, $this->originalStmts, $this->tokens),
         );
     }
 

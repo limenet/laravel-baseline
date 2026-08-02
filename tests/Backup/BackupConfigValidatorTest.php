@@ -3,7 +3,7 @@
 use Limenet\LaravelBaseline\Backup\BackupConfigValidator;
 
 it('returns error when backup config file is missing', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
     $this->withTempBasePath([]);
 
     $errors = $validator->validate(base_path('config/backup.php'));
@@ -12,7 +12,7 @@ it('returns error when backup config file is missing', function (): void {
 });
 
 it('returns error when backup config has no return statement', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $this->withTempBasePath([
         'config/backup.php' => '<?php // no return',
@@ -24,7 +24,7 @@ it('returns error when backup config has no return statement', function (): void
 });
 
 it('validates backup name must use env()', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -79,7 +79,7 @@ PHP;
 });
 
 it('validates backup name env() uses correct variable', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -134,7 +134,7 @@ PHP;
 });
 
 it('validates backup name env() has non-empty default', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -189,7 +189,7 @@ PHP;
 });
 
 it('validates monitor backup name uses env() not literal', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -246,7 +246,7 @@ PHP;
 });
 
 it('validates monitor backup name env var matches backup.name env var', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -303,7 +303,7 @@ PHP;
 });
 
 it('validates backup destination disks must be an array', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -358,7 +358,7 @@ PHP;
 });
 
 it('validates monitor backup disks must be an array', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -415,7 +415,7 @@ PHP;
 });
 
 it('validates backup source databases must be an array', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -472,7 +472,7 @@ PHP;
 });
 
 it('validates mail.to must be a string', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -529,7 +529,7 @@ PHP;
 });
 
 it('validates mail.from.name must use config()', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -586,7 +586,7 @@ PHP;
 });
 
 it('resolves database connection name from env() call', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -659,7 +659,7 @@ PHP;
 });
 
 it('validates database_dump_file_timestamp_format must be Y-m-d-H-i-s', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -716,7 +716,7 @@ PHP;
 });
 
 it('validates database_dump_file_timestamp_format must be present', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -772,7 +772,7 @@ PHP;
 });
 
 it('validates backup source excludes must be an array', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php
@@ -823,7 +823,7 @@ PHP;
 });
 
 it('validates backup source excludes must contain all required entries', function (): void {
-    $validator = new BackupConfigValidator();
+    $validator = new BackupConfigValidator;
 
     $config = <<<'PHP'
 <?php

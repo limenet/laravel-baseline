@@ -10,7 +10,7 @@ class UsesReadableEncryptedEnvFileCheck extends AbstractCheck
 {
     public function check(): CheckResult
     {
-        $files = (new Finder())
+        $files = (new Finder)
             ->in(base_path())
             ->ignoreDotFiles(false)
             ->name('.env.*.encrypted')

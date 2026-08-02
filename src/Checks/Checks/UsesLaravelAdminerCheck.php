@@ -23,7 +23,7 @@ class UsesLaravelAdminerCheck extends AbstractCheck
         }
 
         // Validate the adminer configuration
-        $validator = new AdminerConfigValidator();
+        $validator = new AdminerConfigValidator;
         $errors = $validator->validate(
             base_path('config/adminer.php'),
             base_path('app/Http/Kernel.php'),

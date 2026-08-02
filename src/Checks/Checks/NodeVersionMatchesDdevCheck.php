@@ -103,7 +103,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
 
     private function nodeVersionsCompatible(string $a, string $b): bool
     {
-        $parser = new VersionParser();
+        $parser = new VersionParser;
 
         try {
             return Intervals::haveIntersections(
@@ -137,7 +137,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
 
     private function nodeMajor(string $raw): ?string
     {
-        $parser = new VersionParser();
+        $parser = new VersionParser;
 
         try {
             $lowerBound = $parser->parseConstraints($raw)->getLowerBound()->getVersion();

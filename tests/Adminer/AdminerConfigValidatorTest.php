@@ -3,7 +3,7 @@
 use Limenet\LaravelBaseline\Adminer\AdminerConfigValidator;
 
 it('returns error when config file cannot be read', function (): void {
-    $validator = new AdminerConfigValidator();
+    $validator = new AdminerConfigValidator;
 
     $this->withTempBasePath([
         'app/Http/Kernel.php' => '<?php class Kernel {}',
@@ -18,7 +18,7 @@ it('returns error when config file cannot be read', function (): void {
 });
 
 it('returns error when config is empty/unparsable', function (): void {
-    $validator = new AdminerConfigValidator();
+    $validator = new AdminerConfigValidator;
 
     $this->withTempBasePath([
         'config/adminer.php' => '<?php // empty config, no return',
@@ -34,7 +34,7 @@ it('returns error when config is empty/unparsable', function (): void {
 });
 
 it('returns error when kernel file cannot be read', function (): void {
-    $validator = new AdminerConfigValidator();
+    $validator = new AdminerConfigValidator;
 
     $adminerConfig = <<<'PHP'
 <?php
@@ -56,7 +56,7 @@ PHP;
 });
 
 it('returns error when kernel has no middlewareGroups property', function (): void {
-    $validator = new AdminerConfigValidator();
+    $validator = new AdminerConfigValidator;
 
     $adminerConfig = <<<'PHP'
 <?php
@@ -88,7 +88,7 @@ PHP;
 });
 
 it('returns error when kernel is unparsable PHP', function (): void {
-    $validator = new AdminerConfigValidator();
+    $validator = new AdminerConfigValidator;
 
     $adminerConfig = <<<'PHP'
 <?php
@@ -112,7 +112,7 @@ PHP;
 });
 
 it('returns error when adminer middleware group is not an array', function (): void {
-    $validator = new AdminerConfigValidator();
+    $validator = new AdminerConfigValidator;
 
     $adminerConfig = <<<'PHP'
 <?php
@@ -146,7 +146,7 @@ PHP;
 });
 
 it('returns no errors for valid configuration', function (): void {
-    $validator = new AdminerConfigValidator();
+    $validator = new AdminerConfigValidator;
 
     $adminerConfig = <<<'PHP'
 <?php

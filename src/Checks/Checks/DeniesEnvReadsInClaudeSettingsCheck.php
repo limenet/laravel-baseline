@@ -50,7 +50,7 @@ class DeniesEnvReadsInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
     {
         $entries = ['Read(./.env)'];
 
-        $finder = (new Finder())
+        $finder = (new Finder)
             ->in(base_path())
             ->ignoreDotFiles(false)
             ->name('.env.*.encrypted')

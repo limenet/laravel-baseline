@@ -31,12 +31,12 @@ it('all check classes have unique names', function (): void {
 })->group('command');
 
 it('has correct command signature', function (): void {
-    $command = new CheckCommand();
+    $command = new CheckCommand;
     expect($command->signature)->toBe('limenet:laravel-baseline:check {--fix : Automatically fix issues where possible}');
 })->group('command');
 
 it('has correct command description', function (): void {
-    $command = new CheckCommand();
+    $command = new CheckCommand;
     expect($command->description)->toBe('Checks the project against a highly opinionated set of coding standards.');
 })->group('command');
 
@@ -45,7 +45,7 @@ it('has expected number of checks registered', function (): void {
 })->group('command');
 
 it('createAll returns check instances with shared comment collector', function (): void {
-    $collector = new CommentCollector();
+    $collector = new CommentCollector;
     $checks = CheckRegistry::createAll($collector);
 
     expect($checks)->toHaveCount(82);

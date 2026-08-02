@@ -33,7 +33,7 @@ class UsesSpatieHealthScheduleCheckHeartbeatCheck extends AbstractFixableCheck
         $writer = PhpFileWriter::open($file);
 
         $visitor = new HealthScheduleCheckHeartbeatVisitor(self::CLASS_NAME, self::MAX_AGE_IN_MINUTES);
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($writer->stmts);
 
@@ -77,7 +77,7 @@ class UsesSpatieHealthScheduleCheckHeartbeatCheck extends AbstractFixableCheck
      */
     private function findScheduleCheckItem(array $stmts): ?Node\ArrayItem
     {
-        $finder = new NodeFinder();
+        $finder = new NodeFinder;
 
         $healthCall = $finder->findFirst(
             $stmts,

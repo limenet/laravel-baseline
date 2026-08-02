@@ -10,10 +10,10 @@ use PhpParser\ParserFactory;
 
 function parseConfigWith(string $code): array
 {
-    $parser = (new ParserFactory())->createForNewestSupportedVersion();
+    $parser = (new ParserFactory)->createForNewestSupportedVersion();
     $ast = $parser->parse($code);
-    $visitor = new BackupConfigVisitor();
-    $traverser = new NodeTraverser();
+    $visitor = new BackupConfigVisitor;
+    $traverser = new NodeTraverser;
     $traverser->addVisitor($visitor);
     $traverser->traverse($ast);
 

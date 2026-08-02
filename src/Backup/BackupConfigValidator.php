@@ -99,7 +99,7 @@ class BackupConfigValidator
      */
     private function parseConfig(string $code): array
     {
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse($code);
@@ -111,8 +111,8 @@ class BackupConfigValidator
             return [];
         }
 
-        $visitor = new BackupConfigVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new BackupConfigVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 

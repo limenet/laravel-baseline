@@ -10,7 +10,7 @@ class HasEncryptedEnvFileCheck extends AbstractCheck
 {
     public function check(): CheckResult
     {
-        return (new Finder())
+        return (new Finder)
             ->in(base_path())
             ->ignoreDotFiles(false)
             ->name('.env.*.encrypted')

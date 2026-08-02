@@ -142,7 +142,7 @@ class AdminerConfigValidator
      */
     private function parseConfig(string $code): array
     {
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse($code);
@@ -154,8 +154,8 @@ class AdminerConfigValidator
             return [];
         }
 
-        $visitor = new BackupConfigVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new BackupConfigVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
@@ -169,7 +169,7 @@ class AdminerConfigValidator
      */
     private function parseKernelMiddlewareGroups(string $code): ?array
     {
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse($code);
@@ -181,8 +181,8 @@ class AdminerConfigValidator
             return null;
         }
 
-        $visitor = new KernelMiddlewareVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new KernelMiddlewareVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 

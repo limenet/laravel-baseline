@@ -68,7 +68,7 @@ it('setLastRun preserves existing config keys', function (): void {
         'config/baseline.php' => "<?php\n\nreturn ['excludes' => ['someOtherCheck']];\n",
     ]);
 
-    PeriodicStateManager::setLastRun('someCheck', new DateTimeImmutable());
+    PeriodicStateManager::setLastRun('someCheck', new DateTimeImmutable);
 
     $config = require config_path('baseline.php');
     expect($config['excludes'])->toBe(['someOtherCheck']);

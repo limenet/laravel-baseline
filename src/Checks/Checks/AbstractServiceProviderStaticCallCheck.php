@@ -26,7 +26,7 @@ abstract class AbstractServiceProviderStaticCallCheck extends AbstractFixableChe
         $writer = PhpFileWriter::open($file);
 
         $visitor = new StaticCallVisitor($this->staticClassName(), $this->staticMethodName());
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($writer->stmts);
 
@@ -49,13 +49,13 @@ abstract class AbstractServiceProviderStaticCallCheck extends AbstractFixableChe
 
         // Apply fix: parse the statement and prepend to boot()
         $stmtCode = '<?php '.$this->fixStatement();
-        $stmtAst = (new ParserFactory())->createForNewestSupportedVersion()->parse($stmtCode) ?? [];
+        $stmtAst = (new ParserFactory)->createForNewestSupportedVersion()->parse($stmtCode) ?? [];
 
         if ($stmtAst === []) {
             return CheckResult::FAIL;
         }
 
-        $finder = new NodeFinder();
+        $finder = new NodeFinder;
         $bootMethod = $finder->findFirst(
             $writer->stmts,
             fn ($n): bool => $n instanceof Node\Stmt\ClassMethod

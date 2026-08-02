@@ -33,7 +33,7 @@ class UsesLaravelBoostCheck extends AbstractFixableCheck
             $boostConfig = [];
         } else {
             $boostConfig = json_decode(
-                file_get_contents($boostJsonFile) ?: throw new \RuntimeException(),
+                file_get_contents($boostJsonFile) ?: throw new \RuntimeException,
                 true,
                 flags: JSON_THROW_ON_ERROR,
             ) ?? [];

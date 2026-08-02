@@ -19,9 +19,9 @@ class TestCase extends Orchestra
      */
     public function withTempBasePath(array $files = []): void
     {
-        $fs = new Filesystem();
+        $fs = new Filesystem;
 
-        $tempDirObj = (new TemporaryDirectory())
+        $tempDirObj = (new TemporaryDirectory)
             ->create();
         $tmp = $tempDirObj->path();
 

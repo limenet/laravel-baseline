@@ -69,14 +69,14 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
         }
 
         try {
-            $code = file_get_contents($rectorConfigFile) ?: throw new \RuntimeException();
-            $parser = (new ParserFactory())->createForNewestSupportedVersion();
-            $ast = $parser->parse($code) ?: throw new \RuntimeException();
+            $code = file_get_contents($rectorConfigFile) ?: throw new \RuntimeException;
+            $parser = (new ParserFactory)->createForNewestSupportedVersion();
+            $ast = $parser->parse($code) ?: throw new \RuntimeException;
         } catch (\Throwable) {
             return CheckResult::FAIL;
         }
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
@@ -95,7 +95,7 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
     protected function appendToRectorChain(string $rectorFile, string $snippet, array $imports = []): void
     {
         $snippetCode = '<?php $dummy'.$snippet.';';
-        $snippetAst = (new ParserFactory())->createForNewestSupportedVersion()->parse($snippetCode) ?? [];
+        $snippetAst = (new ParserFactory)->createForNewestSupportedVersion()->parse($snippetCode) ?? [];
 
         if ($snippetAst === [] || !$snippetAst[0] instanceof Node\Stmt\Expression) {
             return;
@@ -108,7 +108,7 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
         }
 
         $writer = PhpFileWriter::open($rectorFile);
-        $finder = new NodeFinder();
+        $finder = new NodeFinder;
         $return = $finder->findFirst($writer->stmts, fn ($n): bool => $n instanceof Node\Stmt\Return_);
 
         if ($return instanceof Node\Stmt\Return_) {

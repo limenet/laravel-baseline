@@ -4,12 +4,12 @@ use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
 
 it('can set a comment collector and add comments', function (): void {
-    $instance = new class()
+    $instance = new class
     {
         use CommentManagement;
     };
 
-    $collector = new CommentCollector();
+    $collector = new CommentCollector;
     $instance->setCommentCollector($collector);
 
     $instance->addComment('test comment');
@@ -19,12 +19,12 @@ it('can set a comment collector and add comments', function (): void {
 });
 
 it('delegates getComments to the collector', function (): void {
-    $instance = new class()
+    $instance = new class
     {
         use CommentManagement;
     };
 
-    $collector = new CommentCollector();
+    $collector = new CommentCollector;
     $instance->setCommentCollector($collector);
 
     expect($instance->getComments())->toBe([]);
@@ -36,12 +36,12 @@ it('delegates getComments to the collector', function (): void {
 });
 
 it('can reset comments', function (): void {
-    $instance = new class()
+    $instance = new class
     {
         use CommentManagement;
     };
 
-    $collector = new CommentCollector();
+    $collector = new CommentCollector;
     $instance->setCommentCollector($collector);
 
     $instance->addComment('first');
@@ -54,12 +54,12 @@ it('can reset comments', function (): void {
 });
 
 it('shares state with the underlying collector', function (): void {
-    $instance = new class()
+    $instance = new class
     {
         use CommentManagement;
     };
 
-    $collector = new CommentCollector();
+    $collector = new CommentCollector;
     $instance->setCommentCollector($collector);
 
     $collector->add('added via collector');

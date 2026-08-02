@@ -62,7 +62,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return false;
         }
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
@@ -71,7 +71,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
         }
 
         $visitor = new HealthCheckCacheStoreVisitor($class, 'health-checks', $this->cacheStoreMethod());
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
@@ -86,7 +86,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return false;
         }
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
@@ -94,8 +94,8 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return false;
         }
 
-        $visitor = new BackupConfigVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new BackupConfigVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
@@ -142,7 +142,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return null;
         }
 
-        $parser = (new ParserFactory())->createForNewestSupportedVersion();
+        $parser = (new ParserFactory)->createForNewestSupportedVersion();
 
         try {
             $ast = $parser->parse(file_get_contents($file) ?: '') ?? [];
@@ -150,8 +150,8 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
             return null;
         }
 
-        $visitor = new BackupConfigVisitor();
-        $traverser = new NodeTraverser();
+        $visitor = new BackupConfigVisitor;
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 

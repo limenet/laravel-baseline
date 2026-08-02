@@ -24,7 +24,7 @@ class CheckCommand extends Command
     {
         intro('Running baseline checks...');
 
-        $collector = new CommentCollector();
+        $collector = new CommentCollector;
         $fix = (bool) $this->option('fix');
 
         $results = collect(CheckRegistry::createAll($collector))

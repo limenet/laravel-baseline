@@ -15,9 +15,9 @@ function makeCommand(): CheckCommand
     /** @var Application $app */
     $app = app();
 
-    $command = new CheckCommand();
+    $command = new CheckCommand;
     $command->setLaravel($app);
-    $output = new OutputStyle(new ArrayInput([]), new BufferedOutput());
+    $output = new OutputStyle(new ArrayInput([]), new BufferedOutput);
     $command->setOutput($output);
 
     return $command;
@@ -33,7 +33,7 @@ function makeCommand(): CheckCommand
  */
 function makeCheck(string $checkClass): CheckInterface
 {
-    return new $checkClass(new CommentCollector());
+    return new $checkClass(new CommentCollector);
 }
 
 /**
@@ -47,7 +47,7 @@ function makeCheck(string $checkClass): CheckInterface
  */
 function makeCheckWithCollector(string $checkClass): array
 {
-    $collector = new CommentCollector();
+    $collector = new CommentCollector;
 
     return [new $checkClass($collector), $collector];
 }
@@ -61,7 +61,7 @@ function bindFakeComposer(array $map): void
 {
     $app = app();
 
-    $fake = new class(new Filesystem(), $map) extends IlluminateComposer
+    $fake = new class(new Filesystem, $map) extends IlluminateComposer
     {
         /** @var array<string,bool> */
         private array $map;

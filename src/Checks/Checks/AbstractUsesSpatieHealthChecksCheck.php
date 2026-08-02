@@ -29,7 +29,7 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
         $writer = PhpFileWriter::open($file);
 
         $visitor = new HealthChecksStaticCallVisitor($this->requiredHealthCheckClasses());
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser;
         $traverser->addVisitor($visitor);
         $traverser->traverse($writer->stmts);
 
@@ -43,7 +43,7 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $finder = new NodeFinder();
+        $finder = new NodeFinder;
 
         // Find existing Health::checks([...]) call to extend
         $healthCall = $finder->findFirst(
