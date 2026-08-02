@@ -51,6 +51,9 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          if [ "${{ matrix.laravel }}" = "13.*" ] && [ "${{ matrix.php }}" != "8.3" ]; then
+            composer require "pestphp/pest-plugin-phpstan:^5.0" --no-interaction --no-update
+          fi
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
