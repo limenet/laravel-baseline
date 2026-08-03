@@ -12,11 +12,13 @@ class DoesNotHaveCopilotOrJunieAgentFilesCheck extends AbstractFixableCheck
     {
         $agentsMdFile = base_path('AGENTS.md');
         $junieDir = base_path('.junie');
+        $githubSkillsDir = base_path('.github/skills');
 
         $agentsMdClean = !file_exists($agentsMdFile);
         $junieDirClean = !File::isDirectory($junieDir);
+        $githubSkillsDirClean = !File::isDirectory($githubSkillsDir);
 
-        if ($agentsMdClean && $junieDirClean) {
+        if ($agentsMdClean && $junieDirClean && $githubSkillsDirClean) {
             return CheckResult::PASS;
         }
 
@@ -26,6 +28,10 @@ class DoesNotHaveCopilotOrJunieAgentFilesCheck extends AbstractFixableCheck
 
         if (!$junieDirClean) {
             $this->addComment('Remove the .junie directory — it is generated for the Junie Boost agent, which is no longer required');
+        }
+
+        if (!$githubSkillsDirClean) {
+            $this->addComment('Remove the .github/skills directory — it is generated for the Copilot Boost agent, which is no longer required');
         }
 
         if ($dry) {
@@ -38,6 +44,10 @@ class DoesNotHaveCopilotOrJunieAgentFilesCheck extends AbstractFixableCheck
 
         if (!$junieDirClean) {
             File::deleteDirectory($junieDir);
+        }
+
+        if (!$githubSkillsDirClean) {
+            File::deleteDirectory($githubSkillsDir);
         }
 
         return $this->fix(dry: true);

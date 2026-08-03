@@ -3,7 +3,7 @@
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveCopilotOrJunieAgentFilesCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-it('doesNotHaveCopilotOrJunieAgentFiles passes when neither AGENTS.md nor .junie exist', function (): void {
+it('doesNotHaveCopilotOrJunieAgentFiles passes when no leftover files exist', function (): void {
     $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect(makeCheck(DoesNotHaveCopilotOrJunieAgentFilesCheck::class)->check())->toBe(CheckResult::PASS);
@@ -31,11 +31,23 @@ it('doesNotHaveCopilotOrJunieAgentFiles fails when .junie directory exists', fun
     expect($collector->all())->toContain('Remove the .junie directory — it is generated for the Junie Boost agent, which is no longer required');
 });
 
-it('doesNotHaveCopilotOrJunieAgentFiles fix deletes AGENTS.md and the .junie directory', function (): void {
+it('doesNotHaveCopilotOrJunieAgentFiles fails when .github/skills directory exists', function (): void {
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        '.github/skills/example/SKILL.md' => '# Example',
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(DoesNotHaveCopilotOrJunieAgentFilesCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Remove the .github/skills directory — it is generated for the Copilot Boost agent, which is no longer required');
+});
+
+it('doesNotHaveCopilotOrJunieAgentFiles fix deletes AGENTS.md, .junie, and .github/skills', function (): void {
     $this->withTempBasePath([
         'composer.json' => json_encode(['name' => 'tmp']),
         'AGENTS.md' => '# Agents',
         '.junie/mcp/mcp.json' => json_encode(['mcpServers' => []]),
+        '.github/skills/example/SKILL.md' => '# Example',
     ]);
 
     $check = makeCheck(DoesNotHaveCopilotOrJunieAgentFilesCheck::class);
@@ -43,4 +55,5 @@ it('doesNotHaveCopilotOrJunieAgentFiles fix deletes AGENTS.md and the .junie dir
 
     expect(file_exists(base_path('AGENTS.md')))->toBeFalse();
     expect(is_dir(base_path('.junie')))->toBeFalse();
+    expect(is_dir(base_path('.github/skills')))->toBeFalse();
 });
