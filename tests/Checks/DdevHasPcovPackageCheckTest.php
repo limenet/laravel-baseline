@@ -258,6 +258,14 @@ YML;
     expect($raw)->toContain("# Key features of DDEV's config.yaml:");
     expect($raw)->toContain('# webimage_extra_packages: [php7.4-tidy, php-bcmath]');
 
+    // The new key is inserted before the trailing documentation block,
+    // not appended after it.
+    $newKeyPos = strpos($raw, "webimage_extra_packages:\n");
+    $commentBlockPos = strpos($raw, "# Key features of DDEV's config.yaml:");
+    expect($newKeyPos)->not->toBeFalse();
+    expect($commentBlockPos)->not->toBeFalse();
+    expect($newKeyPos)->toBeLessThan($commentBlockPos);
+
     $ddev = Yaml::parseFile(base_path('.ddev/config.yaml'));
     expect($ddev['webimage_extra_packages'])->toBe(['php${DDEV_PHP_VERSION}-pcov']);
 });

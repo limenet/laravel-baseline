@@ -209,7 +209,14 @@ YML;
     $raw = file_get_contents(base_path('.ddev/config.yaml'));
     expect($raw)->toContain("# Key features of DDEV's config.yaml:");
     expect($raw)->toContain('# nodejs_version: "22"');
-    expect($raw)->toEndWith("nodejs_version: auto\n");
+
+    // The new key is inserted before the trailing documentation block,
+    // not appended after it.
+    $nodejsVersionPos = strpos($raw, 'nodejs_version: auto');
+    $commentBlockPos = strpos($raw, "# Key features of DDEV's config.yaml:");
+    expect($nodejsVersionPos)->not->toBeFalse();
+    expect($commentBlockPos)->not->toBeFalse();
+    expect($nodejsVersionPos)->toBeLessThan($commentBlockPos);
 
     $ddev = Yaml::parseFile(base_path('.ddev/config.yaml'));
     expect($ddev['nodejs_version'])->toBe('auto');

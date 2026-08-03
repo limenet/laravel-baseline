@@ -348,7 +348,7 @@ abstract class AbstractCheck implements CheckInterface
         if (preg_match($pattern, $content) === 1) {
             $content = preg_replace($pattern, $line, $content, 1) ?? $content;
         } else {
-            $content = rtrim($content, "\n")."\n".$line."\n";
+            $content = $this->insertYamlLineBeforeTrailingComments($content, $line);
         }
 
         file_put_contents($file, $content);
@@ -398,7 +398,7 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         // Key doesn't exist yet
-        $content = rtrim($content, "\n")."\n".$key.":\n  - ".$item."\n";
+        $content = $this->insertYamlLineBeforeTrailingComments($content, $key.":\n  - ".$item);
         file_put_contents($file, $content);
     }
 
@@ -664,5 +664,34 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         return CheckResult::PASS;
+    }
+
+    /**
+     * Inserts a line before the file's trailing block of comment/blank
+     * lines (DDEV appends a large commented-out documentation block after
+     * the live keys), so newly added keys land alongside the other live
+     * config instead of after all the documentation. Falls back to
+     * appending at the end when there's no such trailing block.
+     */
+    private function insertYamlLineBeforeTrailingComments(string $content, string $line): string
+    {
+        $lines = explode("\n", rtrim($content, "\n"));
+        $insertAt = count($lines);
+
+        for ($i = count($lines) - 1; $i >= 0; $i--) {
+            $trimmed = trim($lines[$i]);
+
+            if ($trimmed === '' || str_starts_with($trimmed, '#')) {
+                $insertAt = $i;
+
+                continue;
+            }
+
+            break;
+        }
+
+        array_splice($lines, $insertAt, 0, [$line]);
+
+        return implode("\n", $lines)."\n";
     }
 }
