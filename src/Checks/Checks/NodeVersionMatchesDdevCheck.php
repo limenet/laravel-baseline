@@ -6,7 +6,6 @@ use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
-use Symfony\Component\Yaml\Yaml;
 
 class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
 {
@@ -92,9 +91,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             $ddevConfigFile = base_path('.ddev/config.yaml');
 
             if (file_exists($ddevConfigFile)) {
-                $config = Yaml::parseFile($ddevConfigFile) ?? [];
-                $config['nodejs_version'] = 'auto';
-                file_put_contents($ddevConfigFile, Yaml::dump($config, 4, 2));
+                $this->setYamlScalarKey($ddevConfigFile, 'nodejs_version', 'auto');
             }
         }
 

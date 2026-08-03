@@ -4,7 +4,6 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
-use Symfony\Component\Yaml\Yaml;
 
 class DdevHasPcovPackageCheck extends AbstractFixableCheck
 {
@@ -63,16 +62,10 @@ class DdevHasPcovPackageCheck extends AbstractFixableCheck
 
         // Apply fixes
         $ddevConfigFile = base_path('.ddev/config.yaml');
+        $packages = is_array($extraPackages) ? $extraPackages : [];
 
-        if (file_exists($ddevConfigFile)) {
-            $config = Yaml::parseFile($ddevConfigFile) ?? [];
-            $packages = is_array($config['webimage_extra_packages'] ?? null) ? $config['webimage_extra_packages'] : [];
-
-            if (!in_array($pcovPackage, $packages, true)) {
-                $packages[] = $pcovPackage;
-                $config['webimage_extra_packages'] = $packages;
-                file_put_contents($ddevConfigFile, Yaml::dump($config, 4, 2));
-            }
+        if (file_exists($ddevConfigFile) && !in_array($pcovPackage, $packages, true)) {
+            $this->appendToYamlListKey($ddevConfigFile, 'webimage_extra_packages', $pcovPackage);
         }
 
         if (!file_exists($customIniFile)

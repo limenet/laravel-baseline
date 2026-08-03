@@ -149,6 +149,72 @@ it('nodeVersionMatchesDdev fix sets nodejs_version to auto', function (): void {
     expect($ddev['nodejs_version'])->toBe('auto');
 });
 
+it('nodeVersionMatchesDdev fix preserves comments and formatting when replacing nodejs_version', function (): void {
+    // Mirrors DDEV's real layout: live keys grouped at the top with no
+    // interleaved comments, followed by a large commented-out
+    // documentation block (which includes an example of the same key).
+    $ddevConfig = <<<'YML'
+name: test-project
+type: php
+php_version: "8.3"
+nodejs_version: "22"
+webimage_extra_packages: [cron]
+
+# Key features of DDEV's config.yaml:
+
+# nodejs_version: "22"
+# change from the default system Node.js version to any other version.
+YML;
+
+    $this->withTempBasePath([
+        'package.json' => nodePackageJson('^22'),
+        '.nvmrc' => "22\n",
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    $check = makeCheck(NodeVersionMatchesDdevCheck::class);
+    expect($check->fix())->toBe(CheckResult::PASS);
+
+    $raw = file_get_contents(base_path('.ddev/config.yaml'));
+    expect($raw)->toContain("# Key features of DDEV's config.yaml:");
+    expect($raw)->toContain('# nodejs_version: "22"');
+    expect($raw)->toContain('# change from the default system Node.js version to any other version.');
+    expect($raw)->toContain('php_version: "8.3"');
+    expect($raw)->toContain('webimage_extra_packages: [cron]');
+    expect(substr_count($raw, "\nnodejs_version:"))->toBe(1);
+
+    $ddev = Yaml::parseFile(base_path('.ddev/config.yaml'));
+    expect($ddev['nodejs_version'])->toBe('auto');
+});
+
+it('nodeVersionMatchesDdev fix preserves comments when appending nodejs_version', function (): void {
+    $ddevConfig = <<<'YML'
+name: test-project
+type: php
+
+# Key features of DDEV's config.yaml:
+
+# nodejs_version: "22"
+# change from the default system Node.js version to any other version.
+YML;
+
+    $this->withTempBasePath([
+        'package.json' => nodePackageJson(null),
+        '.ddev/config.yaml' => $ddevConfig,
+    ]);
+
+    $check = makeCheck(NodeVersionMatchesDdevCheck::class);
+    expect($check->fix())->toBe(CheckResult::PASS);
+
+    $raw = file_get_contents(base_path('.ddev/config.yaml'));
+    expect($raw)->toContain("# Key features of DDEV's config.yaml:");
+    expect($raw)->toContain('# nodejs_version: "22"');
+    expect($raw)->toEndWith("nodejs_version: auto\n");
+
+    $ddev = Yaml::parseFile(base_path('.ddev/config.yaml'));
+    expect($ddev['nodejs_version'])->toBe('auto');
+});
+
 it('nodeVersionMatchesDdev fix does not auto-resolve a version conflict', function (): void {
     $this->withTempBasePath([
         'package.json' => nodePackageJson('^22'),

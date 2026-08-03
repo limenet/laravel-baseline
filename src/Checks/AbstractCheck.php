@@ -334,6 +334,75 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
+     * Sets a top-level scalar key in a YAML file via a targeted text edit,
+     * replacing only the matching line (or appending one) instead of
+     * re-dumping the whole file — this preserves comments and formatting
+     * that a full parse/dump round trip would discard.
+     */
+    protected function setYamlScalarKey(string $file, string $key, string $value): void
+    {
+        $content = file_get_contents($file) ?: '';
+        $line = "{$key}: {$value}";
+        $pattern = '/^'.preg_quote($key, '/').':.*$/m';
+
+        if (preg_match($pattern, $content) === 1) {
+            $content = preg_replace($pattern, $line, $content, 1) ?? $content;
+        } else {
+            $content = rtrim($content, "\n")."\n".$line."\n";
+        }
+
+        file_put_contents($file, $content);
+    }
+
+    /**
+     * Appends an item to a top-level YAML list key via a targeted text edit,
+     * preserving the list's existing flow/block style and leaving the rest
+     * of the file (including comments) untouched. Creates the key in block
+     * style if it doesn't exist yet.
+     */
+    protected function appendToYamlListKey(string $file, string $key, string $item): void
+    {
+        $content = file_get_contents($file) ?: '';
+        $keyPattern = preg_quote($key, '/');
+
+        // Flow style: `key: [a, b]` or `key: []`
+        if (preg_match('/^('.$keyPattern.':\s*\[)([^\]]*)(\])/m', $content, $matches) === 1) {
+            $items = trim($matches[2]);
+            $newItems = $items === '' ? $item : $items.', '.$item;
+            $content = preg_replace(
+                '/^'.$keyPattern.':\s*\[[^\]]*\]/m',
+                $key.': ['.$newItems.']',
+                $content,
+                1,
+            ) ?? $content;
+            file_put_contents($file, $content);
+
+            return;
+        }
+
+        // Block style: `key:\n  - a\n  - b`
+        if (preg_match('/^'.$keyPattern.':\s*$(\n(?:^[ \t]*-.*$\n?)*)/m', $content, $matches, PREG_OFFSET_CAPTURE) === 1) {
+            $block = $matches[1][0];
+            $insertAt = $matches[1][1] + strlen($block);
+            $indent = '  ';
+
+            if (preg_match('/^([ \t]+)-/m', $block, $indentMatch) === 1) {
+                $indent = $indentMatch[1];
+            }
+
+            $newLine = $indent.'- '.$item."\n";
+            $content = substr($content, 0, $insertAt).$newLine.substr($content, $insertAt);
+            file_put_contents($file, $content);
+
+            return;
+        }
+
+        // Key doesn't exist yet
+        $content = rtrim($content, "\n")."\n".$key.":\n  - ".$item."\n";
+        file_put_contents($file, $content);
+    }
+
+    /**
      * @return array<string,mixed>|null
      */
     protected function getReleaseItConfig(): ?array
