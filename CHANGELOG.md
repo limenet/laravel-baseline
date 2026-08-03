@@ -3,6 +3,20 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.4.0](https://github.com/limenet/laravel-baseline/compare/v2.3.2...v2.4.0) (2026-08-03)
+
+### Features
+
+* add nodeVersionMatchesDdev check ([41f19c9](https://github.com/limenet/laravel-baseline/commit/41f19c96d368f450343f9402dee486056e78fe3c))
+* add updatesDependencies periodic check and updating-dependencies skill ([87cbeb6](https://github.com/limenet/laravel-baseline/commit/87cbeb6c5d3594fd5115d938fc30b810df3095ca))
+* add usesPestPhpstanPlugin, usesPestRectorPlugin and hasRectorConfigWithPestSet checks ([1592596](https://github.com/limenet/laravel-baseline/commit/15925969633e49ce42f7e741b40bfa63fdd14526))
+* replace usesPhpInsights with doesNotUsePhpInsights check ([1c16e1c](https://github.com/limenet/laravel-baseline/commit/1c16e1c7f29307fbe290ba2dfb0f44e369296b3c))
+
+### Bug Fixes
+
+* restore php 8.3 / laravel 12 CI legs after Pest v5 bump ([d7921f5](https://github.com/limenet/laravel-baseline/commit/d7921f58e37ab8273f13cd25d5f9406b50cecda0))
+* sync biome.json $schema when updating dependencies ([68b29b3](https://github.com/limenet/laravel-baseline/commit/68b29b39f41e38eadf55ef9bafce68a721c108a4))
+
 ## [2.3.2](https://github.com/limenet/laravel-baseline/compare/v2.3.1...v2.3.2) (2026-07-06)
 
 ### Bug Fixes
