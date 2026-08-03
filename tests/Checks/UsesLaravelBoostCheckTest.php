@@ -43,7 +43,7 @@ it('usesLaravelBoost v2 passes with correct configuration', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie'],
+        'agents' => ['claude_code'],
         'guidelines' => true,
         'mcp' => true,
     ];
@@ -62,7 +62,7 @@ it('usesLaravelBoost v2 passes with extra keys and agents', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie', 'cursor'],
+        'agents' => ['claude_code', 'cursor'],
         'guidelines' => true,
         'mcp' => true,
         'extra_key' => 'extra_value',
@@ -82,7 +82,7 @@ it('usesLaravelBoost v2 fails when agents are missing', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code'],  // missing copilot and junie
+        'agents' => [],  // missing claude_code
         'guidelines' => true,
         'mcp' => true,
     ];
@@ -93,7 +93,50 @@ it('usesLaravelBoost v2 fails when agents are missing', function (): void {
 
     [$check, $collector] = makeCheckWithCollector(UsesLaravelBoostCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Laravel Boost v2 configuration incomplete: boost.json must include agents: claude_code, copilot, junie');
+    expect($collector->all())->toContain('Laravel Boost v2 configuration incomplete: boost.json must include agents: claude_code');
+});
+
+it('usesLaravelBoost v2 fails when disallowed agents are present', function (): void {
+    bindFakeComposer(['laravel/boost' => true]);
+    $composer = [
+        'require' => ['laravel/boost' => '^2.0'],
+        'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
+    ];
+    $boostConfig = [
+        'agents' => ['claude_code', 'copilot', 'junie'],
+        'guidelines' => true,
+        'mcp' => true,
+    ];
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        'boost.json' => json_encode($boostConfig),
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(UsesLaravelBoostCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('Laravel Boost v2 configuration incomplete: boost.json must not include agents: copilot, junie');
+});
+
+it('usesLaravelBoost fix removes disallowed agents', function (): void {
+    bindFakeComposer(['laravel/boost' => true]);
+    $composer = [
+        'require' => ['laravel/boost' => '^2.0'],
+        'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
+    ];
+    $boostConfig = [
+        'agents' => ['claude_code', 'copilot', 'junie'],
+        'guidelines' => true,
+        'mcp' => true,
+    ];
+    $this->withTempBasePath([
+        'composer.json' => json_encode($composer),
+        'boost.json' => json_encode($boostConfig),
+    ]);
+
+    makeCheck(UsesLaravelBoostCheck::class)->fix();
+
+    $updated = json_decode(file_get_contents(base_path('boost.json')), true);
+    expect($updated['agents'])->toBe(['claude_code']);
 });
 
 it('usesLaravelBoost v2 fails when guidelines is not true', function (): void {
@@ -103,7 +146,7 @@ it('usesLaravelBoost v2 fails when guidelines is not true', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie'],
+        'agents' => ['claude_code'],
         'guidelines' => false,
         'mcp' => true,
     ];
@@ -124,7 +167,7 @@ it('usesLaravelBoost v2 fails when guidelines is missing', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie'],
+        'agents' => ['claude_code'],
         'mcp' => true,
     ];
     $this->withTempBasePath([
@@ -144,7 +187,7 @@ it('usesLaravelBoost v2 fails when mcp is not true', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie'],
+        'agents' => ['claude_code'],
         'guidelines' => true,
         'mcp' => false,
     ];
@@ -165,7 +208,7 @@ it('usesLaravelBoost v2 fails when mcp is missing', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie'],
+        'agents' => ['claude_code'],
         'guidelines' => true,
     ];
     $this->withTempBasePath([
@@ -185,7 +228,7 @@ it('usesLaravelBoost v2 detected from require-dev', function (): void {
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie'],
+        'agents' => ['claude_code'],
         'guidelines' => true,
         'mcp' => true,
     ];
@@ -204,7 +247,7 @@ it('usesLaravelBoost passes with various v2 version constraints', function (stri
         'scripts' => ['post-update-cmd' => ['php artisan boost:update']],
     ];
     $boostConfig = [
-        'agents' => ['claude_code', 'copilot', 'junie'],
+        'agents' => ['claude_code'],
         'guidelines' => true,
         'mcp' => true,
     ];

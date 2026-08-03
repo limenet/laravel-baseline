@@ -39,11 +39,21 @@ class UsesLaravelBoostCheck extends AbstractFixableCheck
             ) ?? [];
         }
 
-        $requiredAgents = ['claude_code', 'copilot', 'junie'];
+        $requiredAgents = ['claude_code'];
+        $disallowedAgents = ['copilot', 'junie'];
         $missingAgents = array_diff($requiredAgents, $boostConfig['agents'] ?? []);
+        $presentDisallowedAgents = array_intersect($disallowedAgents, $boostConfig['agents'] ?? []);
 
         if ($missingAgents !== []) {
             $this->addComment('Laravel Boost v2 configuration incomplete: boost.json must include agents: '.implode(', ', $requiredAgents));
+
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
+        }
+
+        if ($presentDisallowedAgents !== []) {
+            $this->addComment('Laravel Boost v2 configuration incomplete: boost.json must not include agents: '.implode(', ', $presentDisallowedAgents));
 
             if ($dry) {
                 return CheckResult::FAIL;
@@ -72,11 +82,15 @@ class UsesLaravelBoostCheck extends AbstractFixableCheck
 
         // Apply boost.json fix only if needed
         $alreadyCorrect = $missingAgents === []
+            && $presentDisallowedAgents === []
             && ($boostConfig['guidelines'] ?? null) === true
             && ($boostConfig['mcp'] ?? null) === true;
 
         if (!$alreadyCorrect) {
-            $boostConfig['agents'] = array_values(array_unique(array_merge($boostConfig['agents'] ?? [], $requiredAgents)));
+            $boostConfig['agents'] = array_values(array_diff(
+                array_unique(array_merge($boostConfig['agents'] ?? [], $requiredAgents)),
+                $disallowedAgents,
+            ));
             $boostConfig['guidelines'] = true;
             $boostConfig['mcp'] = true;
 
