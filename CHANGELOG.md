@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.4.3](https://github.com/limenet/laravel-baseline/compare/v2.4.2...v2.4.3) (2026-08-03)
+
+### Bug Fixes
+
+* also remove .github/skills in doesNotHaveCopilotOrJunieAgentFiles check ([ef86f6a](https://github.com/limenet/laravel-baseline/commit/ef86f6ab89dd1729a062997e3cbcd618c8055435))
+
 ## [2.4.2](https://github.com/limenet/laravel-baseline/compare/v2.4.1...v2.4.2) (2026-08-03)
 
 ### Bug Fixes
