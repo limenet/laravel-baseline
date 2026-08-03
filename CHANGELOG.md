@@ -3,6 +3,13 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.4.1](https://github.com/limenet/laravel-baseline/compare/v2.4.0...v2.4.1) (2026-08-03)
+
+### Bug Fixes
+
+* preserve comments and formatting when writing .ddev/config.yaml ([5c51e94](https://github.com/limenet/laravel-baseline/commit/5c51e9409cbe3046452c08f12088e7e423e08bc7))
+* require only claude_code agent in usesLaravelBoost check ([8deab14](https://github.com/limenet/laravel-baseline/commit/8deab14cfd0443f39034ca394f95f5a52cacd6ce))
+
 ## [2.4.0](https://github.com/limenet/laravel-baseline/compare/v2.3.2...v2.4.0) (2026-08-03)
 
 ### Features
