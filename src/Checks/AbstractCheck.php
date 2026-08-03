@@ -462,6 +462,54 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
+     * Remove any scripts.$scriptName entries containing $match. Writes composer.json only if something changed.
+     */
+    protected function removeFromComposerScript(string $scriptName, string $match): void
+    {
+        $composerJson = $this->getComposerJson();
+
+        if ($composerJson === null) {
+            return;
+        }
+
+        $scripts = $composerJson['scripts'][$scriptName] ?? [];
+        $filtered = array_values(array_filter($scripts, fn ($script): bool => !str_contains($script, $match)));
+
+        if ($filtered === $scripts) {
+            return;
+        }
+
+        $composerJson['scripts'][$scriptName] = $filtered;
+        $this->writeComposerJson($composerJson);
+    }
+
+    /**
+     * Remove a package from require/require-dev in composer.json (JSON edit only — does not run composer,
+     * so composer.lock/vendor won't be updated; the developer must run `composer update` afterward).
+     */
+    protected function removeComposerPackage(string $package): void
+    {
+        $composerJson = $this->getComposerJson();
+
+        if ($composerJson === null) {
+            return;
+        }
+
+        $changed = false;
+
+        foreach (['require', 'require-dev'] as $section) {
+            if (array_key_exists($package, $composerJson[$section] ?? [])) {
+                unset($composerJson[$section][$package]);
+                $changed = true;
+            }
+        }
+
+        if ($changed) {
+            $this->writeComposerJson($composerJson);
+        }
+    }
+
+    /**
      * Add or overwrite an env var in the <php> section of phpunit.xml using DOMDocument.
      */
     protected function setPhpunitEnvVar(string $name, string $value): void

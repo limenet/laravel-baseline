@@ -18,6 +18,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotPinOldMailTemplateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotUsePhpInsightsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSpatiePasskeysWithFortifyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\FollowsModernLaravelIdiomsCheck;
@@ -67,7 +68,6 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesLimenetPintConfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestPhpstanPluginCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestRectorPluginCheck;
-use Limenet\LaravelBaseline\Checks\Checks\UsesPhpInsightsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReadableEncryptedEnvFileCheck;
@@ -104,6 +104,7 @@ class CheckRegistry
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,
+        DoesNotUsePhpInsightsCheck::class,
         DoesNotUseSailCheck::class,
         DoesNotUseSpatiePasskeysWithFortifyCheck::class,
         DoesNotPinOldMailTemplateCheck::class,
@@ -150,7 +151,6 @@ class CheckRegistry
         UsesPestCheck::class,
         UsesPestPhpstanPluginCheck::class,
         UsesPestRectorPluginCheck::class,
-        UsesPhpInsightsCheck::class,
         UsesPhpstanExtensionsCheck::class,
         UsesPredisCheck::class,
         RunsBoostUpdateCheck::class,

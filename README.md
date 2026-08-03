@@ -69,7 +69,6 @@ This package validates your Laravel installation against the following checks:
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
-- 🔧 **`usesPhpInsights()`** - Validates PHP Insights is configured: ci-lint scripts and `disable-security-check => true` in `config/insights.php` *(partial: fixes ci-lint scripts if package installed)*
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*
 - 🔧 **`hasRectorConfigWithComposerBased()`** - Validates Rector `withComposerBased(phpunit, symfony, laravel)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithConfiguredRules()`** - Validates Rector `withConfiguredRule()` calls are present for `RouteActionCallableRector` and `WhereToWhereLikeRector` *(appends calls to rector.php)*
@@ -121,6 +120,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesPredis()`** - Validates Predis Redis client is installed
 - **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used
 - 🔧 **`doesNotUseSail()`** - Validates Sail is NOT used *(partial: deletes docker-compose.yml; run `composer remove laravel/sail` manually)*
+- 🔧 **`doesNotUsePhpInsights()`** - Validates PHP Insights is NOT used *(removes the `nunomaduro/phpinsights` composer.json entry, leftover ci-lint script entries, and config/insights.php; run `composer update` afterward to sync composer.lock)*
 - **`doesNotUseSpatiePasskeysWithFortify()`** - Fails if both `spatie/laravel-passkeys` and `laravel/fortify` are installed, as they overlap in authentication responsibility
 - **`doesNotUseHorizonWatcher()`** - Validates Spatie Horizon Watcher is NOT installed
 - 🔧 **`doesNotUseGreaterThanOrEqualConstraints()`** - Validates no `>=` version constraints in composer.json (use `^` or `~` instead) *(replaces `>=X.Y` with `^X.Y` in composer.json)*
