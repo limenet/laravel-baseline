@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.4.4](https://github.com/limenet/laravel-baseline/compare/v2.4.3...v2.4.4) (2026-08-03)
+
+### Bug Fixes
+
+* insert new .ddev/config.yaml keys before trailing comment block ([94ed42a](https://github.com/limenet/laravel-baseline/commit/94ed42ab97105dfe65aaf8ad6a4f7bcd8dffb56e))
+
 ## [2.4.3](https://github.com/limenet/laravel-baseline/compare/v2.4.2...v2.4.3) (2026-08-03)
 
 ### Bug Fixes
