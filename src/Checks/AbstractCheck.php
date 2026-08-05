@@ -256,6 +256,55 @@ abstract class AbstractCheck implements CheckInterface
         return $version !== '' ? $version : null;
     }
 
+    /**
+     * The raw `engines.npm` constraint from package.json (e.g. "^12"), or null if absent.
+     */
+    protected function getPackageJsonNpmVersion(): ?string
+    {
+        $packageJson = $this->getPackageJson();
+
+        if ($packageJson === null) {
+            return null;
+        }
+
+        $constraint = $packageJson['engines']['npm'] ?? null;
+
+        return is_string($constraint) && $constraint !== '' ? $constraint : null;
+    }
+
+    /**
+     * Parse the project's .npmrc into a key => value map. Returns [] if the file is absent.
+     *
+     * @return array<string,string>
+     */
+    protected function getNpmrc(): array
+    {
+        $npmrcFile = base_path('.npmrc');
+
+        if (!file_exists($npmrcFile)) {
+            return [];
+        }
+
+        $config = [];
+
+        foreach (explode("\n", file_get_contents($npmrcFile) ?: '') as $line) {
+            $line = trim($line);
+
+            if ($line === '' || str_starts_with($line, '#') || str_starts_with($line, ';')) {
+                continue;
+            }
+
+            if (!str_contains($line, '=')) {
+                continue;
+            }
+
+            [$key, $value] = explode('=', $line, 2);
+            $config[trim($key)] = trim($value);
+        }
+
+        return $config;
+    }
+
     // === Config File Helpers ===
 
     protected function getPhpunitXml(): \SimpleXMLElement|false|null
