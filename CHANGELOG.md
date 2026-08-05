@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.6.0](https://github.com/limenet/laravel-baseline/compare/v2.5.0...v2.6.0) (2026-08-05)
+
+### Features
+
+* enforce pkg.include-dev-deps in trivy.yaml ([d3a9dab](https://github.com/limenet/laravel-baseline/commit/d3a9dab2292bb5028bdc78ad8c65c528bd36fbfa))
+
 ## [2.5.0](https://github.com/limenet/laravel-baseline/compare/v2.4.4...v2.5.0) (2026-08-05)
 
 ### Features
