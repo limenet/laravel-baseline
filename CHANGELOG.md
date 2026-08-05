@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.5.0](https://github.com/limenet/laravel-baseline/compare/v2.4.4...v2.5.0) (2026-08-05)
+
+### Features
+
+* add hardensNpmSupplyChain check ([4ae8498](https://github.com/limenet/laravel-baseline/commit/4ae84987ceaabb43f0b495f236c57edd8aa6afc7))
+
 ## [2.4.4](https://github.com/limenet/laravel-baseline/compare/v2.4.3...v2.4.4) (2026-08-03)
 
 ### Bug Fixes
