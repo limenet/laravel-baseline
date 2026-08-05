@@ -91,6 +91,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
             [['scan', 'disable-telemetry'], true, 'scan.disable-telemetry'],
             [['disable-vex-notice'], true, 'disable-vex-notice'],
             [['dependency-tree'], true, 'dependency-tree'],
+            [['pkg', 'include-dev-deps'], true, 'pkg.include-dev-deps'],
         ];
 
         foreach ($scalarRules as [$path, $expected, $dotted]) {
@@ -145,6 +146,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
                 'scanners' => ['misconfig', 'secret', 'vuln'],
                 'disable-telemetry' => true,
             ],
+            'pkg' => ['include-dev-deps' => true],
             'disable-vex-notice' => true,
             'dependency-tree' => true,
         ];

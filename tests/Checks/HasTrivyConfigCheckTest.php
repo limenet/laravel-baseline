@@ -22,6 +22,8 @@ scan:
     - secret
     - vuln
   disable-telemetry: true
+pkg:
+  include-dev-deps: true
 disable-vex-notice: true
 dependency-tree: true
 YML;
@@ -193,6 +195,28 @@ it('hasTrivyConfig fails when dependency-tree is missing or false', function ():
     expect($collector->all())->toContain("Invalid value in trivy.yaml: 'dependency-tree' must equal true");
 });
 
+it('hasTrivyConfig fails when pkg.include-dev-deps is missing', function (): void {
+    bindFakeComposer([]);
+    $config = Yaml::parse(canonicalTrivyYaml());
+    unset($config['pkg']);
+    $this->withTempBasePath(canonicalLayout(['trivy.yaml' => Yaml::dump($config, 4, 2)]));
+
+    [$check, $collector] = makeCheckWithCollector(HasTrivyConfigCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Invalid value in trivy.yaml: 'pkg.include-dev-deps' must equal true");
+});
+
+it('hasTrivyConfig fails when pkg.include-dev-deps is false', function (): void {
+    bindFakeComposer([]);
+    $config = Yaml::parse(canonicalTrivyYaml());
+    $config['pkg']['include-dev-deps'] = false;
+    $this->withTempBasePath(canonicalLayout(['trivy.yaml' => Yaml::dump($config, 4, 2)]));
+
+    [$check, $collector] = makeCheckWithCollector(HasTrivyConfigCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Invalid value in trivy.yaml: 'pkg.include-dev-deps' must equal true");
+});
+
 it('hasTrivyConfig fails when scan.skip-files is missing required entries', function (): void {
     bindFakeComposer([]);
     $config = Yaml::parse(canonicalTrivyYaml());
@@ -267,7 +291,7 @@ it('hasTrivyConfig auto-fix merges while preserving user extras', function (): v
     $config = Yaml::parse(canonicalTrivyYaml());
     $config['scan']['skip-dirs'][] = 'custom-dir/';
     $config['scan']['scanners'] = ['secret', 'vuln', 'license'];
-    unset($config['ignorefile'], $config['dependency-tree']);
+    unset($config['ignorefile'], $config['dependency-tree'], $config['pkg']);
     $this->withTempBasePath(canonicalLayout(['trivy.yaml' => Yaml::dump($config, 4, 2)]));
 
     $check = makeCheck(HasTrivyConfigCheck::class);
@@ -280,6 +304,7 @@ it('hasTrivyConfig auto-fix merges while preserving user extras', function (): v
     expect($fixed['scan']['scanners'])->toContain('misconfig');
     expect($fixed['ignorefile'])->toBe('.trivyignore.yaml');
     expect($fixed['dependency-tree'])->toBeTrue();
+    expect($fixed['pkg']['include-dev-deps'])->toBeTrue();
 });
 
 it('hasTrivyConfig auto-fix appends .trivycache/ without duplicating existing lines', function (): void {
