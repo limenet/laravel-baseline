@@ -12,7 +12,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
     /**
      * Node version to establish when the project declares none at all.
      */
-    private const DEFAULT_NODE_VERSION = '26';
+    private const DEFAULT_NODE_VERSION = '24';
 
     public function fix(bool $dry = false): CheckResult
     {

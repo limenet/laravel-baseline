@@ -90,10 +90,10 @@ it('nodeVersionMatchesDdev comment names the default when no constraint exists',
 
     [$check, $collector] = makeCheckWithCollector(NodeVersionMatchesDdevCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('package.json missing engines.node: add "engines": { "node": "^26" }');
+    expect($collector->all())->toContain('package.json missing engines.node: add "engines": { "node": "^24" }');
 });
 
-it('nodeVersionMatchesDdev fix establishes Node 26 when nothing is set', function (): void {
+it('nodeVersionMatchesDdev fix establishes Node 24 when nothing is set', function (): void {
     $this->withTempBasePath([
         'package.json' => nodePackageJson(null),
         '.ddev/config.yaml' => "name: test-project\n",
@@ -103,8 +103,8 @@ it('nodeVersionMatchesDdev fix establishes Node 26 when nothing is set', functio
     expect($check->fix())->toBe(CheckResult::PASS);
 
     $packageJson = json_decode(file_get_contents(base_path('package.json')), true);
-    expect($packageJson['engines']['node'])->toBe('^26');
-    expect(trim(file_get_contents(base_path('.nvmrc'))))->toBe('26');
+    expect($packageJson['engines']['node'])->toBe('^24');
+    expect(trim(file_get_contents(base_path('.nvmrc'))))->toBe('24');
 
     $ddev = Yaml::parseFile(base_path('.ddev/config.yaml'));
     expect($ddev['nodejs_version'])->toBe('auto');
