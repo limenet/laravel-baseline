@@ -22,8 +22,18 @@ it('nodeVersionMatchesDdev implements FixableInterface', function (): void {
 
 it('nodeVersionMatchesDdev passes when engines.node, .nvmrc and nodejs_version: auto agree', function (): void {
     $this->withTempBasePath([
-        'package.json' => nodePackageJson('^22'),
-        '.nvmrc' => "22\n",
+        'package.json' => nodePackageJson('^24'),
+        '.nvmrc' => "24\n",
+        '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
+    ]);
+
+    expect(makeCheck(NodeVersionMatchesDdevCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
+it('nodeVersionMatchesDdev passes when engines.node and .nvmrc pin a newer major', function (): void {
+    $this->withTempBasePath([
+        'package.json' => nodePackageJson('^26'),
+        '.nvmrc' => "26\n",
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
@@ -32,7 +42,7 @@ it('nodeVersionMatchesDdev passes when engines.node, .nvmrc and nodejs_version: 
 
 it('nodeVersionMatchesDdev fails when package.json is missing', function (): void {
     $this->withTempBasePath([
-        '.nvmrc' => "22\n",
+        '.nvmrc' => "24\n",
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
@@ -42,7 +52,7 @@ it('nodeVersionMatchesDdev fails when package.json is missing', function (): voi
 it('nodeVersionMatchesDdev fails when engines.node is missing', function (): void {
     $this->withTempBasePath([
         'package.json' => nodePackageJson(null),
-        '.nvmrc' => "22\n",
+        '.nvmrc' => "24\n",
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
@@ -51,7 +61,31 @@ it('nodeVersionMatchesDdev fails when engines.node is missing', function (): voi
 
 it('nodeVersionMatchesDdev fails when .nvmrc is missing', function (): void {
     $this->withTempBasePath([
+        'package.json' => nodePackageJson('^24'),
+        '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
+    ]);
+
+    expect(makeCheck(NodeVersionMatchesDdevCheck::class)->check())->toBe(CheckResult::FAIL);
+});
+
+it('nodeVersionMatchesDdev fails when the declared version is below the floor', function (): void {
+    // Consistent with each other, but both on a line the baseline no longer allows.
+    $this->withTempBasePath([
         'package.json' => nodePackageJson('^22'),
+        '.nvmrc' => "22\n",
+        '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(NodeVersionMatchesDdevCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain('engines.node (^22) allows Node < 24; require Node >= 24 (e.g. "^24")');
+});
+
+it('nodeVersionMatchesDdev fails when engines.node is open-ended below the floor', function (): void {
+    // ">=20" has a lower bound below the floor even though it also permits 24+.
+    $this->withTempBasePath([
+        'package.json' => nodePackageJson('>=20'),
+        '.nvmrc' => "24\n",
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
@@ -59,22 +93,23 @@ it('nodeVersionMatchesDdev fails when .nvmrc is missing', function (): void {
 });
 
 it('nodeVersionMatchesDdev fails when engines.node and .nvmrc are incompatible', function (): void {
+    // Both clear the floor — this is a genuine disagreement, not a stale version.
     $this->withTempBasePath([
-        'package.json' => nodePackageJson('^22'),
-        '.nvmrc' => "20\n",
+        'package.json' => nodePackageJson('^26'),
+        '.nvmrc' => "24\n",
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
     [$check, $collector] = makeCheckWithCollector(NodeVersionMatchesDdevCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Node version mismatch: package.json engines.node (^22) and .nvmrc (20) disagree');
+    expect($collector->all())->toContain('Node version mismatch: package.json engines.node (^26) and .nvmrc (24) disagree');
 });
 
 it('nodeVersionMatchesDdev fails when .ddev nodejs_version is not auto', function (): void {
     $this->withTempBasePath([
-        'package.json' => nodePackageJson('^22'),
-        '.nvmrc' => "22\n",
-        '.ddev/config.yaml' => "name: test-project\nnodejs_version: \"22\"\n",
+        'package.json' => nodePackageJson('^24'),
+        '.nvmrc' => "24\n",
+        '.ddev/config.yaml' => "name: test-project\nnodejs_version: \"24\"\n",
     ]);
 
     [$check, $collector] = makeCheckWithCollector(NodeVersionMatchesDdevCheck::class);
@@ -111,20 +146,21 @@ it('nodeVersionMatchesDdev fix establishes Node 24 when nothing is set', functio
 });
 
 it('nodeVersionMatchesDdev fix creates .nvmrc from the existing engines.node', function (): void {
+    // A newer-than-floor line is preserved, not forced down to the floor.
     $this->withTempBasePath([
-        'package.json' => nodePackageJson('^22'),
+        'package.json' => nodePackageJson('^26'),
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
     $check = makeCheck(NodeVersionMatchesDdevCheck::class);
     expect($check->fix())->toBe(CheckResult::PASS);
-    expect(trim(file_get_contents(base_path('.nvmrc'))))->toBe('22');
+    expect(trim(file_get_contents(base_path('.nvmrc'))))->toBe('26');
 });
 
 it('nodeVersionMatchesDdev fix creates engines.node from the existing .nvmrc', function (): void {
     $this->withTempBasePath([
         'package.json' => nodePackageJson(null),
-        '.nvmrc' => "22\n",
+        '.nvmrc' => "26\n",
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
@@ -132,14 +168,32 @@ it('nodeVersionMatchesDdev fix creates engines.node from the existing .nvmrc', f
     expect($check->fix())->toBe(CheckResult::PASS);
 
     $packageJson = json_decode(file_get_contents(base_path('package.json')), true);
-    expect($packageJson['engines']['node'])->toBe('^22');
+    expect($packageJson['engines']['node'])->toBe('^26');
+});
+
+it('nodeVersionMatchesDdev fix bumps a below-floor version in both files', function (): void {
+    $this->withTempBasePath([
+        'package.json' => nodePackageJson('^22'),
+        '.nvmrc' => "22\n",
+        '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(NodeVersionMatchesDdevCheck::class);
+    expect($check->fix())->toBe(CheckResult::PASS);
+
+    $packageJson = json_decode(file_get_contents(base_path('package.json')), true);
+    expect($packageJson['engines']['node'])->toBe('^24');
+    expect(trim(file_get_contents(base_path('.nvmrc'))))->toBe('24');
+
+    expect($collector->all())->toContain('engines.node (^22) allows Node < 24; require Node >= 24 (e.g. "^24")');
+    expect($collector->all())->toContain('.nvmrc (22) pins Node < 24: set it to "24"');
 });
 
 it('nodeVersionMatchesDdev fix sets nodejs_version to auto', function (): void {
     $this->withTempBasePath([
-        'package.json' => nodePackageJson('^22'),
-        '.nvmrc' => "22\n",
-        '.ddev/config.yaml' => "name: test-project\nnodejs_version: \"22\"\n",
+        'package.json' => nodePackageJson('^24'),
+        '.nvmrc' => "24\n",
+        '.ddev/config.yaml' => "name: test-project\nnodejs_version: \"24\"\n",
     ]);
 
     $check = makeCheck(NodeVersionMatchesDdevCheck::class);
@@ -167,8 +221,8 @@ webimage_extra_packages: [cron]
 YML;
 
     $this->withTempBasePath([
-        'package.json' => nodePackageJson('^22'),
-        '.nvmrc' => "22\n",
+        'package.json' => nodePackageJson('^24'),
+        '.nvmrc' => "24\n",
         '.ddev/config.yaml' => $ddevConfig,
     ]);
 
@@ -223,9 +277,10 @@ YML;
 });
 
 it('nodeVersionMatchesDdev fix does not auto-resolve a version conflict', function (): void {
+    // Both clear the floor, so choosing between them is a human decision.
     $this->withTempBasePath([
-        'package.json' => nodePackageJson('^22'),
-        '.nvmrc' => "20\n",
+        'package.json' => nodePackageJson('^26'),
+        '.nvmrc' => "24\n",
         '.ddev/config.yaml' => "name: test-project\nnodejs_version: auto\n",
     ]);
 
@@ -234,6 +289,6 @@ it('nodeVersionMatchesDdev fix does not auto-resolve a version conflict', functi
 
     // Files remain untouched — the developer must resolve the conflict.
     $packageJson = json_decode(file_get_contents(base_path('package.json')), true);
-    expect($packageJson['engines']['node'])->toBe('^22');
-    expect(trim(file_get_contents(base_path('.nvmrc'))))->toBe('20');
+    expect($packageJson['engines']['node'])->toBe('^26');
+    expect(trim(file_get_contents(base_path('.nvmrc'))))->toBe('24');
 });

@@ -10,9 +10,10 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
 {
     /**
-     * Node version to establish when the project declares none at all.
+     * Minimum Node major: 24 is the current LTS. Anything older is bumped to it;
+     * newer lines are left alone. Also the version established when none is declared.
      */
-    private const DEFAULT_NODE_VERSION = '24';
+    private const MIN_NODE_VERSION = '24';
 
     public function fix(bool $dry = false): CheckResult
     {
@@ -36,7 +37,13 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $major = $this->resolveNodeMajor($engines, $nvmrc);
+        $enginesTooLow = $engines !== null && !$this->guaranteesMinNodeVersion($engines);
+        $nvmrcTooLow = $nvmrc !== null && !$this->guaranteesMinNodeVersion($nvmrc);
+
+        // A below-floor declaration is bumped to the floor; otherwise keep the project's own line.
+        $major = ($enginesTooLow || $nvmrcTooLow)
+            ? self::MIN_NODE_VERSION
+            : $this->resolveNodeMajor($engines, $nvmrc);
 
         if ($engines === null) {
             $this->addComment(sprintf(
@@ -47,10 +54,33 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             if ($dry) {
                 return CheckResult::FAIL;
             }
+        } elseif ($enginesTooLow) {
+            $this->addComment(sprintf(
+                'engines.node (%s) allows Node < %s; require Node >= %s (e.g. "^%s")',
+                $engines,
+                self::MIN_NODE_VERSION,
+                self::MIN_NODE_VERSION,
+                self::MIN_NODE_VERSION,
+            ));
+
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
         }
 
         if ($nvmrc === null) {
             $this->addComment(sprintf('.nvmrc missing: create a .nvmrc pinning Node "%s"', $major));
+
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
+        } elseif ($nvmrcTooLow) {
+            $this->addComment(sprintf(
+                '.nvmrc (%s) pins Node < %s: set it to "%s"',
+                $nvmrc,
+                self::MIN_NODE_VERSION,
+                self::MIN_NODE_VERSION,
+            ));
 
             if ($dry) {
                 return CheckResult::FAIL;
@@ -78,12 +108,12 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
         }
 
         // Apply fixes
-        if ($engines === null) {
+        if ($engines === null || $enginesTooLow) {
             $packageJson['engines']['node'] = '^'.$major;
             $this->writePackageJson($packageJson);
         }
 
-        if ($nvmrc === null) {
+        if ($nvmrc === null || $nvmrcTooLow) {
             file_put_contents(base_path('.nvmrc'), $major."\n");
         }
 
@@ -96,6 +126,24 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
         }
 
         return $this->fix(dry: true);
+    }
+
+    /**
+     * True when every version the constraint allows is >= the floor (i.e. it never
+     * intersects "< 24"). Unparseable input is treated as not guaranteeing it.
+     */
+    private function guaranteesMinNodeVersion(string $constraint): bool
+    {
+        $parser = new VersionParser;
+
+        try {
+            return !Intervals::haveIntersections(
+                $parser->parseConstraints($constraint),
+                $parser->parseConstraints('<'.self::MIN_NODE_VERSION),
+            );
+        } catch (\UnexpectedValueException) {
+            return false;
+        }
     }
 
     private function nodeVersionsCompatible(string $a, string $b): bool
@@ -113,7 +161,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
     }
 
     /**
-     * The major version to enforce: the .nvmrc value, then engines.node, then the default.
+     * The major version to establish: the .nvmrc value, then engines.node, then the floor.
      */
     private function resolveNodeMajor(?string $engines, ?string $nvmrc): string
     {
@@ -129,7 +177,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             }
         }
 
-        return self::DEFAULT_NODE_VERSION;
+        return self::MIN_NODE_VERSION;
     }
 
     private function nodeMajor(string $raw): ?string
