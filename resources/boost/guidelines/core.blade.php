@@ -14,7 +14,7 @@ ddev composer run ci-lint
 ```
 
 `ci-lint` runs Laravel Pint (code style) and PHPStan/Larastan (static analysis at a strict
-level). For frontend changes, also run:
+level). For frontend changes, also run the following — on the host, not through DDEV:
 
 ```bash
 npm run ci-lint
@@ -22,7 +22,7 @@ npm run ci-lint
 
 All code must pass these checks before being committed.
 
-### Use DDEV for artisan and composer
+### Use DDEV for artisan and composer — but not for npm
 
 This project runs inside DDEV. Always execute artisan and composer through DDEV so the PHP
 version, extensions, and environment match the container — never run them on the host:
@@ -30,6 +30,16 @@ version, extensions, and environment match the container — never run them on t
 ```bash
 ddev artisan <command>
 ddev composer run <script>
+```
+
+Node tooling is the exception: run `npm` (and everything it drives, such as Vite) **on the host,
+outside DDEV** — never `ddev npm`:
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run ci-lint
 ```
 
 ### Use project-relative paths
