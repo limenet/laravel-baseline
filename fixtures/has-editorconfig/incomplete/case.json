@@ -1,0 +1,10 @@
+{
+    "check": "hasEditorconfig",
+    "description": "fails when a required property is absent, and replaces the file on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": { ".editorconfig": "@template:editorconfig" }
+    }
+}

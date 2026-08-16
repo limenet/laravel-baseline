@@ -1,0 +1,11 @@
+{
+    "check": "nodeVersion",
+    "description": "fails on a genuine disagreement and refuses to auto-resolve it",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "fail",
+        "files": { ".nvmrc": "24\n" },
+        "json": { "package.json": { "engines.node": "^26" } }
+    }
+}
