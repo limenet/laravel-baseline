@@ -53,6 +53,57 @@ function makeCheckWithCollector(string $checkClass): array
 }
 
 /**
+ * Helper: temp base path for the Pulse cache serializable-classes check, which needs
+ * both a faked composer package and a real composer.json version constraint
+ * (composerPackageSatisfies() reads require, not Composer::hasPackage()).
+ *
+ * @param  array<string, string>  $files
+ */
+function pulseCacheBasePath(object $test, array $files, string $laravel = '^13.0'): void
+{
+    $test->withTempBasePath([
+        'composer.json' => json_encode([
+            'name' => 'tmp/app',
+            'require' => ['laravel/framework' => $laravel],
+        ]),
+        ...$files,
+    ]);
+}
+
+/**
+ * Helper: a config/cache.php resembling the Laravel skeleton, with an injectable
+ * serializable_classes value and optional use statements.
+ */
+function pulseCacheConfig(string $serializableClasses, string $uses = ''): string
+{
+    return <<<PHP
+    <?php
+
+    {$uses}
+    return [
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default Cache Store
+        |--------------------------------------------------------------------------
+        */
+
+        'default' => env('CACHE_STORE', 'database'),
+
+        'stores' => [
+            'array' => [
+                'driver' => 'array',
+                'serialize' => false,
+            ],
+        ],
+
+        'serializable_classes' => {$serializableClasses},
+
+    ];
+    PHP;
+}
+
+/**
  * Helper: bind a fake Composer instance with predefined package availability map.
  *
  * @param  array<string,bool>  $map

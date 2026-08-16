@@ -63,22 +63,9 @@ class PhpFileWriter
      */
     public static function writeConfig(string $path, array $config): void
     {
-        $printer = new class extends Standard
-        {
-            /** @param Node[] $nodes */
-            protected function pMaybeMultiline(array $nodes, bool $trailingComma = false): string
-            {
-                if ($nodes === []) {
-                    return '';
-                }
-
-                return $this->pCommaSeparatedMultiline($nodes, $trailingComma).$this->nl;
-            }
-        };
-
         $stmts = [new Return_(self::buildArrayNode($config))];
 
-        file_put_contents($path, $printer->prettyPrintFile($stmts)."\n");
+        file_put_contents($path, self::multilinePrinter()->prettyPrintFile($stmts)."\n");
     }
 
     /**
@@ -131,13 +118,39 @@ class PhpFileWriter
 
     /**
      * Write $stmts back to the file, preserving all formatting that was not changed.
+     *
+     * Nodes that were replaced wholesale are re-printed from scratch; pass
+     * $multilineArrays to have those print one array element per line instead of
+     * collapsing onto a single line. Untouched arrays are reproduced verbatim
+     * from the original tokens either way.
      */
-    public function save(): void
+    public function save(bool $multilineArrays = false): void
     {
+        $printer = $multilineArrays ? self::multilinePrinter() : new Standard;
+
         file_put_contents(
             $this->path,
-            (new Standard)->printFormatPreserving($this->stmts, $this->originalStmts, $this->tokens),
+            $printer->printFormatPreserving($this->stmts, $this->originalStmts, $this->tokens),
         );
+    }
+
+    /**
+     * A pretty printer that never collapses an array onto a single line.
+     */
+    private static function multilinePrinter(): Standard
+    {
+        return new class extends Standard
+        {
+            /** @param Node[] $nodes */
+            protected function pMaybeMultiline(array $nodes, bool $trailingComma = false): string
+            {
+                if ($nodes === []) {
+                    return '';
+                }
+
+                return $this->pCommaSeparatedMultiline($nodes, $trailingComma).$this->nl;
+            }
+        };
     }
 
     /** @param array<mixed> $array */

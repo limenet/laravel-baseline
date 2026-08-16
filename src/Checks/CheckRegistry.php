@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks;
 
 use Limenet\LaravelBaseline\Checks\Checks\AllowsToolingInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\BumpsComposerCheck;
+use Limenet\LaravelBaseline\Checks\Checks\CacheAllowsPulseSerializableClassesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsBaselineCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsSentryHookCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
@@ -93,6 +94,7 @@ class CheckRegistry
     private static array $checks = [
         AllowsToolingInClaudeSettingsCheck::class,
         BumpsComposerCheck::class,
+        CacheAllowsPulseSerializableClassesCheck::class,
         CallsBaselineCheck::class,
         DeniesEnvReadsInClaudeSettingsCheck::class,
         DoesNotCallPeriodicBaselineOnUpdateCheck::class,
