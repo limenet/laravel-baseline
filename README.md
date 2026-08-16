@@ -8,6 +8,19 @@
 
 Checks your Laravel installation against a highly opinionated baseline.
 
+This repository ships **two runners** from one policy:
+
+| | Composer | npm |
+| --- | --- | --- |
+| Package | `limenet/laravel-baseline` | `@limenet-ch/baseline` |
+| For | Laravel projects (DDEV, composer) | JS/TS-only projects (no PHP, no DDEV) |
+| Command | `php artisan limenet:laravel-baseline:check` | `npx baseline check` |
+| Checks | all of them | [the portable subset](#js-only-projects) |
+
+Both read `policy/`, so the version floors and required keys are defined once, and both are
+executed against the shared behavioural fixtures in `fixtures/`. They are released in lockstep:
+the same version number means the same policy in both ecosystems.
+
 
 ## Installation
 
@@ -56,6 +69,66 @@ The package also ships [Laravel Boost](https://laravel.com/docs/boost) resources
 conventions) and on-demand skills (e.g. `creating-a-release`). When a project that has
 `laravel/boost` installed runs `php artisan boost:install` or `php artisan boost:update --discover`,
 Boost discovers and publishes these to the consuming project's coding agents automatically.
+
+## JS-only projects
+
+Projects with no PHP and no DDEV use the npm runner instead. It is a second implementation, not a
+wrapper: PHP cannot reach into a JS project (and by this baseline's own convention `npm` runs on
+the host while artisan runs inside DDEV), so the portable checks are reimplemented in TypeScript and
+kept honest by the shared fixtures rather than by shared code.
+
+```bash
+npm install --save-dev @limenet-ch/baseline
+```
+
+```bash
+npx baseline check              # report issues
+npx baseline check --fix        # apply safe fixes, then report what is left
+npx baseline periodic           # walk through expired periodic checks
+npx baseline install-skills     # copy the packaged skills into .claude/skills/
+```
+
+Wire it into the `ci-lint` npm script so CI and the Claude Stop hook both run it — npm has no
+`post-update-cmd` equivalent, and npm 12 blocks dependency lifecycle scripts by default:
+
+```json
+"scripts": {
+    "ci-lint": "biome ci . && tsc --noEmit && baseline check"
+}
+```
+
+State lives in `.baseline.json` at the project root (a JS project has no `config/` directory):
+
+```json
+{
+    "excludes": ["hasNpmScripts"],
+    "periodic": { "updatesDependencies": "2026-08-16T09:00:00.000Z" }
+}
+```
+
+### What the npm runner checks
+
+| Check | Relationship to the Laravel runner |
+| --- | --- |
+| `nodeVersion` | identical |
+| `hardensNpmSupplyChain` | identical |
+| `hasEditorconfig` | identical |
+| `doesNotHaveCopilotOrJunieAgentFiles` | identical |
+| `allowsToolingInClaudeSettings` | requires only the shared allow entries, not the DDEV/artisan ones |
+| `deniesEnvReadsInClaudeSettings` | identical |
+| `runsCiLintHookInClaudeSettings` | hooks `npm run ci-lint` instead of `ddev composer run ci-lint` |
+| `updatesDependencies` | identical (periodic, every 30 days) |
+| `hasNpmScripts` | identical |
+| `hasCiJobs` | same GitLab CI templates, without the `php` job |
+| `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
+| `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
+| `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
+
+Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
+the DDEV checks (`ddevNodeVersionIsAuto`, `ddevMutagenIgnoresNodeModules`, …); and
+`hasClaudeSettingsWithLaravelSkills` / `doesNotHaveLaravelSimplifierInClaudeSettings`, which are
+vacuous without Laravel. `hasTrivyConfig` is not ported **yet** — its canonical config still bakes in
+Laravel paths (`vendor/**`, `storage/logs/`, `.ddev/`) that need splitting into the policy first.
 
 ## Checks
 
