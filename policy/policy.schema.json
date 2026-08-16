@@ -1,0 +1,126 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/limenet/laravel-baseline/policy/policy.schema.json",
+    "title": "limenet baseline policy",
+    "description": "Policy values shared verbatim by the PHP (limenet/laravel-baseline) and JS (@limenet-ch/baseline) runners. Anything that is a value rather than logic belongs here, so a floor is bumped in one place.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["node", "npm", "editorconfig", "agentFiles", "claude", "periodic"],
+    "properties": {
+        "$schema": { "type": "string" },
+        "node": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minMajor"],
+            "properties": {
+                "minMajor": {
+                    "type": "string",
+                    "description": "Lowest permitted Node major. Declarations below it are bumped to it; newer lines are left alone.",
+                    "pattern": "^\\d+$"
+                }
+            }
+        },
+        "npm": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minMajor", "constraint", "minReleaseAgeDays", "engineStrict"],
+            "properties": {
+                "minMajor": { "type": "string", "pattern": "^\\d+$" },
+                "constraint": {
+                    "type": "string",
+                    "description": "The engines.npm constraint written when none is present or the present one is too low."
+                },
+                "minReleaseAgeDays": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Install-time cooldown in days: npm skips versions younger than this."
+                },
+                "engineStrict": {
+                    "type": "boolean",
+                    "description": "Whether .npmrc must set engine-strict, making the engines requirement enforced rather than advisory."
+                }
+            }
+        },
+        "editorconfig": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["template", "requiredProperties"],
+            "properties": {
+                "template": {
+                    "type": "string",
+                    "description": "Filename under policy/templates/ holding the canonical .editorconfig body."
+                },
+                "requiredProperties": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Substrings that must appear in an existing .editorconfig for it to count as complete."
+                }
+            }
+        },
+        "agentFiles": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["forbidden"],
+            "properties": {
+                "forbidden": {
+                    "type": "object",
+                    "description": "Project-relative path => reason it must not exist. Rendered as \"Remove {path} — {reason}\".",
+                    "additionalProperties": { "type": "string" }
+                }
+            }
+        },
+        "claude": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["allow", "deny", "ciLintHookCommand"],
+            "properties": {
+                "allow": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["shared", "php"],
+                    "properties": {
+                        "shared": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.allow entries that apply to every project type."
+                        },
+                        "php": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.allow entries that only make sense in a Laravel/DDEV project."
+                        }
+                    }
+                },
+                "deny": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["shared"],
+                    "properties": {
+                        "shared": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.deny entries that apply to every project type. Dynamic per-environment entries are derived at runtime, not listed here."
+                        }
+                    }
+                },
+                "ciLintHookCommand": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php", "js"],
+                    "properties": {
+                        "php": { "type": "string" },
+                        "js": { "type": "string" }
+                    }
+                }
+            }
+        },
+        "periodic": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["defaultIntervalDays"],
+            "properties": {
+                "defaultIntervalDays": { "type": "integer", "minimum": 1 }
+            }
+        }
+    }
+}

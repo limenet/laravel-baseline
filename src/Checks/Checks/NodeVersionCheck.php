@@ -9,12 +9,6 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class NodeVersionCheck extends AbstractFixableCheck
 {
-    /**
-     * Minimum Node major: 24 is the current LTS. Anything older is bumped to it;
-     * newer lines are left alone. Also the version established when none is declared.
-     */
-    private const MIN_NODE_VERSION = '24';
-
     public function fix(bool $dry = false): CheckResult
     {
         $packageJson = $this->getPackageJson();
@@ -42,7 +36,7 @@ class NodeVersionCheck extends AbstractFixableCheck
 
         // A below-floor declaration is bumped to the floor; otherwise keep the project's own line.
         $major = ($enginesTooLow || $nvmrcTooLow)
-            ? self::MIN_NODE_VERSION
+            ? $this->minNodeVersion()
             : $this->resolveNodeMajor($engines, $nvmrc);
 
         if ($engines === null) {
@@ -58,9 +52,9 @@ class NodeVersionCheck extends AbstractFixableCheck
             $this->addComment(sprintf(
                 'engines.node (%s) allows Node < %s; require Node >= %s (e.g. "^%s")',
                 $engines,
-                self::MIN_NODE_VERSION,
-                self::MIN_NODE_VERSION,
-                self::MIN_NODE_VERSION,
+                $this->minNodeVersion(),
+                $this->minNodeVersion(),
+                $this->minNodeVersion(),
             ));
 
             if ($dry) {
@@ -78,8 +72,8 @@ class NodeVersionCheck extends AbstractFixableCheck
             $this->addComment(sprintf(
                 '.nvmrc (%s) pins Node < %s: set it to "%s"',
                 $nvmrc,
-                self::MIN_NODE_VERSION,
-                self::MIN_NODE_VERSION,
+                $this->minNodeVersion(),
+                $this->minNodeVersion(),
             ));
 
             if ($dry) {
@@ -105,6 +99,15 @@ class NodeVersionCheck extends AbstractFixableCheck
     }
 
     /**
+     * Minimum Node major. Declarations below it are bumped to it, newer lines are
+     * left alone, and it is the version established when none is declared.
+     */
+    private function minNodeVersion(): string
+    {
+        return $this->policy()->string('node.minMajor');
+    }
+
+    /**
      * True when every version the constraint allows is >= the floor (i.e. it never
      * intersects "< 24"). Unparseable input is treated as not guaranteeing it.
      */
@@ -115,7 +118,7 @@ class NodeVersionCheck extends AbstractFixableCheck
         try {
             return !Intervals::haveIntersections(
                 $parser->parseConstraints($constraint),
-                $parser->parseConstraints('<'.self::MIN_NODE_VERSION),
+                $parser->parseConstraints('<'.$this->minNodeVersion()),
             );
         } catch (\UnexpectedValueException) {
             return false;
@@ -153,7 +156,7 @@ class NodeVersionCheck extends AbstractFixableCheck
             }
         }
 
-        return self::MIN_NODE_VERSION;
+        return $this->minNodeVersion();
     }
 
     private function nodeMajor(string $raw): ?string

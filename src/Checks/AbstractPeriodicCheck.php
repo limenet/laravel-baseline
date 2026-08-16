@@ -11,7 +11,7 @@ abstract class AbstractPeriodicCheck extends AbstractCheck implements PeriodicCh
 {
     public function interval(): CarbonInterval
     {
-        return CarbonInterval::days(30);
+        return CarbonInterval::days($this->policy()->int('periodic.defaultIntervalDays'));
     }
 
     public function isApplicable(): bool

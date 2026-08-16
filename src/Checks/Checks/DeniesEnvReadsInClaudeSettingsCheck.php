@@ -48,7 +48,7 @@ class DeniesEnvReadsInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
      */
     private function requiredDenyEntries(): array
     {
-        $entries = ['Read(./.env)'];
+        $entries = $this->policy()->strings('claude.deny.shared');
 
         $finder = (new Finder)
             ->in(base_path())
