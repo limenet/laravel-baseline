@@ -1,0 +1,8 @@
+{
+    "check": "hasCiJobs",
+    "description": "passes on a js project declaring every required CI job",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

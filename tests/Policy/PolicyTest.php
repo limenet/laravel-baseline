@@ -24,8 +24,23 @@ it('loads every key the checks depend on with the declared type', function (): v
     expect($policy->strings('claude.deny.shared'))->not->toBeEmpty();
     expect($policy->string('claude.ciLintHookCommand.php'))->toBeString();
     expect($policy->string('claude.ciLintHookCommand.js'))->toBeString();
+    expect($policy->stringListMap('ci.requiredJobs.php'))->not->toBeEmpty();
+    expect($policy->stringListMap('ci.requiredJobs.js'))->not->toBeEmpty();
     expect($policy->int('periodic.defaultIntervalDays'))->toBeInt();
 });
+
+it('normalises a single accepted CI template into a list', function (): void {
+    $map = Policy::fromArray(['ci' => ['requiredJobs' => ['php' => [
+        'build' => '.build',
+        'test' => ['.test', '.test_db'],
+    ]]]])->stringListMap('ci.requiredJobs.php');
+
+    expect($map)->toBe(['build' => ['.build'], 'test' => ['.test', '.test_db']]);
+});
+
+it('throws when an accepted-template list holds a non-string', function (): void {
+    Policy::fromArray(['ci' => ['requiredJobs' => ['php' => ['test' => [1]]]]])->stringListMap('ci.requiredJobs.php');
+})->throws(PolicyException::class, 'is not a map of strings or lists of strings');
 
 it('resolves templates relative to the policy directory', function (): void {
     $policy = Policy::fromDirectory();

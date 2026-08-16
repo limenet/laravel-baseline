@@ -1,0 +1,8 @@
+{
+    "check": "isCiLintComplete",
+    "description": "passes when the ci-lint composer script runs the formatter and the analyser",
+    "engines": [
+        "php"
+    ],
+    "expect": "pass"
+}

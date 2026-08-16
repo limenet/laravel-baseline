@@ -1,0 +1,9 @@
+{
+    "name": "test-project",
+    "scripts": {
+        "release": "release-it"
+    },
+    "devDependencies": {
+        "release-it": "^21.0.0"
+    }
+}

@@ -1,4 +1,5 @@
 import { type CheckResult, CommentCollector, icon, isError, isFixable } from '../checks/check.js'
+import { isPeriodic } from '../checks/periodic-check.js'
 import { createChecks } from '../checks/registry.js'
 import type { Project } from '../project.js'
 import { excludedChecks } from '../state.js'
@@ -16,6 +17,12 @@ export function runCheck(project: Project, options: CheckOptions): number {
     let errors = 0
 
     for (const check of createChecks(project, comments)) {
+        // A periodic check that does not apply yields no result at all, matching
+        // the PHP runner rather than counting as a pass.
+        if (isPeriodic(check) && !check.isApplicable()) {
+            continue
+        }
+
         if (excluded.includes(check.name)) {
             console.log(`⚪ ${displayName(check.name)} (excluded)`)
 

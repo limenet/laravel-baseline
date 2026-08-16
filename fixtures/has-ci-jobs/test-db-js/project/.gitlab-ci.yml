@@ -1,0 +1,9 @@
+build:
+  extends:
+    - .build
+js:
+  extends:
+    - .lint_js
+test:
+  extends:
+    - .test_db

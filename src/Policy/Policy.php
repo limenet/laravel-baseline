@@ -128,6 +128,50 @@ final class Policy
     }
 
     /**
+     * A map whose values are either a single string or a list of them, always
+     * returned as lists — for keys where one accepted value and several are
+     * equally valid, such as the CI templates a job may extend.
+     *
+     * @return array<string,list<string>>
+     */
+    public function stringListMap(string $key): array
+    {
+        $value = $this->lookup($key);
+
+        if (!is_array($value)) {
+            throw PolicyException::wrongType($key, 'map of strings or lists of strings');
+        }
+
+        $map = [];
+
+        foreach ($value as $mapKey => $item) {
+            if (!is_string($mapKey)) {
+                throw PolicyException::wrongType($key, 'map of strings or lists of strings');
+            }
+
+            if (is_string($item)) {
+                $map[$mapKey] = [$item];
+
+                continue;
+            }
+
+            if (!is_array($item) || $item === []) {
+                throw PolicyException::wrongType($key, 'map of strings or lists of strings');
+            }
+
+            $list = [];
+
+            foreach ($item as $entry) {
+                $list[] = is_string($entry) ? $entry : throw PolicyException::wrongType($key, 'map of strings or lists of strings');
+            }
+
+            $map[$mapKey] = $list;
+        }
+
+        return $map;
+    }
+
+    /**
      * The verbatim body of a canonical file under policy/templates/. Multi-line
      * file bodies live there rather than JSON-escaped into policy.json, so their
      * diffs stay readable and their newlines survive both loaders unchanged.

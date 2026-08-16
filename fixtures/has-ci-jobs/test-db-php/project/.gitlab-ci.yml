@@ -1,0 +1,12 @@
+build:
+  extends:
+    - .build
+php:
+  extends:
+    - .lint_php
+js:
+  extends:
+    - .lint_js
+test:
+  extends:
+    - .test_db

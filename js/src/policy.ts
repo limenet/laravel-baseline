@@ -103,6 +103,38 @@ export class Policy {
     }
 
     /**
+     * A map whose values are either a single string or a list of them, always
+     * returned as lists — for keys where one accepted value and several are
+     * equally valid, such as the CI templates a job may extend.
+     */
+    stringListMap(key: string): Record<string, string[]> {
+        const value = this.lookup(key)
+        const expected = 'map of strings or lists of strings'
+
+        if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+            throw PolicyError.wrongType(key, expected)
+        }
+
+        const map: Record<string, string[]> = {}
+
+        for (const [mapKey, item] of Object.entries(value)) {
+            if (typeof item === 'string') {
+                map[mapKey] = [item]
+
+                continue
+            }
+
+            if (!Array.isArray(item) || item.length === 0 || item.some((entry) => typeof entry !== 'string')) {
+                throw PolicyError.wrongType(key, expected)
+            }
+
+            map[mapKey] = item as string[]
+        }
+
+        return map
+    }
+
+    /**
      * The verbatim body of a canonical file under policy/templates/. Multi-line
      * bodies live there rather than JSON-escaped into policy.json, so their diffs
      * stay readable and their newlines survive both loaders unchanged.
