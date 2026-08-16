@@ -1,0 +1,6 @@
+{
+    "check": "nodeVersion",
+    "description": "passes when engines.node and .nvmrc agree on a version at the floor",
+    "engines": ["php", "js"],
+    "expect": "pass"
+}

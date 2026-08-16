@@ -1,0 +1,6 @@
+{
+    "check": "hasEditorconfig",
+    "description": "passes on the canonical .editorconfig the fixer itself writes",
+    "engines": ["php", "js"],
+    "expect": "pass"
+}
