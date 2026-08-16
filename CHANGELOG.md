@@ -3,6 +3,18 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.7.0](https://github.com/limenet/laravel-baseline/compare/v2.6.0...v2.7.0) (2026-08-16)
+
+### Features
+
+* add cacheAllowsPulseSerializableClasses check ([12bd353](https://github.com/limenet/laravel-baseline/commit/12bd3533133255f80de3fb93ec14a873e25feb56)), references [laravel/pulse#505](https://github.com/laravel/pulse/issues/505)
+
+### Bug Fixes
+
+* **boost:** note that npm runs on the host, outside DDEV ([edf9e02](https://github.com/limenet/laravel-baseline/commit/edf9e02c06f6f97d4833bd21384f64158ba9a124))
+* default to Node 24 instead of 26 in nodeVersionMatchesDdev ([5b41a8d](https://github.com/limenet/laravel-baseline/commit/5b41a8ddb1595bca37f4083847ef8adf482ae176))
+* require at least Node 24 in nodeVersionMatchesDdev ([27dd95b](https://github.com/limenet/laravel-baseline/commit/27dd95bc8bd25b85a0b547cda9125a9a945c4bbf))
+
 ## [2.6.0](https://github.com/limenet/laravel-baseline/compare/v2.5.0...v2.6.0) (2026-08-05)
 
 ### Features
