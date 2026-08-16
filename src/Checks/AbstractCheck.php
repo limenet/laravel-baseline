@@ -413,6 +413,63 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
+     * Sets a scalar key inside a top-level YAML mapping (e.g. `variables.FOO`)
+     * via a targeted text edit, replacing only the matching line, inserting one
+     * into the existing block, or creating the whole mapping. Like
+     * setYamlScalarKey() this avoids a parse/dump round trip, which would
+     * discard every comment in the file.
+     */
+    protected function setYamlMappingScalar(string $file, string $mapping, string $key, string $value): void
+    {
+        $content = file_get_contents($file) ?: '';
+        $lines = explode("\n", $content);
+        $mappingIndex = null;
+
+        foreach ($lines as $index => $line) {
+            if (preg_match('/^'.preg_quote($mapping, '/').':\s*$/', $line) === 1) {
+                $mappingIndex = $index;
+                break;
+            }
+        }
+
+        if ($mappingIndex === null) {
+            file_put_contents(
+                $file,
+                $this->insertYamlLineBeforeTrailingComments($content, $mapping.":\n  ".$key.': '.$value),
+            );
+
+            return;
+        }
+
+        $indent = '  ';
+        $insertAt = $mappingIndex + 1;
+
+        for ($i = $mappingIndex + 1, $count = count($lines); $i < $count; $i++) {
+            // Blank lines sit inside the block; a dedented line ends it.
+            if (trim($lines[$i]) === '') {
+                continue;
+            }
+
+            if (preg_match('/^[ \t]+/', $lines[$i], $indentMatch) !== 1) {
+                break;
+            }
+
+            $indent = $indentMatch[0];
+            $insertAt = $i + 1;
+
+            if (preg_match('/^[ \t]+'.preg_quote($key, '/').':/', $lines[$i]) === 1) {
+                $lines[$i] = $indent.$key.': '.$value;
+                file_put_contents($file, implode("\n", $lines));
+
+                return;
+            }
+        }
+
+        array_splice($lines, $insertAt, 0, [$indent.$key.': '.$value]);
+        file_put_contents($file, implode("\n", $lines));
+    }
+
+    /**
      * Appends an item to a top-level YAML list key via a targeted text edit,
      * preserving the list's existing flow/block style and leaving the rest
      * of the file (including comments) untouched. Creates the key in block

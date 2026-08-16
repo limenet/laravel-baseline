@@ -1,0 +1,12 @@
+variables:
+  NODE_VERSION: "24"
+
+build:
+  extends:
+    - .build
+js:
+  extends:
+    - .lint_js
+test:
+  extends:
+    - .test

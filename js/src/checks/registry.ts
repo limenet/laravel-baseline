@@ -2,6 +2,7 @@ import type { Project } from '../project.js'
 import { AllowsToolingInClaudeSettingsCheck } from './allows-tooling-in-claude-settings-check.js'
 import { CallsBaselineCheck } from './calls-baseline-check.js'
 import type { Check, CommentCollector } from './check.js'
+import { CiSetsNodeVersionCheck } from './ci-sets-node-version-check.js'
 import { DeniesEnvReadsInClaudeSettingsCheck } from './denies-env-reads-in-claude-settings-check.js'
 import { DoesNotHaveCopilotOrJunieAgentFilesCheck } from './does-not-have-copilot-or-junie-agent-files-check.js'
 import { HardensNpmSupplyChainCheck } from './hardens-npm-supply-chain-check.js'
@@ -29,6 +30,7 @@ type CheckConstructor = (new (
 const checks: CheckConstructor[] = [
     AllowsToolingInClaudeSettingsCheck,
     CallsBaselineCheck,
+    CiSetsNodeVersionCheck,
     DeniesEnvReadsInClaudeSettingsCheck,
     DoesNotHaveCopilotOrJunieAgentFilesCheck,
     HardensNpmSupplyChainCheck,

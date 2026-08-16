@@ -1,0 +1,12 @@
+{
+    "check": "ciSetsNodeVersion",
+    "description": "fails when the CI pipeline never sets NODE_VERSION, and adds it on fix",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass"
+    }
+}
