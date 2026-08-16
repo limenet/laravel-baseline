@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Policy\Policy;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Yaml\Yaml;
@@ -32,6 +33,14 @@ abstract class AbstractCheck implements CheckInterface
             ->beforeLast('Check')
             ->lcfirst()
             ->toString();
+    }
+
+    /**
+     * The policy values shared with the npm runner (see policy/policy.json).
+     */
+    protected function policy(): Policy
+    {
+        return app(Policy::class);
     }
 
     protected function getComposer(): Composer
