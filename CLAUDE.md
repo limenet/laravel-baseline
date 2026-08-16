@@ -80,6 +80,11 @@ When multiple checks share structural logic (e.g., all parse the same file and r
 
 ## When Adding a New Check
 
+> **Start with the `adding-a-check` skill** (`.claude/skills/adding-a-check/SKILL.md`). It settles
+> the two things that cannot be inferred from the request — which runner(s) the check targets, and
+> whether it auto-fixes — before any code is written. Both decisions change the shape of what you
+> write, so guessing means rewriting.
+
 ### 1. Create a New Check Class
 
 Create a new class in `src/Checks/Checks/` that extends `AbstractCheck`:
