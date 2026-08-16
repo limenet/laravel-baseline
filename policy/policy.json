@@ -57,9 +57,7 @@
             ]
         },
         "deny": {
-            "shared": [
-                "Read(./.env)"
-            ]
+            "shared": ["Read(./.env)"]
         },
         "ciLintHookCommand": {
             "php": "ddev composer run ci-lint",
