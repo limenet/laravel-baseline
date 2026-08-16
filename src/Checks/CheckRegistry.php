@@ -8,6 +8,7 @@ use Limenet\LaravelBaseline\Checks\Checks\CacheAllowsPulseSerializableClassesChe
 use Limenet\LaravelBaseline\Checks\Checks\CallsBaselineCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CallsSentryHookCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
+use Limenet\LaravelBaseline\Checks\Checks\CiSetsNodeVersionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasRedisAddonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
@@ -105,6 +106,7 @@ class CheckRegistry
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
         CallsSentryHookCheck::class,
         CheckPhpunitCheck::class,
+        CiSetsNodeVersionCheck::class,
         DdevHasPcovPackageCheck::class,
         DdevHasRedisAddonCheck::class,
         DdevMutagenIgnoresNodeModulesCheck::class,

@@ -65,6 +65,10 @@
         }
     },
     "ci": {
+        "nodeVersionVariable": {
+            "name": "NODE_VERSION",
+            "value": "latest"
+        },
         "requiredJobs": {
             "php": {
                 "build": ".build",

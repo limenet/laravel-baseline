@@ -144,8 +144,12 @@ it('names a registered check and a real project directory in every fixture', fun
         expect($case['engines'])->not->toBeEmpty();
         expect(is_dir(dirname($file).'/project'))->toBeTrue();
 
-        // Throws if the fixture names a check no longer in the registry.
-        conformanceCheckClass($case['check']);
+        // Only checks this runner claims must resolve here — a fixture may target
+        // the npm runner alone (e.g. ciSetsNodeVersion, which has no PHP
+        // counterpart). The vitest suite makes the mirror-image assertion.
+        if (in_array('php', $case['engines'], true)) {
+            conformanceCheckClass($case['check']);
+        }
 
         // The directory name must be the kebab-case of the check it exercises,
         // so a rename cannot leave the tree half-migrated.

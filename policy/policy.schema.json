@@ -133,8 +133,18 @@
         "ci": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["requiredJobs"],
+            "required": ["nodeVersionVariable", "requiredJobs"],
             "properties": {
+                "nodeVersionVariable": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["name", "value"],
+                    "description": "The CI variable that pins the Node version. Setting it lets the shared template resolve the version, which is what keeps CI and local in step now that DDEV's nodejs_version: auto is not in play.",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "value": { "type": "string" }
+                    }
+                },
                 "requiredJobs": {
                     "type": "object",
                     "additionalProperties": false,

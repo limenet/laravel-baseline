@@ -120,6 +120,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `updatesDependencies` | identical (periodic, every 30 days) |
 | `hasNpmScripts` | identical |
 | `hasCiJobs` | same GitLab CI templates, without the `php` job |
+| `ciSetsNodeVersion` | identical |
 | `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
 | `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
 | `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
@@ -127,8 +128,8 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
 the DDEV checks (`ddevNodeVersionIsAuto`, `ddevMutagenIgnoresNodeModules`, …); and
 `hasClaudeSettingsWithLaravelSkills` / `doesNotHaveLaravelSimplifierInClaudeSettings`, which are
-vacuous without Laravel. `hasTrivyConfig` is not ported **yet** — its canonical config still bakes in
-Laravel paths (`vendor/**`, `storage/logs/`, `.ddev/`) that need splitting into the policy first.
+vacuous without Laravel. `hasTrivyConfig` stays Laravel-only too — its canonical config bakes in
+Laravel paths (`vendor/**`, `storage/logs/`, `.ddev/`).
 
 ## Checks
 
@@ -207,6 +208,7 @@ This package validates your Laravel installation against the following checks:
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline
+- 🔧 **`ciSetsNodeVersion()`** - Validates `.gitlab-ci.yml` sets `variables.NODE_VERSION` to `latest`, so the shared CI template resolves the Node version instead of drifting from the project *(adds the variable, creating the `variables` mapping if needed, preserving comments and existing entries)*
 - **`doesNotUseIgnition()`** - Validates Ignition debugger is NOT installed
 
 ### Local Development

@@ -1,0 +1,12 @@
+{
+    "check": "ciSetsNodeVersion",
+    "description": "fails when NODE_VERSION pins a specific major instead of \"latest\"",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass"
+    }
+}
