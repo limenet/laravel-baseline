@@ -64,6 +64,33 @@
             "js": "npm run ci-lint"
         }
     },
+    "ci": {
+        "requiredJobs": {
+            "php": {
+                "build": ".build",
+                "php": ".lint_php",
+                "js": ".lint_js",
+                "test": ".test"
+            },
+            "js": {
+                "build": ".build",
+                "js": ".lint_js",
+                "test": ".test"
+            }
+        }
+    },
+    "ciLint": {
+        "required": {
+            "php": ["pint --parallel", "phpstan"],
+            "js": ["biome", "tsc"]
+        },
+        "baselineCommand": {
+            "js": "baseline check"
+        }
+    },
+    "npmScripts": {
+        "required": ["ci-lint", "production"]
+    },
     "periodic": {
         "defaultIntervalDays": 30
     }

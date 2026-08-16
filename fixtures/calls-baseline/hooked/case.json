@@ -1,0 +1,8 @@
+{
+    "check": "callsBaseline",
+    "description": "passes when ci-lint runs the baseline",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

@@ -1,0 +1,9 @@
+{
+    "check": "allowsToolingInClaudeSettings",
+    "description": "passes when both the shared and php allow entries are present",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "pass"
+}

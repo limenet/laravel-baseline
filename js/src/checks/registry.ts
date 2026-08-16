@@ -1,9 +1,18 @@
 import type { Project } from '../project.js'
+import { AllowsToolingInClaudeSettingsCheck } from './allows-tooling-in-claude-settings-check.js'
+import { CallsBaselineCheck } from './calls-baseline-check.js'
 import type { Check, CommentCollector } from './check.js'
+import { DeniesEnvReadsInClaudeSettingsCheck } from './denies-env-reads-in-claude-settings-check.js'
 import { DoesNotHaveCopilotOrJunieAgentFilesCheck } from './does-not-have-copilot-or-junie-agent-files-check.js'
 import { HardensNpmSupplyChainCheck } from './hardens-npm-supply-chain-check.js'
+import { HasCiJobsCheck } from './has-ci-jobs-check.js'
 import { HasEditorconfigCheck } from './has-editorconfig-check.js'
+import { HasNpmScriptsCheck } from './has-npm-scripts-check.js'
+import { IsCiLintCompleteCheck } from './is-ci-lint-complete-check.js'
 import { NodeVersionCheck } from './node-version-check.js'
+import { RunsCiLintHookInClaudeSettingsCheck } from './runs-ci-lint-hook-in-claude-settings-check.js'
+import { UpdatesDependenciesCheck } from './updates-dependencies-check.js'
+import { UsesReleaseItCheck } from './uses-release-it-check.js'
 
 type CheckConstructor = (new (
     project: Project,
@@ -18,10 +27,19 @@ type CheckConstructor = (new (
  * README for the ported / not-ported table.
  */
 const checks: CheckConstructor[] = [
+    AllowsToolingInClaudeSettingsCheck,
+    CallsBaselineCheck,
+    DeniesEnvReadsInClaudeSettingsCheck,
     DoesNotHaveCopilotOrJunieAgentFilesCheck,
     HardensNpmSupplyChainCheck,
+    HasCiJobsCheck,
     HasEditorconfigCheck,
+    HasNpmScriptsCheck,
+    IsCiLintCompleteCheck,
     NodeVersionCheck,
+    RunsCiLintHookInClaudeSettingsCheck,
+    UpdatesDependenciesCheck,
+    UsesReleaseItCheck,
 ]
 
 export function allChecks(): CheckConstructor[] {

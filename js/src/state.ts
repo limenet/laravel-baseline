@@ -27,3 +27,25 @@ export function excludedChecks(project: Project): string[] {
 export function writeState(project: Project, state: BaselineState): void {
     project.writeJson(STATE_FILE, state)
 }
+
+/** When the developer last confirmed a periodic check, or null if never. */
+export function lastRun(project: Project, checkName: string): Date | null {
+    const recorded = readState(project).periodic?.[checkName]
+
+    if (recorded === undefined) {
+        return null
+    }
+
+    const parsed = new Date(recorded)
+
+    return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+export function recordRun(project: Project, checkName: string, when: Date = new Date()): void {
+    const state = readState(project)
+
+    writeState(project, {
+        ...state,
+        periodic: { ...state.periodic, [checkName]: when.toISOString() },
+    })
+}

@@ -1,0 +1,8 @@
+{
+    "check": "usesReleaseIt",
+    "description": "passes with release-it installed, a release script, and no bumper plugin",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

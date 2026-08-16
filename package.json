@@ -50,7 +50,8 @@
         "release": "GITHUB_TOKEN=$(gh auth token) release-it"
     },
     "dependencies": {
-        "semver": "^7.7.4"
+        "semver": "^7.7.4",
+        "yaml": "^2.9.0"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.4.1",

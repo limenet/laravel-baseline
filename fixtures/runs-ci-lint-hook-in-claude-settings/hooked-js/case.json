@@ -1,0 +1,8 @@
+{
+    "check": "runsCiLintHookInClaudeSettings",
+    "description": "passes when the Stop hook runs the js ci-lint command",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

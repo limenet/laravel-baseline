@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util'
 import { runCheck } from './commands/check.js'
+import { runPeriodic } from './commands/periodic.js'
 import { Project } from './project.js'
 
 const USAGE = `baseline — a highly opinionated baseline for JS/TS projects.
 
 Usage:
   baseline check [--fix] [--verbose] [--cwd <path>]
+  baseline periodic [--cwd <path>]
 
 Options:
   --fix        Repair what can be repaired, then re-verify
@@ -15,7 +17,7 @@ Options:
   --help       Show this message
 `
 
-function main(): number {
+async function main(): Promise<number> {
     const { values, positionals } = parseArgs({
         allowPositionals: true,
         options: {
@@ -39,6 +41,8 @@ function main(): number {
     switch (command) {
         case 'check':
             return runCheck(project, { fix: values.fix, verbose: values.verbose })
+        case 'periodic':
+            return await runPeriodic(project)
         default:
             console.error(`Unknown command "${command}".\n\n${USAGE}`)
 
@@ -46,4 +50,4 @@ function main(): number {
     }
 }
 
-process.exitCode = main()
+process.exitCode = await main()

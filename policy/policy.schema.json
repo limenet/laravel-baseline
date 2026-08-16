@@ -5,7 +5,17 @@
     "description": "Policy values shared verbatim by the PHP (limenet/laravel-baseline) and JS (@limenet-ch/baseline) runners. Anything that is a value rather than logic belongs here, so a floor is bumped in one place.",
     "type": "object",
     "additionalProperties": false,
-    "required": ["node", "npm", "editorconfig", "agentFiles", "claude", "periodic"],
+    "required": [
+        "node",
+        "npm",
+        "editorconfig",
+        "agentFiles",
+        "claude",
+        "ci",
+        "ciLint",
+        "npmScripts",
+        "periodic"
+    ],
     "properties": {
         "$schema": { "type": "string" },
         "node": {
@@ -111,6 +121,61 @@
                         "php": { "type": "string" },
                         "js": { "type": "string" }
                     }
+                }
+            }
+        },
+        "ci": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["requiredJobs"],
+            "properties": {
+                "requiredJobs": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php", "js"],
+                    "description": "GitLab CI job name => the shared template it must extend. The js set omits the php job.",
+                    "properties": {
+                        "php": { "type": "object", "additionalProperties": { "type": "string" } },
+                        "js": { "type": "object", "additionalProperties": { "type": "string" } }
+                    }
+                }
+            }
+        },
+        "ciLint": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["required", "baselineCommand"],
+            "properties": {
+                "required": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php", "js"],
+                    "description": "Substrings the project's ci-lint script must contain — a composer script for php, an npm script for js.",
+                    "properties": {
+                        "php": { "type": "array", "items": { "type": "string" } },
+                        "js": { "type": "array", "items": { "type": "string" } }
+                    }
+                },
+                "baselineCommand": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["js"],
+                    "description": "How the baseline runner invokes itself from a project. The php runner hooks composer's post-update-cmd instead, which npm has no equivalent of.",
+                    "properties": {
+                        "js": { "type": "string" }
+                    }
+                }
+            }
+        },
+        "npmScripts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["required"],
+            "properties": {
+                "required": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "npm scripts every project must define."
                 }
             }
         },

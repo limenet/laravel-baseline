@@ -1,0 +1,16 @@
+{
+    "check": "callsBaseline",
+    "description": "fails when ci-lint never runs the baseline, and appends it on fix",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "json": {
+            "package.json": {
+                "scripts.ci-lint": "biome ci . && baseline check"
+            }
+        }
+    }
+}
