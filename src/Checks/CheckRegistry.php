@@ -11,6 +11,7 @@ use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasRedisAddonCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DdevNodeVersionIsAutoCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DeniesEnvReadsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveCopilotOrJunieAgentFilesCheck;
@@ -51,7 +52,7 @@ use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\LaravelBoostMcpUsesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\ModelShouldBeStrictCheck;
-use Limenet\LaravelBaseline\Checks\Checks\NodeVersionMatchesDdevCheck;
+use Limenet\LaravelBaseline\Checks\Checks\NodeVersionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
@@ -107,6 +108,7 @@ class CheckRegistry
         DdevHasPcovPackageCheck::class,
         DdevHasRedisAddonCheck::class,
         DdevMutagenIgnoresNodeModulesCheck::class,
+        DdevNodeVersionIsAutoCheck::class,
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,
@@ -142,7 +144,7 @@ class CheckRegistry
         IsLaravelVersionMaintainedCheck::class,
         LaravelBoostMcpUsesDdevCheck::class,
         ModelShouldBeStrictCheck::class,
-        NodeVersionMatchesDdevCheck::class,
+        NodeVersionCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
         PhpVersionMatchesCiCheck::class,
         PhpVersionMatchesDdevCheck::class,

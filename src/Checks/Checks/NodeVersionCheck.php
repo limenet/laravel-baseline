@@ -7,7 +7,7 @@ use Composer\Semver\VersionParser;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
+class NodeVersionCheck extends AbstractFixableCheck
 {
     /**
      * Minimum Node major: 24 is the current LTS. Anything older is bumped to it;
@@ -87,22 +87,6 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             }
         }
 
-        $ddevConfig = $this->getDdevConfig();
-
-        if ($ddevConfig === null) {
-            return CheckResult::FAIL;
-        }
-
-        $nodejsVersion = $ddevConfig['nodejs_version'] ?? null;
-
-        if ($nodejsVersion !== 'auto') {
-            $this->addComment('DDEV nodejs_version should be "auto" to derive the Node version from the project: set "nodejs_version: auto" in .ddev/config.yaml');
-
-            if ($dry) {
-                return CheckResult::FAIL;
-            }
-        }
-
         if ($dry) {
             return CheckResult::PASS;
         }
@@ -115,14 +99,6 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
 
         if ($nvmrc === null || $nvmrcTooLow) {
             file_put_contents(base_path('.nvmrc'), $major."\n");
-        }
-
-        if ($nodejsVersion !== 'auto') {
-            $ddevConfigFile = base_path('.ddev/config.yaml');
-
-            if (file_exists($ddevConfigFile)) {
-                $this->setYamlScalarKey($ddevConfigFile, 'nodejs_version', 'auto');
-            }
         }
 
         return $this->fix(dry: true);

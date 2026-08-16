@@ -104,6 +104,23 @@ function pulseCacheConfig(string $serializableClasses, string $uses = ''): strin
 }
 
 /**
+ * Helper: a minimal package.json, optionally declaring engines.node.
+ *
+ * Lives here rather than in a test file because Pest shares one global function
+ * namespace across the suite, so both Node-related test files can use it.
+ */
+function nodePackageJson(?string $engines): string
+{
+    $data = ['name' => 'test-project'];
+
+    if ($engines !== null) {
+        $data['engines'] = ['node' => $engines];
+    }
+
+    return json_encode($data);
+}
+
+/**
  * Helper: bind a fake Composer instance with predefined package availability map.
  *
  * @param  array<string,bool>  $map

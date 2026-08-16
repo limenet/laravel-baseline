@@ -138,11 +138,12 @@ This package validates your Laravel installation against the following checks:
 
 ### Local Development
 - **`phpVersionMatchesDdev()`** - Validates PHP version consistency with DDEV
-- 🔧 **`nodeVersionMatchesDdev()`** - Validates the project pins Node >= 24 (the current LTS) in both `package.json` `engines.node` and `.nvmrc` (compatible with each other) and that `.ddev/config.yaml` sets `nodejs_version: auto` so DDEV derives the Node version from the project *(creates the missing constraint — establishing Node 24 when none is declared — bumps a declaration that allows anything older to 24, and sets `nodejs_version: auto`; a newer line such as Node 26 is left alone, and a conflict between existing `engines.node` and `.nvmrc` is reported, not auto-resolved)*
+- 🔧 **`nodeVersion()`** - Validates the project pins Node >= 24 (the current LTS) in both `package.json` `engines.node` and `.nvmrc`, compatible with each other *(creates the missing constraint — establishing Node 24 when none is declared — and bumps a declaration that allows anything older to 24; a newer line such as Node 26 is left alone, and a conflict between existing `engines.node` and `.nvmrc` is reported, not auto-resolved)*
 - 🔧 **`hardensNpmSupplyChain()`** - Hardens npm against supply-chain attacks: requires `package.json` `engines.npm` >= 12 (npm 12 blocks dependency lifecycle scripts by default and refuses git/remote deps), `.npmrc` `engine-strict=true` so that requirement is enforced rather than advisory, and `.npmrc` `min-release-age=7` for a 7-day install cooldown that skips freshly-published (potentially compromised) versions *(sets `engines.npm` to `^12`, and upserts both `.npmrc` keys while preserving existing lines)*
 - 🔧 **`ddevHasPcovPackage()`** - Validates DDEV coverage configuration *(adds pcov to webimage_extra_packages and creates .ddev/php/90-custom.ini)*
 - **`ddevHasRedisAddon()`** - Validates DDEV Redis addon is installed and at minimum version 2.2.0
 - 🔧 **`ddevMutagenIgnoresNodeModules()`** - Validates DDEV Mutagen sync configuration *(creates mutagen.yml and fixes .gitignore)*
+- 🔧 **`ddevNodeVersionIsAuto()`** - Validates `.ddev/config.yaml` sets `nodejs_version: auto` so DDEV derives the Node version from the project's `.nvmrc` instead of pinning its own *(sets `nodejs_version: auto`, preserving surrounding comments and formatting)*
 - **`updatesDdevAddons()`** - Fails if any installed DDEV add-on (`.ddev/addon-metadata/*/manifest.yaml`) has an `install_date` older than 3 months; comment shows the `ddev add-on get <repository>` command to refresh each stale add-on
 
 ### Build & Release
