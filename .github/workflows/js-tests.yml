@@ -1,0 +1,70 @@
+name: js-tests
+
+on:
+  push:
+    paths:
+      - "js/**"
+      - "policy/**"
+      - "fixtures/**"
+      - "package.json"
+      - "package-lock.json"
+      - "biome.json"
+      - "tsconfig*.json"
+      - "vitest.config.ts"
+      - ".gitattributes"
+      - ".github/workflows/js-tests.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint and typecheck
+        run: npm run ci-lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      # The two tarballs are the thing that actually reaches users, and both
+      # failure modes are silent: a missing policy/ throws for every composer
+      # consumer on install, and a leaked source tree bloats the npm package.
+      - name: Guard the npm tarball
+        run: |
+          npm pack --dry-run --json > /tmp/pack.json
+          node -e '
+            const pkg = Object.values(require("/tmp/pack.json"))[0];
+            const files = pkg.files.map((f) => f.path);
+            const required = ["policy/policy.json", "policy/templates/editorconfig", "js/dist/bin.js"];
+            const missing = required.filter((f) => !files.includes(f));
+            const leaked = files.filter((f) => /^(js\/(src|tests)|fixtures|src|tests|config|resources)\//.test(f));
+            if (missing.length) { console.error("missing from npm tarball: " + missing.join(", ")); process.exit(1); }
+            if (leaked.length) { console.error("leaked into npm tarball: " + leaked.join(", ")); process.exit(1); }
+            console.log(`npm tarball ok: ${files.length} files`);
+          '
+
+      - name: Guard the composer distribution archive
+        run: |
+          git archive HEAD | tar -t > /tmp/dist.txt
+          grep -qx 'policy/policy.json' /tmp/dist.txt || { echo 'policy/policy.json is missing from the composer archive'; exit 1; }
+          grep -qx 'policy/templates/editorconfig' /tmp/dist.txt || { echo 'policy/templates/editorconfig is missing from the composer archive'; exit 1; }
+          ! grep -q '^js/' /tmp/dist.txt || { echo 'js/ leaked into the composer archive'; exit 1; }
+          ! grep -q '^fixtures/' /tmp/dist.txt || { echo 'fixtures/ leaked into the composer archive'; exit 1; }
+          echo 'composer archive ok'
