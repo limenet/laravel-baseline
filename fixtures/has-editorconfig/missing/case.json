@@ -1,0 +1,10 @@
+{
+    "check": "hasEditorconfig",
+    "description": "fails without an .editorconfig, and writes the canonical body on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": { ".editorconfig": "@template:editorconfig" }
+    }
+}

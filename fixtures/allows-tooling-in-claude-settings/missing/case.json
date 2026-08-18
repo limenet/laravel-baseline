@@ -1,0 +1,12 @@
+{
+    "check": "allowsToolingInClaudeSettings",
+    "description": "fails when no allow entries are declared, and writes them on fix",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass"
+    }
+}

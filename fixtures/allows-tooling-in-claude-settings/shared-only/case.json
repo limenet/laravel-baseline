@@ -1,0 +1,8 @@
+{
+    "check": "allowsToolingInClaudeSettings",
+    "description": "passes in a JS project declaring only the shared entries",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

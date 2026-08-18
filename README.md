@@ -8,6 +8,19 @@
 
 Checks your Laravel installation against a highly opinionated baseline.
 
+This repository ships **two runners** from one policy:
+
+| | Composer | npm |
+| --- | --- | --- |
+| Package | `limenet/laravel-baseline` | `@limenet-ch/baseline` |
+| For | Laravel projects (DDEV, composer) | JS/TS-only projects (no PHP, no DDEV) |
+| Command | `php artisan limenet:laravel-baseline:check` | `npx baseline check` |
+| Checks | all of them | [the portable subset](#js-only-projects) |
+
+Both read `policy/`, so the version floors and required keys are defined once, and both are
+executed against the shared behavioural fixtures in `fixtures/`. They are released in lockstep:
+the same version number means the same policy in both ecosystems.
+
 
 ## Installation
 
@@ -56,6 +69,67 @@ The package also ships [Laravel Boost](https://laravel.com/docs/boost) resources
 conventions) and on-demand skills (e.g. `creating-a-release`). When a project that has
 `laravel/boost` installed runs `php artisan boost:install` or `php artisan boost:update --discover`,
 Boost discovers and publishes these to the consuming project's coding agents automatically.
+
+## JS-only projects
+
+Projects with no PHP and no DDEV use the npm runner instead. It is a second implementation, not a
+wrapper: PHP cannot reach into a JS project (and by this baseline's own convention `npm` runs on
+the host while artisan runs inside DDEV), so the portable checks are reimplemented in TypeScript and
+kept honest by the shared fixtures rather than by shared code.
+
+```bash
+npm install --save-dev @limenet-ch/baseline
+```
+
+```bash
+npx baseline check              # report issues
+npx baseline check --fix        # apply safe fixes, then report what is left
+npx baseline periodic           # walk through expired periodic checks
+npx baseline install-skills     # copy the packaged skills into .claude/skills/
+```
+
+Wire it into the `ci-lint` npm script so CI and the Claude Stop hook both run it — npm has no
+`post-update-cmd` equivalent, and npm 12 blocks dependency lifecycle scripts by default:
+
+```json
+"scripts": {
+    "ci-lint": "biome ci . && tsc --noEmit && baseline check"
+}
+```
+
+State lives in `.baseline.json` at the project root (a JS project has no `config/` directory):
+
+```json
+{
+    "excludes": ["hasNpmScripts"],
+    "periodic": { "updatesDependencies": "2026-08-16T09:00:00.000Z" }
+}
+```
+
+### What the npm runner checks
+
+| Check | Relationship to the Laravel runner |
+| --- | --- |
+| `nodeVersion` | identical |
+| `hardensNpmSupplyChain` | identical |
+| `hasEditorconfig` | identical |
+| `doesNotHaveCopilotOrJunieAgentFiles` | identical |
+| `allowsToolingInClaudeSettings` | requires only the shared allow entries, not the DDEV/artisan ones |
+| `deniesEnvReadsInClaudeSettings` | identical |
+| `runsCiLintHookInClaudeSettings` | hooks `npm run ci-lint` instead of `ddev composer run ci-lint` |
+| `updatesDependencies` | identical (periodic, every 30 days) |
+| `hasNpmScripts` | identical |
+| `hasCiJobs` | same GitLab CI templates, without the `php` job |
+| `ciSetsNodeVersion` | identical |
+| `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
+| `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
+| `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
+
+Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
+the DDEV checks (`ddevNodeVersionIsAuto`, `ddevMutagenIgnoresNodeModules`, …); and
+`hasClaudeSettingsWithLaravelSkills` / `doesNotHaveLaravelSimplifierInClaudeSettings`, which are
+vacuous without Laravel. `hasTrivyConfig` stays Laravel-only too — its canonical config bakes in
+Laravel paths (`vendor/**`, `storage/logs/`, `.ddev/`).
 
 ## Checks
 
@@ -133,15 +207,17 @@ This package validates your Laravel installation against the following checks:
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline
+- 🔧 **`ciSetsNodeVersion()`** - Validates `.gitlab-ci.yml` sets `variables.NODE_VERSION` to `latest`, so the shared CI template resolves the Node version instead of drifting from the project *(adds the variable, creating the `variables` mapping if needed, preserving comments and existing entries)*
 - **`doesNotUseIgnition()`** - Validates Ignition debugger is NOT installed
 
 ### Local Development
 - **`phpVersionMatchesDdev()`** - Validates PHP version consistency with DDEV
-- 🔧 **`nodeVersionMatchesDdev()`** - Validates the project pins Node >= 24 (the current LTS) in both `package.json` `engines.node` and `.nvmrc` (compatible with each other) and that `.ddev/config.yaml` sets `nodejs_version: auto` so DDEV derives the Node version from the project *(creates the missing constraint — establishing Node 24 when none is declared — bumps a declaration that allows anything older to 24, and sets `nodejs_version: auto`; a newer line such as Node 26 is left alone, and a conflict between existing `engines.node` and `.nvmrc` is reported, not auto-resolved)*
+- 🔧 **`nodeVersion()`** - Validates the project pins Node >= 24 (the current LTS) in both `package.json` `engines.node` and `.nvmrc`, compatible with each other *(creates the missing constraint — establishing Node 24 when none is declared — and bumps a declaration that allows anything older to 24; a newer line such as Node 26 is left alone, and a conflict between existing `engines.node` and `.nvmrc` is reported, not auto-resolved)*
 - 🔧 **`hardensNpmSupplyChain()`** - Hardens npm against supply-chain attacks: requires `package.json` `engines.npm` >= 12 (npm 12 blocks dependency lifecycle scripts by default and refuses git/remote deps), `.npmrc` `engine-strict=true` so that requirement is enforced rather than advisory, and `.npmrc` `min-release-age=7` for a 7-day install cooldown that skips freshly-published (potentially compromised) versions *(sets `engines.npm` to `^12`, and upserts both `.npmrc` keys while preserving existing lines)*
 - 🔧 **`ddevHasPcovPackage()`** - Validates DDEV coverage configuration *(adds pcov to webimage_extra_packages and creates .ddev/php/90-custom.ini)*
 - **`ddevHasRedisAddon()`** - Validates DDEV Redis addon is installed and at minimum version 2.2.0
 - 🔧 **`ddevMutagenIgnoresNodeModules()`** - Validates DDEV Mutagen sync configuration *(creates mutagen.yml and fixes .gitignore)*
+- 🔧 **`ddevNodeVersionIsAuto()`** - Validates `.ddev/config.yaml` sets `nodejs_version: auto` so DDEV derives the Node version from the project's `.nvmrc` instead of pinning its own *(sets `nodejs_version: auto`, preserving surrounding comments and formatting)*
 - **`updatesDdevAddons()`** - Fails if any installed DDEV add-on (`.ddev/addon-metadata/*/manifest.yaml`) has an `install_date` older than 3 months; comment shows the `ddev add-on get <repository>` command to refresh each stale add-on
 
 ### Build & Release

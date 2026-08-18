@@ -5,6 +5,8 @@ on:
     paths:
       - "**.php"
       - "phpstan.neon"
+      - "phpstan-baseline.neon"
+      - "policy/**"
       - ".github/workflows/phpstan.yml"
 
 jobs:

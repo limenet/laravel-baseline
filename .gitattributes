@@ -9,6 +9,7 @@
 /art                export-ignore
 /docs               export-ignore
 /tests              export-ignore
+/fixtures           export-ignore
 /workbench          export-ignore
 /.editorconfig      export-ignore
 /.php_cs.dist.php   export-ignore
@@ -18,3 +19,18 @@
 /UPGRADING.md       export-ignore
 /phpstan.neon       export-ignore
 /phpstan-baseline.neon  export-ignore
+
+# The npm runner. `policy/` is deliberately absent from this list — the PHP
+# checks read policy/policy.json from vendor/ at runtime, so export-ignoring it
+# breaks every consumer on install. See the guards in js-tests.yml and
+# tests/Conformance/FixtureConformanceTest.php.
+/js                 export-ignore
+/node_modules       export-ignore
+/package.json       export-ignore
+/package-lock.json  export-ignore
+/biome.json         export-ignore
+/tsconfig.json      export-ignore
+/tsconfig.build.json    export-ignore
+/vitest.config.ts   export-ignore
+/.release-it.json   export-ignore
+/CLAUDE.md          export-ignore

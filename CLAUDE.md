@@ -4,6 +4,18 @@
 
 ## Architecture Overview
 
+This repository ships **two runners** from one policy:
+
+- `limenet/laravel-baseline` (Composer, `src/`) — every check, for Laravel projects.
+- `@limenet-ch/baseline` (npm, `js/`) — the portable subset, for JS/TS projects with no PHP and no
+  DDEV.
+
+They do **not** share code, and deliberately so: PHP cannot reach into a JS project, and this
+baseline's own guideline (`resources/boost/guidelines/core.blade.php`) puts `npm` on the host while
+artisan runs inside DDEV, so shelling out across that boundary is not an option. What is shared is
+the *policy* (`policy/`) and the *behavioural contract* (`fixtures/`), both read by both runners.
+Drift is caught by the fixtures, not prevented by a common implementation.
+
 The codebase uses a **one class per check** architecture:
 
 ```
@@ -21,14 +33,35 @@ src/
 ├── Commands/
 │   ├── LaravelBaselineCommand.php   # CI-safe check runner
 │   └── PeriodicCheckCommand.php     # Interactive periodic check runner
+├── Policy/
+│   └── Policy.php                  # Typed reader for policy/policy.json
 └── State/
-    └── StateManager.php             # Reads/writes config/baseline.php for periodic state
+    └── PeriodicStateManager.php    # Reads/writes config/baseline.php for periodic state
 
 resources/
 └── boost/                          # Laravel Boost resources shipped to consumers
     ├── guidelines/core.blade.php   # Always-on AI guideline (dev loop, conventions)
     └── skills/<name>/SKILL.md      # On-demand AI skills (e.g. creating-a-release)
+
+policy/                             # SHARED — read at runtime by both runners
+├── policy.json                     # Floors, required keys, allow/deny lists
+├── policy.schema.json
+└── templates/editorconfig          # Canonical file bodies, verbatim
+
+fixtures/                           # SHARED — executed by both test suites
+└── <check-name>/<case>/
+    ├── case.json                   # engines, expected verdict, expected fix outcome
+    └── project/                    # materialised into a temp project root
+
+js/                                 # The npm runner (@limenet-ch/baseline)
+├── src/checks/                     # One class per check, mirroring src/Checks/Checks/
+├── src/commands/                   # check, periodic, install-skills
+├── skills/<name>/SKILL.md          # JS variants, copied by `baseline install-skills`
+└── tests/                          # vitest, incl. the shared-fixture runner
 ```
+
+`js/src` and `js/dist` sit at the same depth on purpose, so `../../policy` resolves identically in
+source and in build output. Do not flatten that.
 
 ## Check Size Guidelines
 
@@ -46,6 +79,11 @@ A check with 3+ distinct conditions is a signal to review: ask whether any of th
 When multiple checks share structural logic (e.g., all parse the same file and run the same kind of visitor), extract a shared abstract base class rather than duplicating the parsing logic.
 
 ## When Adding a New Check
+
+> **Start with the `adding-a-check` skill** (`.claude/skills/adding-a-check/SKILL.md`). It settles
+> the two things that cannot be inferred from the request — which runner(s) the check targets, and
+> whether it auto-fixes — before any code is written. Both decisions change the shape of what you
+> write, so guessing means rewriting.
 
 ### 1. Create a New Check Class
 
@@ -153,6 +191,21 @@ it('myNew provides helpful comment when script is missing', function (): void {
 
 Add check documentation to [README.md](README.md) under the appropriate category. The entry must use the exact `name()` of the check (e.g., `**\`usesPest()\`**`). The test in `tests/ReadmeChecksTest.php` enforces that every registered check is documented and will fail if the README is missing any. Forgetting this step will break the test suite.
 
+### 4b. Decide whether the check belongs in the npm runner too
+
+Ask whether the check means anything in a project with no PHP, no composer and no DDEV.
+
+- **No** (composer, artisan, Rector, PHPStan, Spatie Health, DDEV) — stop here. Nothing to do.
+- **Yes, identically** — add the TS class under `js/src/checks/`, register it in
+  `js/src/checks/registry.ts`, and add a fixture with `"engines": ["php", "js"]`.
+- **Yes, but with different data** — put the differing values in `policy/policy.json` under a
+  `php` / `js` split (see `ci.requiredJobs`, `ciLint.required`, `claude.allow`), have *both* checks
+  read their half, and write one fixture per engine.
+
+**Any constant a check compares against belongs in `policy/`, not in the class.** That is the only
+thing keeping the two runners from disagreeing about what the standard actually is. Logic stays in
+the classes; values move.
+
 ### 5. Run the Full Test Suite
 
 Always run the full test suite after adding a new check:
@@ -163,7 +216,14 @@ composer test
 
 Adding a new check to the registry can affect other tests (e.g., tests that count total checks or iterate over all registered checks). Do not rely solely on running tests for the new check.
 
-When **renaming** a check class, the `name()` return value changes automatically (it is derived from the class name). Update the README.md entry to match — the `ReadmeChecksTest` will catch any mismatch.
+When **renaming** a check class, the `name()` return value changes automatically (it is derived from the class name). Update the README.md entry to match — the `ReadmeChecksTest` will catch any mismatch. Also rename the fixture directory (it must be the kebab-case of the check name, which the conformance test asserts) and, if the check exists on both sides, the `checkName` in the TS class.
+
+If you touched `policy/`, `fixtures/` or anything under `js/`, run the npm side too — a policy
+change can break the *other* runner without touching a single PHP file:
+
+```bash
+npm run ci-lint && npm run build && npm test
+```
 
 ## Available Helper Methods in AbstractCheck
 
@@ -239,7 +299,9 @@ class RunsMyTaskCheck extends AbstractPeriodicCheck
 
 ### How periodic state is stored
 
-Timestamps are persisted in `config/baseline.php` under a `periodic` key by `StateManager`. The file is rewritten using `var_export` each time a check is confirmed. `StateManager` reads directly via `require` (bypassing Laravel's config cache) so state is always fresh.
+Timestamps are persisted in `config/baseline.php` under a `periodic` key by `PeriodicStateManager`. The file is rewritten via `PhpFileWriter::writeConfig` (nikic/php-parser) each time a check is confirmed. `PeriodicStateManager` reads directly via `require` (bypassing Laravel's config cache) so state is always fresh.
+
+The npm runner keeps the same two keys in `.baseline.json` at the project root, since a JS project has no `config/` directory to write a PHP file into.
 
 ### Running periodic checks
 
@@ -274,6 +336,10 @@ Common types:
 - Breaking change → append `!` after the type (e.g. `feat!:`) or add a `BREAKING CHANGE:` footer →
   triggers a **major** bump.
 
+**Scope the commit** so the changelog stays legible to two audiences: `feat(php|js|policy): …`.
+A single version covers both artifacts, so a PHP-only `feat:` also bumps the npm package — the
+scope is what tells a reader whether their side actually changed. `policy` legitimately means both.
+
 Guidelines:
 
 - Write the description in the imperative mood ("add check", not "added check").
@@ -304,3 +370,13 @@ This single command, driven by `.release-it.json`:
 
 A valid `GITHUB_TOKEN` (with `repo` scope) must be in the environment, otherwise release-it can't
 create the GitHub release via the API and falls back to opening a browser.
+
+`@release-it/bumper` writes the version into **both** `composer.json` and `package.json`, keeping the
+two artifacts in lockstep — the same version means the same `policy/`, which is the only
+compatibility guarantee available given they share a file rather than a dependency edge.
+
+**release-it does not publish to npm** (`"npm": false`) and that is deliberate: it pushes the tag
+*before* publishing, and npm versions are immutable, so a failed publish would strand a tag that
+Packagist has already served and npm can never receive. `.github/workflows/npm-publish.yml` runs on
+the published GitHub release instead, re-verifies that the tag and both manifests agree, and is
+re-runnable via `workflow_dispatch` without retagging.

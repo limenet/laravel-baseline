@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Policy\Policy;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Yaml\Yaml;
@@ -32,6 +33,14 @@ abstract class AbstractCheck implements CheckInterface
             ->beforeLast('Check')
             ->lcfirst()
             ->toString();
+    }
+
+    /**
+     * The policy values shared with the npm runner (see policy/policy.json).
+     */
+    protected function policy(): Policy
+    {
+        return app(Policy::class);
     }
 
     protected function getComposer(): Composer
@@ -401,6 +410,91 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         file_put_contents($file, $content);
+    }
+
+    /**
+     * Sets a scalar key inside a top-level YAML mapping (e.g. `variables.FOO`)
+     * via a targeted text edit, replacing only the matching line, inserting one
+     * into the existing block, or creating the whole mapping. Like
+     * setYamlScalarKey() this avoids a parse/dump round trip, which would
+     * discard every comment in the file.
+     */
+    protected function setYamlMappingScalar(string $file, string $mapping, string $key, string $value): void
+    {
+        $content = file_get_contents($file) ?: '';
+        $lines = explode("\n", $content);
+        $mappingIndex = null;
+
+        foreach ($lines as $index => $line) {
+            if (preg_match('/^'.preg_quote($mapping, '/').':\s*$/', $line) === 1) {
+                $mappingIndex = $index;
+                break;
+            }
+        }
+
+        if ($mappingIndex === null) {
+            file_put_contents(
+                $file,
+                $this->insertYamlLineBeforeTrailingComments($content, $mapping.":\n  ".$key.': '.$value),
+            );
+
+            return;
+        }
+
+        // The first child line fixes the block's indentation; anything deeper
+        // belongs to a nested mapping (GitLab's extended `variables:` syntax
+        // spells an entry as `NAME:` + `value:`/`description:` beneath it), so it
+        // extends the block but is never the key being set. Following it instead
+        // would splice the new key inside the previous entry.
+        $blockIndent = null;
+        $insertAt = $mappingIndex + 1;
+
+        for ($i = $mappingIndex + 1, $count = count($lines); $i < $count; $i++) {
+            // Blank lines sit inside the block; a dedented line ends it.
+            if (trim($lines[$i]) === '') {
+                continue;
+            }
+
+            if (preg_match('/^[ \t]+/', $lines[$i], $indentMatch) !== 1) {
+                break;
+            }
+
+            $blockIndent ??= $indentMatch[0];
+
+            if (strlen($indentMatch[0]) < strlen($blockIndent)) {
+                break;
+            }
+
+            $insertAt = $i + 1;
+
+            if (strlen($indentMatch[0]) > strlen($blockIndent)) {
+                continue;
+            }
+
+            if (preg_match('/^[ \t]+'.preg_quote($key, '/').':/', $lines[$i]) !== 1) {
+                continue;
+            }
+
+            // An existing entry in the extended form spans several lines;
+            // replacing only the first would strand `value:`/`description:` under
+            // a scalar, so the whole nested block is replaced with it.
+            $span = 1;
+
+            while ($i + $span < $count
+                && trim($lines[$i + $span]) !== ''
+                && preg_match('/^[ \t]+/', $lines[$i + $span], $nestedMatch) === 1
+                && strlen($nestedMatch[0]) > strlen($blockIndent)) {
+                $span++;
+            }
+
+            array_splice($lines, $i, $span, [$blockIndent.$key.': '.$value]);
+            file_put_contents($file, implode("\n", $lines));
+
+            return;
+        }
+
+        array_splice($lines, $insertAt, 0, [($blockIndent ?? '  ').$key.': '.$value]);
+        file_put_contents($file, implode("\n", $lines));
     }
 
     /**

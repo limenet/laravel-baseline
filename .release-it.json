@@ -10,16 +10,26 @@
         "release": true,
         "releaseName": "v${version}"
     },
+    "hooks": {
+        "before:init": ["composer test", "npm run ci-lint", "npm run build", "npm test"],
+        "after:bump": ["npm install --package-lock-only --ignore-scripts"]
+    },
     "plugins": {
         "@release-it/bumper": {
             "in": {
                 "file": "composer.json",
                 "path": "version"
             },
-            "out": {
-                "file": "composer.json",
-                "path": "version"
-            }
+            "out": [
+                {
+                    "file": "composer.json",
+                    "path": "version"
+                },
+                {
+                    "file": "package.json",
+                    "path": "version"
+                }
+            ]
         },
         "@release-it/conventional-changelog": {
             "infile": "CHANGELOG.md",

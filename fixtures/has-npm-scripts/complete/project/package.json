@@ -1,0 +1,7 @@
+{
+    "name": "test-project",
+    "scripts": {
+        "ci-lint": "true",
+        "production": "true"
+    }
+}

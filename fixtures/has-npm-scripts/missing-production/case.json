@@ -1,0 +1,9 @@
+{
+    "check": "hasNpmScripts",
+    "description": "fails when a required npm script is missing",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail"
+}

@@ -1,0 +1,6 @@
+{
+    "check": "nodeVersion",
+    "description": "passes when the project pins a newer major than the floor",
+    "engines": ["php", "js"],
+    "expect": "pass"
+}

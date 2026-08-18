@@ -1,0 +1,10 @@
+{
+    "check": "doesNotHaveCopilotOrJunieAgentFiles",
+    "description": "fails when the forbidden agent paths exist, and deletes all of them on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "absent": ["AGENTS.md", ".junie", ".github/skills"]
+    }
+}

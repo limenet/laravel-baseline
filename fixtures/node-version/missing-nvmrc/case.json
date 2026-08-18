@@ -1,0 +1,10 @@
+{
+    "check": "nodeVersion",
+    "description": "fails when .nvmrc is absent, and derives it from engines.node on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": { ".nvmrc": "26\n" }
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "check": "hardensNpmSupplyChain",
+    "description": "fails when engines.npm allows a version below the floor, and bumps it on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "json": { "package.json": { "engines.npm": "^12" } }
+    }
+}

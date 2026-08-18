@@ -1,0 +1,101 @@
+{
+    "$schema": "./policy.schema.json",
+    "node": {
+        "minMajor": "24"
+    },
+    "npm": {
+        "minMajor": "12",
+        "constraint": "^12",
+        "minReleaseAgeDays": 7,
+        "engineStrict": true
+    },
+    "editorconfig": {
+        "template": "editorconfig",
+        "requiredProperties": [
+            "root = true",
+            "charset = utf-8",
+            "end_of_line = lf",
+            "indent_style = space",
+            "insert_final_newline = true",
+            "trim_trailing_whitespace = true"
+        ]
+    },
+    "agentFiles": {
+        "forbidden": {
+            "AGENTS.md": "it is generated for the Copilot/Junie Boost agents, which are no longer required",
+            ".junie": "it is the Junie Boost agent's directory, which is no longer required",
+            ".github/skills": "it is the Copilot Boost agent's skills directory, which is no longer required"
+        }
+    },
+    "claude": {
+        "allow": {
+            "shared": [
+                "Bash(npm info:*)",
+                "Bash(npm view:*)",
+                "Bash(npm ls:*)",
+                "Bash(npm outdated:*)",
+                "Skill(code-review)",
+                "Skill(code-review:*)"
+            ],
+            "php": [
+                "Bash(ddev composer run ci-lint:*)",
+                "Bash(ddev composer test:*)",
+                "Bash(ddev artisan test:*)",
+                "Bash(ddev artisan make:*)",
+                "Bash(ddev artisan route:list:*)",
+                "Bash(ddev artisan about:*)",
+                "Bash(ddev artisan config:show:*)",
+                "Bash(ddev artisan ide-helper:*)",
+                "Bash(ddev artisan optimize:clear:*)",
+                "Bash(ddev artisan cache:clear:*)",
+                "Bash(ddev artisan config:clear:*)",
+                "Bash(ddev artisan route:clear:*)",
+                "Bash(ddev artisan view:clear:*)",
+                "Bash(ddev composer show:*)",
+                "Bash(ddev composer outdated:*)",
+                "Bash(ddev composer why:*)"
+            ]
+        },
+        "deny": {
+            "shared": ["Read(./.env)"]
+        },
+        "ciLintHookCommand": {
+            "php": "ddev composer run ci-lint",
+            "js": "npm run ci-lint"
+        }
+    },
+    "ci": {
+        "nodeVersionVariable": {
+            "name": "NODE_VERSION",
+            "value": "latest"
+        },
+        "requiredJobs": {
+            "php": {
+                "build": ".build",
+                "php": ".lint_php",
+                "js": ".lint_js",
+                "test": ".test"
+            },
+            "js": {
+                "build": ".build",
+                "js": ".lint_js",
+                "test": ".test"
+            }
+        }
+    },
+    "ciLint": {
+        "required": {
+            "php": ["pint --parallel", "phpstan"],
+            "js": ["biome", "tsc"]
+        },
+        "baselineCommand": {
+            "js": "baseline check"
+        }
+    },
+    "npmScripts": {
+        "required": ["ci-lint", "production"]
+    },
+    "periodic": {
+        "defaultIntervalDays": 30
+    }
+}

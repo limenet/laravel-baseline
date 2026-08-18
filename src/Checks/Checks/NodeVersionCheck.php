@@ -7,14 +7,8 @@ use Composer\Semver\VersionParser;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
-class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
+class NodeVersionCheck extends AbstractFixableCheck
 {
-    /**
-     * Minimum Node major: 24 is the current LTS. Anything older is bumped to it;
-     * newer lines are left alone. Also the version established when none is declared.
-     */
-    private const MIN_NODE_VERSION = '24';
-
     public function fix(bool $dry = false): CheckResult
     {
         $packageJson = $this->getPackageJson();
@@ -42,7 +36,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
 
         // A below-floor declaration is bumped to the floor; otherwise keep the project's own line.
         $major = ($enginesTooLow || $nvmrcTooLow)
-            ? self::MIN_NODE_VERSION
+            ? $this->minNodeVersion()
             : $this->resolveNodeMajor($engines, $nvmrc);
 
         if ($engines === null) {
@@ -58,9 +52,9 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             $this->addComment(sprintf(
                 'engines.node (%s) allows Node < %s; require Node >= %s (e.g. "^%s")',
                 $engines,
-                self::MIN_NODE_VERSION,
-                self::MIN_NODE_VERSION,
-                self::MIN_NODE_VERSION,
+                $this->minNodeVersion(),
+                $this->minNodeVersion(),
+                $this->minNodeVersion(),
             ));
 
             if ($dry) {
@@ -78,25 +72,9 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             $this->addComment(sprintf(
                 '.nvmrc (%s) pins Node < %s: set it to "%s"',
                 $nvmrc,
-                self::MIN_NODE_VERSION,
-                self::MIN_NODE_VERSION,
+                $this->minNodeVersion(),
+                $this->minNodeVersion(),
             ));
-
-            if ($dry) {
-                return CheckResult::FAIL;
-            }
-        }
-
-        $ddevConfig = $this->getDdevConfig();
-
-        if ($ddevConfig === null) {
-            return CheckResult::FAIL;
-        }
-
-        $nodejsVersion = $ddevConfig['nodejs_version'] ?? null;
-
-        if ($nodejsVersion !== 'auto') {
-            $this->addComment('DDEV nodejs_version should be "auto" to derive the Node version from the project: set "nodejs_version: auto" in .ddev/config.yaml');
 
             if ($dry) {
                 return CheckResult::FAIL;
@@ -117,15 +95,16 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             file_put_contents(base_path('.nvmrc'), $major."\n");
         }
 
-        if ($nodejsVersion !== 'auto') {
-            $ddevConfigFile = base_path('.ddev/config.yaml');
-
-            if (file_exists($ddevConfigFile)) {
-                $this->setYamlScalarKey($ddevConfigFile, 'nodejs_version', 'auto');
-            }
-        }
-
         return $this->fix(dry: true);
+    }
+
+    /**
+     * Minimum Node major. Declarations below it are bumped to it, newer lines are
+     * left alone, and it is the version established when none is declared.
+     */
+    private function minNodeVersion(): string
+    {
+        return $this->policy()->string('node.minMajor');
     }
 
     /**
@@ -139,7 +118,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
         try {
             return !Intervals::haveIntersections(
                 $parser->parseConstraints($constraint),
-                $parser->parseConstraints('<'.self::MIN_NODE_VERSION),
+                $parser->parseConstraints('<'.$this->minNodeVersion()),
             );
         } catch (\UnexpectedValueException) {
             return false;
@@ -177,7 +156,7 @@ class NodeVersionMatchesDdevCheck extends AbstractFixableCheck
             }
         }
 
-        return self::MIN_NODE_VERSION;
+        return $this->minNodeVersion();
     }
 
     private function nodeMajor(string $raw): ?string

@@ -1,0 +1,12 @@
+variables:
+  NODE_VERSION: latest
+
+build:
+  extends:
+    - .build
+js:
+  extends:
+    - .lint_js
+test:
+  extends:
+    - .test

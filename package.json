@@ -1,13 +1,67 @@
 {
-    "name": "laravel-baseline",
-    "private": true,
+    "name": "@limenet-ch/baseline",
+    "version": "2.7.0",
+    "description": "A highly opinionated baseline for JS/TS projects.",
+    "keywords": [
+        "baseline",
+        "conformance",
+        "lint",
+        "standards"
+    ],
+    "homepage": "https://github.com/limenet/laravel-baseline",
+    "bugs": "https://github.com/limenet/laravel-baseline/issues",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/limenet/laravel-baseline.git"
+    },
+    "license": "MIT",
+    "author": "Linus Metzler <hi@linusmetzler.me>",
+    "type": "module",
+    "engines": {
+        "node": ">=24"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "bin": {
+        "baseline": "js/dist/bin.js"
+    },
+    "exports": {
+        ".": {
+            "types": "./js/dist/index.d.ts",
+            "default": "./js/dist/index.js"
+        },
+        "./policy.json": "./policy/policy.json",
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "js/dist",
+        "js/skills",
+        "policy"
+    ],
     "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "lint": "biome check js policy",
+        "format": "biome check --write js policy",
+        "test": "vitest run",
+        "ci-lint": "biome ci js policy && tsc -p tsconfig.json --noEmit",
+        "prepack": "npm run build",
         "release": "GITHUB_TOKEN=$(gh auth token) release-it"
     },
+    "dependencies": {
+        "semver": "^7.7.4",
+        "yaml": "^2.9.0"
+    },
     "devDependencies": {
+        "@biomejs/biome": "^2.4.1",
         "@release-it/bumper": "^8.0.0",
         "@release-it/conventional-changelog": "^12.0.0",
+        "@types/node": "^24.10.1",
+        "@types/semver": "^7.7.4",
         "conventional-changelog-conventionalcommits": "^10.2.1",
-        "release-it": "^21.0.1"
+        "release-it": "^21.0.1",
+        "typescript": "^5.9.3",
+        "vitest": "^3.2.4"
     }
 }

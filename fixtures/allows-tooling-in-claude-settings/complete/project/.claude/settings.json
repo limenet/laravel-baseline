@@ -1,0 +1,28 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(ddev composer run ci-lint:*)",
+            "Bash(ddev composer test:*)",
+            "Bash(ddev artisan test:*)",
+            "Bash(ddev artisan make:*)",
+            "Bash(ddev artisan route:list:*)",
+            "Bash(ddev artisan about:*)",
+            "Bash(ddev artisan config:show:*)",
+            "Bash(ddev artisan ide-helper:*)",
+            "Bash(ddev artisan optimize:clear:*)",
+            "Bash(ddev artisan cache:clear:*)",
+            "Bash(ddev artisan config:clear:*)",
+            "Bash(ddev artisan route:clear:*)",
+            "Bash(ddev artisan view:clear:*)",
+            "Bash(ddev composer show:*)",
+            "Bash(ddev composer outdated:*)",
+            "Bash(ddev composer why:*)",
+            "Bash(npm info:*)",
+            "Bash(npm view:*)",
+            "Bash(npm ls:*)",
+            "Bash(npm outdated:*)",
+            "Skill(code-review)",
+            "Skill(code-review:*)"
+        ]
+    }
+}

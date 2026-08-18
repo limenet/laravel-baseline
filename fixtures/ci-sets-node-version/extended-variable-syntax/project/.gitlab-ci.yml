@@ -1,0 +1,8 @@
+variables:
+  DEPLOY_TARGET:
+    value: "staging"
+    description: "Where the pipeline deploys to"
+
+js:
+  extends:
+    - .lint_js

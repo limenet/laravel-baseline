@@ -14,11 +14,6 @@ class HasCiJobsCheck extends AbstractCiJobCheck
 
     protected function requiredCiJobs(): array
     {
-        return [
-            'build' => '.build',
-            'php' => '.lint_php',
-            'js' => '.lint_js',
-            'test' => '.test',
-        ];
+        return $this->policy()->stringMap('ci.requiredJobs.php');
     }
 }

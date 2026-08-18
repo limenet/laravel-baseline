@@ -1,0 +1,8 @@
+{
+    "check": "runsCiLintHookInClaudeSettings",
+    "description": "passes when the Stop hook runs the php ci-lint command",
+    "engines": [
+        "php"
+    ],
+    "expect": "pass"
+}
