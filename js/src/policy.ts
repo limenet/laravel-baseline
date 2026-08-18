@@ -83,7 +83,11 @@ export class Policy {
             throw PolicyError.wrongType(key, 'list of strings')
         }
 
-        return value as string[]
+        // A copy, as Policy::strings() returns one: the policy is cached for the
+        // whole process, so handing out the live array would let a caller that
+        // appends to the result (DeniesEnvReadsInClaudeSettingsCheck does)
+        // permanently extend the policy for every later check.
+        return [...(value as string[])]
     }
 
     stringMap(key: string): Record<string, string> {
@@ -99,7 +103,7 @@ export class Policy {
             }
         }
 
-        return value as Record<string, string>
+        return { ...(value as Record<string, string>) }
     }
 
     /**

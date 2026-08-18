@@ -41,10 +41,15 @@ export class Project {
             return null
         }
 
+        // Throws rather than yielding null, as the PHP runner's JSON_THROW_ON_ERROR
+        // does: null is how callers spell "the file isn't there", so swallowing a
+        // syntax error would let --fix overwrite a file it never managed to read.
         try {
             return JSON.parse(contents) as T
-        } catch {
-            return null
+        } catch (error) {
+            throw new Error(
+                `${relative} is not valid JSON: ${error instanceof Error ? error.message : error}`,
+            )
         }
     }
 
