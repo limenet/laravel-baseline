@@ -80,6 +80,56 @@ it('ciSetsNodeVersion fix replaces a pinned major in place', function (): void {
     expect($ci['variables']['NPM_CONFIG_CACHE'])->toBe('.npm');
 });
 
+it('ciSetsNodeVersion fix adds the variable beside an entry in the extended syntax', function (): void {
+    $ci = <<<'YML'
+variables:
+  DEPLOY_TARGET:
+    value: "staging"
+    description: "Where the pipeline deploys to"
+
+js:
+  extends:
+    - .lint_js
+YML;
+
+    $this->withTempBasePath(['.gitlab-ci.yml' => $ci]);
+
+    expect(makeCheck(CiSetsNodeVersionCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    // The new key must land as a sibling of DEPLOY_TARGET, not inside its
+    // value:/description: mapping.
+    $parsed = Yaml::parseFile(base_path('.gitlab-ci.yml'));
+    expect($parsed['variables']['NODE_VERSION'])->toBe('latest');
+    expect($parsed['variables']['DEPLOY_TARGET'])->toBe([
+        'value' => 'staging',
+        'description' => 'Where the pipeline deploys to',
+    ]);
+    expect($parsed['js']['extends'])->toBe(['.lint_js']);
+});
+
+it('ciSetsNodeVersion fix replaces an extended-syntax entry wholesale', function (): void {
+    $ci = <<<'YML'
+variables:
+  NODE_VERSION:
+    value: "24"
+    description: "The Node major the pipeline runs"
+  NPM_CONFIG_CACHE: .npm
+YML;
+
+    $this->withTempBasePath(['.gitlab-ci.yml' => $ci]);
+
+    expect(makeCheck(CiSetsNodeVersionCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    // value:/description: describe the value being replaced, so they go with it —
+    // leaving them behind would strand them under a scalar.
+    $raw = file_get_contents(base_path('.gitlab-ci.yml'));
+    expect($raw)->not->toContain('description:');
+
+    $parsed = Yaml::parseFile(base_path('.gitlab-ci.yml'));
+    expect($parsed['variables']['NODE_VERSION'])->toBe('latest');
+    expect($parsed['variables']['NPM_CONFIG_CACHE'])->toBe('.npm');
+});
+
 it('ciSetsNodeVersion fix preserves comments and unrelated jobs', function (): void {
     $ci = <<<'YML'
 # Pipeline for the app

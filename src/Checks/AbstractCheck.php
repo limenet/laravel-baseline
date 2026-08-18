@@ -441,7 +441,12 @@ abstract class AbstractCheck implements CheckInterface
             return;
         }
 
-        $indent = '  ';
+        // The first child line fixes the block's indentation; anything deeper
+        // belongs to a nested mapping (GitLab's extended `variables:` syntax
+        // spells an entry as `NAME:` + `value:`/`description:` beneath it), so it
+        // extends the block but is never the key being set. Following it instead
+        // would splice the new key inside the previous entry.
+        $blockIndent = null;
         $insertAt = $mappingIndex + 1;
 
         for ($i = $mappingIndex + 1, $count = count($lines); $i < $count; $i++) {
@@ -454,18 +459,41 @@ abstract class AbstractCheck implements CheckInterface
                 break;
             }
 
-            $indent = $indentMatch[0];
+            $blockIndent ??= $indentMatch[0];
+
+            if (strlen($indentMatch[0]) < strlen($blockIndent)) {
+                break;
+            }
+
             $insertAt = $i + 1;
 
-            if (preg_match('/^[ \t]+'.preg_quote($key, '/').':/', $lines[$i]) === 1) {
-                $lines[$i] = $indent.$key.': '.$value;
-                file_put_contents($file, implode("\n", $lines));
-
-                return;
+            if (strlen($indentMatch[0]) > strlen($blockIndent)) {
+                continue;
             }
+
+            if (preg_match('/^[ \t]+'.preg_quote($key, '/').':/', $lines[$i]) !== 1) {
+                continue;
+            }
+
+            // An existing entry in the extended form spans several lines;
+            // replacing only the first would strand `value:`/`description:` under
+            // a scalar, so the whole nested block is replaced with it.
+            $span = 1;
+
+            while ($i + $span < $count
+                && trim($lines[$i + $span]) !== ''
+                && preg_match('/^[ \t]+/', $lines[$i + $span], $nestedMatch) === 1
+                && strlen($nestedMatch[0]) > strlen($blockIndent)) {
+                $span++;
+            }
+
+            array_splice($lines, $i, $span, [$blockIndent.$key.': '.$value]);
+            file_put_contents($file, implode("\n", $lines));
+
+            return;
         }
 
-        array_splice($lines, $insertAt, 0, [$indent.$key.': '.$value]);
+        array_splice($lines, $insertAt, 0, [($blockIndent ?? '  ').$key.': '.$value]);
         file_put_contents($file, implode("\n", $lines));
     }
 
