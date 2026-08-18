@@ -56,4 +56,12 @@ async function main(): Promise<number> {
     }
 }
 
-process.exitCode = await main()
+try {
+    process.exitCode = await main()
+} catch (error) {
+    // Unreadable policy, malformed JSON in the project: actionable on its own, so
+    // it is reported as a message rather than as a stack trace.
+    console.error(`Error: ${error instanceof Error ? error.message : String(error)}`)
+
+    process.exitCode = 1
+}

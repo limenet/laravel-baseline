@@ -83,7 +83,11 @@ export class Policy {
             throw PolicyError.wrongType(key, 'list of strings')
         }
 
-        return value as string[]
+        // A copy, as Policy::strings() returns one: the policy is cached for the
+        // whole process, so handing out the live array would let a caller that
+        // appends to the result (DeniesEnvReadsInClaudeSettingsCheck does)
+        // permanently extend the policy for every later check.
+        return [...(value as string[])]
     }
 
     stringMap(key: string): Record<string, string> {
@@ -99,7 +103,7 @@ export class Policy {
             }
         }
 
-        return value as Record<string, string>
+        return { ...(value as Record<string, string>) }
     }
 
     /**
@@ -124,11 +128,16 @@ export class Policy {
                 continue
             }
 
-            if (!Array.isArray(item) || item.length === 0 || item.some((entry) => typeof entry !== 'string')) {
+            if (
+                !Array.isArray(item) ||
+                item.length === 0 ||
+                item.some((entry) => typeof entry !== 'string')
+            ) {
                 throw PolicyError.wrongType(key, expected)
             }
 
-            map[mapKey] = item as string[]
+            // Copied for the same reason strings() copies — see above.
+            map[mapKey] = [...(item as string[])]
         }
 
         return map

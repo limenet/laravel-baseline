@@ -7,6 +7,14 @@
     ],
     "expect": "fail",
     "fix": {
-        "expect": "pass"
+        "expect": "pass",
+        "json": {
+            ".claude/settings.json": {
+                "permissions.deny": [
+                    "Read(./.env)",
+                    "Read(./.env.staging)"
+                ]
+            }
+        }
     }
 }

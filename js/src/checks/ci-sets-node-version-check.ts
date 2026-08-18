@@ -24,12 +24,14 @@ export class CiSetsNodeVersionCheck extends FixableCheck {
         const name = policy().string('ci.nodeVersionVariable.name')
         const value = policy().string('ci.nodeVersionVariable.value')
 
-        let document: ReturnType<typeof parseDocument>
+        // parseDocument() collects syntax errors on the document instead of
+        // throwing, and such a document cannot be stringified — so this has to be
+        // checked up front, or the write below crashes the CLI on a malformed
+        // pipeline rather than reporting it.
+        const document = parseDocument(contents)
 
-        try {
-            document = parseDocument(contents)
-        } catch {
-            this.comment(`${CI_FILE} could not be parsed`)
+        if (document.errors.length > 0) {
+            this.comment(`${CI_FILE} could not be parsed: ${document.errors[0]?.message ?? 'invalid YAML'}`)
 
             return 'fail'
         }

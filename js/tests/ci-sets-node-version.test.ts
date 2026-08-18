@@ -60,6 +60,37 @@ it('replaces a pinned major rather than appending a second entry', () => {
     expect(parse(raw).variables.NODE_VERSION).toBe('latest')
 })
 
+it('adds the variable beside an entry written in the extended syntax', () => {
+    const project = scratch(`variables:
+  DEPLOY_TARGET:
+    value: "staging"
+    description: "Where the pipeline deploys to"
+
+js:
+  extends:
+    - .lint_js
+`)
+
+    expect(check(project).fix()).toBe('pass')
+
+    const parsed = parse(project.read('.gitlab-ci.yml') ?? '')
+
+    expect(parsed.variables.NODE_VERSION).toBe('latest')
+    expect(parsed.variables.DEPLOY_TARGET).toStrictEqual({
+        value: 'staging',
+        description: 'Where the pipeline deploys to',
+    })
+})
+
+it('reports a malformed pipeline instead of crashing on the write', () => {
+    // parseDocument() collects errors rather than throwing, and the document it
+    // returns cannot be stringified — so the guard has to be an explicit check.
+    const project = scratch('variables:\n  - [unclosed\n')
+
+    expect(check(project).fix()).toBe('fail')
+    expect(project.read('.gitlab-ci.yml')).toBe('variables:\n  - [unclosed\n')
+})
+
 it('fails without repairing when there is no CI configuration at all', () => {
     const project = Project.at(mkdtempSync(join(tmpdir(), 'baseline-ci-')))
 
