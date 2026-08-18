@@ -1,0 +1,12 @@
+{
+    "check": "ciSetsNodeVersion",
+    "description": "adds the variable alongside an entry written in GitLab's extended value/description syntax",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass"
+    }
+}
