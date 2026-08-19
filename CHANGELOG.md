@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.8.0](https://github.com/limenet/laravel-baseline/compare/v2.7.0...v2.8.0) (2026-08-19)
+
+### Features
+
+* add the gitignoresLspFiles check ([94a175f](https://github.com/limenet/laravel-baseline/commit/94a175f2ba9fd2126e0080ddedbf93808f5b730a))
+
 ## [2.7.0](https://github.com/limenet/laravel-baseline/compare/v2.6.0...v2.7.0) (2026-08-16)
 
 ### Features
