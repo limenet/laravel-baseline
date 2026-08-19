@@ -25,6 +25,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSpatiePasskeysWithFortifyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\FollowsModernLaravelIdiomsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\FormRequestFailOnUnknownFieldsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\GitignoresLspFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HardensNpmSupplyChainCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasClaudeSettingsWithLaravelSkillsCheck;
@@ -115,6 +116,7 @@ class CheckRegistry
         DoesNotPinOldMailTemplateCheck::class,
         FollowsModernLaravelIdiomsCheck::class,
         FormRequestFailOnUnknownFieldsCheck::class,
+        GitignoresLspFilesCheck::class,
         HardensNpmSupplyChainCheck::class,
         HasCiJobsCheck::class,
         HasClaudeSettingsWithLaravelSkillsCheck::class,

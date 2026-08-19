@@ -35,7 +35,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
             }
         }
 
-        $gitignoreResult = $this->ensureGitignoreEntry('.trivycache/', $dry);
+        $gitignoreResult = $this->ensureGitignoreEntry('.trivycache/', 'ignore the Trivy cache directory', $dry);
 
         if ($gitignoreResult !== null && $dry) {
             return $gitignoreResult;
@@ -200,43 +200,6 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 
         $this->setByPath($config, $path, array_values(array_merge($currentList, $missing)));
         $changed = true;
-
-        return CheckResult::FAIL;
-    }
-
-    private function ensureGitignoreEntry(string $entry, bool $dry): ?CheckResult
-    {
-        $file = base_path('.gitignore');
-
-        if (!file_exists($file)) {
-            $this->addComment("Missing .gitignore in project root: create it and add '{$entry}'");
-
-            if ($dry) {
-                return CheckResult::FAIL;
-            }
-
-            file_put_contents($file, $entry."\n");
-
-            return CheckResult::FAIL;
-        }
-
-        $contents = (string) file_get_contents($file);
-        $lines = array_map('trim', explode("\n", $contents));
-        $normalizedEntry = trim($entry, '/');
-        $normalizedLines = array_map(static fn (string $line): string => trim($line, '/'), $lines);
-
-        if (in_array($normalizedEntry, $normalizedLines, true)) {
-            return null;
-        }
-
-        $this->addComment("Missing entry in .gitignore: add '{$entry}' to ignore the Trivy cache directory");
-
-        if ($dry) {
-            return CheckResult::FAIL;
-        }
-
-        $prefix = ($contents === '' || str_ends_with($contents, "\n")) ? '' : "\n";
-        file_put_contents($file, $contents.$prefix.$entry."\n");
 
         return CheckResult::FAIL;
     }

@@ -676,6 +676,51 @@ abstract class AbstractCheck implements CheckInterface
         $dom->save($xmlFile);
     }
 
+    // === Gitignore Helpers ===
+
+    /**
+     * Ensure an entry exists in the project .gitignore, creating or appending to the file
+     * unless this is a dry run.
+     *
+     * Returns null when the entry is already present, otherwise the failing result.
+     */
+    protected function ensureGitignoreEntry(string $entry, string $reason, bool $dry): ?CheckResult
+    {
+        $file = base_path('.gitignore');
+
+        if (!file_exists($file)) {
+            $this->addComment("Missing .gitignore in project root: create it and add '{$entry}'");
+
+            if ($dry) {
+                return CheckResult::FAIL;
+            }
+
+            file_put_contents($file, $entry."\n");
+
+            return CheckResult::FAIL;
+        }
+
+        $contents = (string) file_get_contents($file);
+        $lines = array_map('trim', explode("\n", $contents));
+        $normalizedEntry = trim($entry, '/');
+        $normalizedLines = array_map(static fn (string $line): string => trim($line, '/'), $lines);
+
+        if (in_array($normalizedEntry, $normalizedLines, true)) {
+            return null;
+        }
+
+        $this->addComment("Missing entry in .gitignore: add '{$entry}' to {$reason}");
+
+        if ($dry) {
+            return CheckResult::FAIL;
+        }
+
+        $prefix = ($contents === '' || str_ends_with($contents, "\n")) ? '' : "\n";
+        file_put_contents($file, $contents.$prefix.$entry."\n");
+
+        return CheckResult::FAIL;
+    }
+
     // === Schedule Helpers ===
 
     protected function hasScheduleEntry(string $command): bool
