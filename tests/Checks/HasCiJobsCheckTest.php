@@ -25,6 +25,51 @@ YML;
     expect($check->check())->toBe(CheckResult::PASS);
 });
 
+it('hasCiJobs allows the test job to extend .test_db', function (): void {
+    bindFakeComposer([]);
+    $yaml = <<<'YML'
+build:
+  extends: ['.build']
+php:
+  extends: ['.lint_php']
+js:
+  extends: ['.lint_js']
+test:
+  extends: ['.test_db']
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        '.gitlab-ci.yml' => $yaml,
+    ]);
+
+    $check = makeCheck(HasCiJobsCheck::class);
+    expect($check->check())->toBe(CheckResult::PASS);
+});
+
+it('hasCiJobs fails when the test job extends an unknown template', function (): void {
+    bindFakeComposer([]);
+    $yaml = <<<'YML'
+build:
+  extends: ['.build']
+php:
+  extends: ['.lint_php']
+js:
+  extends: ['.lint_js']
+test:
+  extends: ['.test_other']
+YML;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        '.gitlab-ci.yml' => $yaml,
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(HasCiJobsCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($collector->all())->toContain("Missing or misconfigured CI job in .gitlab-ci.yml: Add job 'test' with 'extends: [.test] or [.test_db]'");
+});
+
 it('hasCiJobs allows additional keys like before_script in job definitions', function (): void {
     bindFakeComposer([]);
     $yaml = <<<'YML'

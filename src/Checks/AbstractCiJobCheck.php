@@ -7,7 +7,7 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 abstract class AbstractCiJobCheck extends AbstractCheck
 {
     /**
-     * @return array<string, string> jobName => extends template
+     * @return array<string, string|list<string>> jobName => extends template (or a list of accepted templates)
      */
     abstract protected function requiredCiJobs(): array;
 
@@ -20,8 +20,11 @@ abstract class AbstractCiJobCheck extends AbstractCheck
         }
 
         foreach ($this->requiredCiJobs() as $jobName => $extends) {
-            if (!isset($data[$jobName]['extends']) || $data[$jobName]['extends'] !== [$extends]) {
-                $this->addComment("Missing or misconfigured CI job in .gitlab-ci.yml: Add job '$jobName' with 'extends: [$extends]'");
+            $accepted = is_array($extends) ? $extends : [$extends];
+
+            if (!isset($data[$jobName]['extends']) || !in_array($data[$jobName]['extends'], array_map(fn (string $template): array => [$template], $accepted), true)) {
+                $rendered = implode(' or ', array_map(fn (string $template): string => "[$template]", $accepted));
+                $this->addComment("Missing or misconfigured CI job in .gitlab-ci.yml: Add job '$jobName' with 'extends: $rendered'");
 
                 return CheckResult::FAIL;
             }

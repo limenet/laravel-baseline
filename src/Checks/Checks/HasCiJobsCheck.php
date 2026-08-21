@@ -18,7 +18,7 @@ class HasCiJobsCheck extends AbstractCiJobCheck
             'build' => '.build',
             'php' => '.lint_php',
             'js' => '.lint_js',
-            'test' => '.test',
+            'test' => ['.test', '.test_db'],
         ];
     }
 }

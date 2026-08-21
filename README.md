@@ -129,7 +129,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`doesNotUseGreaterThanOrEqualConstraints()`** - Validates no `>=` version constraints in composer.json (use `^` or `~` instead) *(replaces `>=X.Y` with `^X.Y` in composer.json)*
 
 ### CI/CD & Deployment
-- **`hasCiJobs()`** - Validates GitLab CI pipeline jobs are properly configured
+- **`hasCiJobs()`** - Validates GitLab CI pipeline jobs are properly configured (the `test` job may extend either `.test` or `.test_db`)
 - 🔧 **`hasTrivyConfig()`** - Validates Trivy security scanning CI job, `trivy.yaml` (scanners, skip-files, skip-dirs, ignorefile, cache.dir, telemetry/VEX/dependency-tree flags, and `pkg.include-dev-deps` so development dependencies are reported instead of silently skipped), presence of `.trivyignore.yaml`, and `.trivycache/` in `.gitignore` *(creates/merges trivy.yaml, creates an empty .trivyignore.yaml, appends to .gitignore, and adds CI job)*
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
