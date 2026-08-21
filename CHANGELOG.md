@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.8.1](https://github.com/limenet/laravel-baseline/compare/v2.8.0...v2.8.1) (2026-08-21)
+
+### Bug Fixes
+
+* allow the test CI job to extend .test_db ([4e2a0d3](https://github.com/limenet/laravel-baseline/commit/4e2a0d3d34662ede26361226082c9a6865781dfd))
+
 ## [2.8.0](https://github.com/limenet/laravel-baseline/compare/v2.7.0...v2.8.0) (2026-08-19)
 
 ### Features
