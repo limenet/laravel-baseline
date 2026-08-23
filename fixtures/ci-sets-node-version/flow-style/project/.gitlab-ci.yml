@@ -1,0 +1,5 @@
+variables: {NPM_CONFIG_CACHE: .npm}
+
+js:
+  extends:
+    - .lint_js

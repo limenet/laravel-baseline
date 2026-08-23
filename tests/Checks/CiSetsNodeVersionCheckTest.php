@@ -160,3 +160,66 @@ YML;
     expect($parsed['variables']['NPM_CONFIG_CACHE'])->toBe('.npm');
     expect($parsed['php']['extends'])->toBe(['.lint_php']);
 });
+
+it('ciSetsNodeVersion fix extends a variables mapping whose header carries a comment', function (): void {
+    $ci = <<<'YML'
+variables:  # pipeline wide
+  NPM_CONFIG_CACHE: .npm
+
+js:
+  extends:
+    - .lint_js
+YML;
+
+    $this->withTempBasePath(['.gitlab-ci.yml' => $ci]);
+
+    expect(makeCheck(CiSetsNodeVersionCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    // A comment after the key still opens a block mapping, so the variable
+    // belongs inside it — appending a second `variables:` would be a duplicate
+    // key and make the pipeline unparseable.
+    $raw = file_get_contents(base_path('.gitlab-ci.yml'));
+    expect(substr_count($raw, 'variables:'))->toBe(1);
+    expect($raw)->toContain('# pipeline wide');
+
+    $parsed = Yaml::parseFile(base_path('.gitlab-ci.yml'));
+    expect($parsed['variables']['NODE_VERSION'])->toBe('latest');
+    expect($parsed['variables']['NPM_CONFIG_CACHE'])->toBe('.npm');
+});
+
+it('ciSetsNodeVersion fix extends a flow-style variables mapping', function (): void {
+    $this->withTempBasePath([
+        '.gitlab-ci.yml' => "variables: {NPM_CONFIG_CACHE: .npm}\n\njs:\n  extends:\n    - .lint_js\n",
+    ]);
+
+    expect(makeCheck(CiSetsNodeVersionCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    $raw = file_get_contents(base_path('.gitlab-ci.yml'));
+    expect(substr_count($raw, 'variables:'))->toBe(1);
+
+    $parsed = Yaml::parseFile(base_path('.gitlab-ci.yml'));
+    expect($parsed['variables']['NODE_VERSION'])->toBe('latest');
+    expect($parsed['variables']['NPM_CONFIG_CACHE'])->toBe('.npm');
+});
+
+it('ciSetsNodeVersion fix replaces a pinned major in a flow-style mapping', function (): void {
+    $this->withTempBasePath([
+        '.gitlab-ci.yml' => "variables: {NODE_VERSION: \"24\", NPM_CONFIG_CACHE: .npm}\n",
+    ]);
+
+    expect(makeCheck(CiSetsNodeVersionCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    $parsed = Yaml::parseFile(base_path('.gitlab-ci.yml'));
+    expect($parsed['variables']['NODE_VERSION'])->toBe('latest');
+    expect($parsed['variables']['NPM_CONFIG_CACHE'])->toBe('.npm');
+});
+
+it('ciSetsNodeVersion reports a parse error instead of crashing on malformed YAML', function (): void {
+    $this->withTempBasePath([
+        '.gitlab-ci.yml' => "variables:\n  NODE_VERSION: latest\nvariables:\n  NODE_VERSION: latest\n",
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(CiSetsNodeVersionCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect(implode("\n", $collector->all()))->toContain('.gitlab-ci.yml could not be parsed');
+});

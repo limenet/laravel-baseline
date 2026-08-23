@@ -12,6 +12,7 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Policy\Policy;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractCheck implements CheckInterface
@@ -364,7 +365,16 @@ abstract class AbstractCheck implements CheckInterface
             return null;
         }
 
-        $data = Yaml::parseFile($file);
+        try {
+            $data = Yaml::parseFile($file);
+        } catch (ParseException $e) {
+            // A malformed file is a finding, not a crash: the fixable checks
+            // re-read the file to verify their own write, so an exception here
+            // aborts the entire run instead of reporting the one bad file.
+            $this->addComment("{$path} could not be parsed: {$e->getMessage()}");
+
+            return null;
+        }
 
         if (!is_array($data)) {
             $this->addComment("{$path} is empty or invalid");
@@ -424,12 +434,16 @@ abstract class AbstractCheck implements CheckInterface
         $content = file_get_contents($file) ?: '';
         $lines = explode("\n", $content);
         $mappingIndex = null;
+        $header = '';
 
         foreach ($lines as $index => $line) {
-            if (preg_match('/^'.preg_quote($mapping, '/').':\s*$/', $line) === 1) {
-                $mappingIndex = $index;
-                break;
+            if (preg_match('/^'.preg_quote($mapping, '/').':(?:[ \t]+(.*))?[ \t]*$/', $line, $matches) !== 1) {
+                continue;
             }
+
+            $mappingIndex = $index;
+            $header = trim($matches[1] ?? '');
+            break;
         }
 
         if ($mappingIndex === null) {
@@ -438,6 +452,29 @@ abstract class AbstractCheck implements CheckInterface
                 $this->insertYamlLineBeforeTrailingComments($content, $mapping.":\n  ".$key.': '.$value),
             );
 
+            return;
+        }
+
+        // Whatever follows the key decides where the entry goes. A trailing
+        // comment or an anchor still opens a block mapping underneath; a flow
+        // mapping keeps its entries on this very line; anything else (an alias,
+        // a scalar) is a shape this text edit cannot extend. Only the mapping
+        // found above may be written to — appending a second `<mapping>:` would
+        // give the file a duplicate key and make it unparseable.
+        if (str_starts_with($header, '{')) {
+            $rewritten = $this->setYamlFlowMappingScalar($lines[$mappingIndex], $key, $value);
+
+            if ($rewritten !== null) {
+                $lines[$mappingIndex] = $rewritten;
+                file_put_contents($file, implode("\n", $lines));
+            }
+
+            return;
+        }
+
+        if ($header !== ''
+            && !str_starts_with($header, '#')
+            && preg_match('/^&\S+(?:[ \t]+#.*)?$/', $header) !== 1) {
             return;
         }
 
@@ -852,6 +889,76 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         return CheckResult::PASS;
+    }
+
+    /**
+     * Rewrites a flow mapping written on a single line (`variables: {A: b}`),
+     * replacing the entry for $key or appending one before the closing brace.
+     * Returns null when the mapping does not close on that line, since a text
+     * edit has no way to tell where it ends.
+     */
+    private function setYamlFlowMappingScalar(string $line, string $key, string $value): ?string
+    {
+        $open = strpos($line, '{');
+
+        if ($open === false) {
+            return null;
+        }
+
+        // Scanned rather than matched with strrpos() so that a brace inside a
+        // quoted value, or in a comment trailing the mapping, is not mistaken
+        // for the one that closes it.
+        $close = null;
+        $depth = 0;
+        $quote = null;
+
+        for ($i = $open, $length = strlen($line); $i < $length; $i++) {
+            $char = $line[$i];
+
+            if ($quote !== null) {
+                if ($char === $quote) {
+                    $quote = null;
+                }
+
+                continue;
+            }
+
+            if ($char === '"' || $char === "'") {
+                $quote = $char;
+            } elseif ($char === '{' || $char === '[') {
+                $depth++;
+            } elseif ($char === '}' || $char === ']') {
+                $depth--;
+
+                if ($depth === 0) {
+                    $close = $i;
+                    break;
+                }
+            }
+        }
+
+        if ($close === null) {
+            return null;
+        }
+
+        $inner = substr($line, $open + 1, $close - $open - 1);
+        $entry = $key.': '.$value;
+        // The value runs to the next entry's comma, with quoted spans skipped so
+        // that a comma inside one does not end it early.
+        $pattern = '/(^|,)([ \t]*)'.preg_quote($key, '/').'[ \t]*:(?:"[^"]*"|\'[^\']*\'|[^,])*/';
+
+        if (preg_match($pattern, $inner) === 1) {
+            $inner = preg_replace_callback(
+                $pattern,
+                static fn (array $matches): string => $matches[1].$matches[2].$entry,
+                $inner,
+                1,
+            ) ?? $inner;
+        } else {
+            $inner = trim($inner) === '' ? $entry : rtrim($inner).', '.$entry;
+        }
+
+        return substr($line, 0, $open + 1).$inner.substr($line, $close);
     }
 
     /**
