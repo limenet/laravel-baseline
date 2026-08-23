@@ -10,6 +10,7 @@ import { HardensNpmSupplyChainCheck } from './hardens-npm-supply-chain-check.js'
 import { HasCiJobsCheck } from './has-ci-jobs-check.js'
 import { HasEditorconfigCheck } from './has-editorconfig-check.js'
 import { HasNpmScriptsCheck } from './has-npm-scripts-check.js'
+import { HasTrivyConfigCheck } from './has-trivy-config-check.js'
 import { IsCiLintCompleteCheck } from './is-ci-lint-complete-check.js'
 import { NodeVersionCheck } from './node-version-check.js'
 import { RunsCiLintHookInClaudeSettingsCheck } from './runs-ci-lint-hook-in-claude-settings-check.js'
@@ -39,6 +40,7 @@ const checks: CheckConstructor[] = [
     HasCiJobsCheck,
     HasEditorconfigCheck,
     HasNpmScriptsCheck,
+    HasTrivyConfigCheck,
     IsCiLintCompleteCheck,
     NodeVersionCheck,
     RunsCiLintHookInClaudeSettingsCheck,

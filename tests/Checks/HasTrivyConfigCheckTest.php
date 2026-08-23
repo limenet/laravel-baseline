@@ -2,31 +2,16 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\HasTrivyConfigCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Policy\Policy;
 use Symfony\Component\Yaml\Yaml;
 
+// The canonical body lives in policy/templates/, shared with the npm runner —
+// a copy here would be a second definition of the standard that could drift.
 function canonicalTrivyYaml(): string
 {
-    return <<<'YML'
-ignorefile: .trivyignore.yaml
-cache:
-  dir: .trivycache
-scan:
-  skip-files:
-    - .env
-    - vendor/**/Dockerfile
-  skip-dirs:
-    - .ddev/
-    - storage/logs/
-  scanners:
-    - misconfig
-    - secret
-    - vuln
-  disable-telemetry: true
-pkg:
-  include-dev-deps: true
-disable-vex-notice: true
-dependency-tree: true
-YML;
+    $policy = Policy::fromDirectory();
+
+    return $policy->template($policy->string('trivy.template'));
 }
 
 function canonicalCiYaml(): string

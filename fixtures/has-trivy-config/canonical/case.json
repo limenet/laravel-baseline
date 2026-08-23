@@ -1,0 +1,9 @@
+{
+    "check": "hasTrivyConfig",
+    "description": "passes on the canonical Trivy setup",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "pass"
+}

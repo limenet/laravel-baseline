@@ -24,6 +24,12 @@ it('loads every key the checks depend on with the declared type', function (): v
     expect($policy->strings('claude.deny.shared'))->not->toBeEmpty();
     expect($policy->string('claude.ciLintHookCommand.php'))->toBeString();
     expect($policy->string('claude.ciLintHookCommand.js'))->toBeString();
+    expect($policy->string('trivy.configFile'))->toBeString();
+    expect($policy->string('trivy.ignoreFile'))->toBeString();
+    expect($policy->string('trivy.gitignoreEntry'))->toBeString();
+    expect($policy->strings('trivy.forbiddenKeys'))->not->toBeEmpty();
+    expect($policy->stringListMap('trivy.ciJob'))->not->toBeEmpty();
+    expect($policy->template($policy->string('trivy.template')))->toContain('ignorefile:');
     expect($policy->stringListMap('ci.requiredJobs.php'))->not->toBeEmpty();
     expect($policy->stringListMap('ci.requiredJobs.js'))->not->toBeEmpty();
     expect($policy->int('periodic.defaultIntervalDays'))->toBeInt();

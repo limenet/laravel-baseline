@@ -92,6 +92,14 @@
             "js": "baseline check"
         }
     },
+    "trivy": {
+        "template": "trivy.yaml",
+        "configFile": "trivy.yaml",
+        "ignoreFile": ".trivyignore.yaml",
+        "gitignoreEntry": ".trivycache/",
+        "forbiddenKeys": ["severity"],
+        "ciJob": { "security": ".lint_security" }
+    },
     "baseline": {
         "composerPackage": "limenet/laravel-baseline",
         "npmPackage": "@limenet-ch/baseline"

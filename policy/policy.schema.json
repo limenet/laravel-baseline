@@ -13,6 +13,7 @@
         "claude",
         "ci",
         "ciLint",
+        "trivy",
         "baseline",
         "npmScripts",
         "periodic"
@@ -188,6 +189,36 @@
                         "js": { "type": "string" }
                     }
                 }
+            }
+        },
+        "trivy": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["template", "configFile", "ignoreFile", "gitignoreEntry", "forbiddenKeys", "ciJob"],
+            "description": "Trivy's canonical setup. The template under policy/templates/ is both what a fix writes into an empty project and the requirement set itself: every scalar leaf must be equal in the project's file, every list leaf must be contained in it, and unlisted keys are the project's own business.",
+            "properties": {
+                "template": {
+                    "type": "string",
+                    "description": "Filename under policy/templates/ holding the canonical trivy.yaml body."
+                },
+                "configFile": {
+                    "type": "string",
+                    "description": "Project-relative path of Trivy's config file."
+                },
+                "ignoreFile": {
+                    "type": "string",
+                    "description": "Project-relative path of the ignore file, which must exist even when empty."
+                },
+                "gitignoreEntry": {
+                    "type": "string",
+                    "description": "The cache directory, as it must appear in .gitignore."
+                },
+                "forbiddenKeys": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Top-level keys that must NOT be set, leaving Trivy's own default behaviour in place."
+                },
+                "ciJob": { "type": "object", "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" } }
             }
         },
         "baseline": {

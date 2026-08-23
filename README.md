@@ -121,6 +121,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `updatesDependencies` | identical (periodic, every 30 days) |
 | `hasNpmScripts` | identical |
 | `hasCiJobs` | same GitLab CI templates, without the `php` job |
+| `hasTrivyConfig` | identical, canonical config included: its `vendor/**`, `storage/logs/` and `.ddev/` skips are inert in a JS project |
 | `ciSetsNodeVersion` | identical |
 | `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
 | `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
@@ -129,8 +130,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
 the DDEV checks (`ddevNodeVersionIsAuto`, `ddevMutagenIgnoresNodeModules`, …); and
 `hasClaudeSettingsWithLaravelSkills` / `doesNotHaveLaravelSimplifierInClaudeSettings`, which are
-vacuous without Laravel. `hasTrivyConfig` stays Laravel-only too — its canonical config bakes in
-Laravel paths (`vendor/**`, `storage/logs/`, `.ddev/`).
+vacuous without Laravel.
 
 ## Checks
 

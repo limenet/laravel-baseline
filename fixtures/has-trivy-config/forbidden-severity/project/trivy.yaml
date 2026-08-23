@@ -1,0 +1,22 @@
+ignorefile: .trivyignore.yaml
+cache:
+  dir: .trivycache
+scan:
+  skip-files:
+    - .env
+    - vendor/**/Dockerfile
+  skip-dirs:
+    - .ddev/
+    - storage/logs/
+  scanners:
+    - misconfig
+    - secret
+    - vuln
+  disable-telemetry: true
+pkg:
+  include-dev-deps: true
+disable-vex-notice: true
+dependency-tree: true
+severity:
+  - CRITICAL
+  - HIGH

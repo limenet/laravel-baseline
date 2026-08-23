@@ -1,0 +1,9 @@
+{
+    "check": "hasTrivyConfig",
+    "description": "fails when trivy.yaml pins severity",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail"
+}
