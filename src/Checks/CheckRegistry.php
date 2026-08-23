@@ -19,6 +19,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveCopilotOrJunieAgentFilesChe
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveGuidelinesScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotPinOldMailTemplateCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseBothBaselineRunnersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
@@ -111,6 +112,7 @@ class CheckRegistry
         DdevHasRedisAddonCheck::class,
         DdevMutagenIgnoresNodeModulesCheck::class,
         DdevNodeVersionIsAutoCheck::class,
+        DoesNotUseBothBaselineRunnersCheck::class,
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,

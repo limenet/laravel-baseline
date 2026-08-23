@@ -13,6 +13,7 @@
         "claude",
         "ci",
         "ciLint",
+        "baseline",
         "npmScripts",
         "periodic"
     ],
@@ -187,6 +188,16 @@
                         "js": { "type": "string" }
                     }
                 }
+            }
+        },
+        "baseline": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["composerPackage", "npmPackage"],
+            "description": "The two runners' own package names, so each can recognise the other's presence in a project.",
+            "properties": {
+                "composerPackage": { "type": "string" },
+                "npmPackage": { "type": "string" }
             }
         },
         "npmScripts": {

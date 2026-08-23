@@ -114,6 +114,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `hardensNpmSupplyChain` | identical |
 | `hasEditorconfig` | identical |
 | `doesNotHaveCopilotOrJunieAgentFiles` | identical |
+| `doesNotUseBothBaselineRunners` | mirrored: fails when `composer.json` requires `limenet/laravel-baseline`, since the Composer runner wins |
 | `allowsToolingInClaudeSettings` | requires only the shared allow entries, not the DDEV/artisan ones |
 | `deniesEnvReadsInClaudeSettings` | identical |
 | `runsCiLintHookInClaudeSettings` | hooks `npm run ci-lint` instead of `ddev composer run ci-lint` |
@@ -199,6 +200,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`doesNotUseSail()`** - Validates Sail is NOT used *(partial: deletes docker-compose.yml; run `composer remove laravel/sail` manually)*
 - 🔧 **`doesNotUsePhpInsights()`** - Validates PHP Insights is NOT used *(removes the `nunomaduro/phpinsights` composer.json entry, leftover ci-lint script entries, and config/insights.php; run `composer update` afterward to sync composer.lock)*
 - **`doesNotUseSpatiePasskeysWithFortify()`** - Fails if both `spatie/laravel-passkeys` and `laravel/fortify` are installed, as they overlap in authentication responsibility
+- **`doesNotUseBothBaselineRunners()`** - Fails when `package.json` also declares `@limenet-ch/baseline`: the npm runner is the fallback for projects this package cannot reach, and in a Laravel project this one wins (reports the `npm uninstall` to run; never uninstalls for you)
 - **`doesNotUseHorizonWatcher()`** - Validates Spatie Horizon Watcher is NOT installed
 - 🔧 **`doesNotUseGreaterThanOrEqualConstraints()`** - Validates no `>=` version constraints in composer.json (use `^` or `~` instead) *(replaces `>=X.Y` with `^X.Y` in composer.json)*
 

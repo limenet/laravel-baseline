@@ -92,6 +92,10 @@
             "js": "baseline check"
         }
     },
+    "baseline": {
+        "composerPackage": "limenet/laravel-baseline",
+        "npmPackage": "@limenet-ch/baseline"
+    },
     "npmScripts": {
         "required": ["ci-lint", "production"]
     },

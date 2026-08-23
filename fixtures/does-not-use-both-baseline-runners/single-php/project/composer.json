@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "limenet/laravel-baseline": "^2.8"
+    }
+}

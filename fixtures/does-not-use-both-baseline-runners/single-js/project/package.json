@@ -1,0 +1,6 @@
+{
+    "name": "test-project",
+    "devDependencies": {
+        "@limenet-ch/baseline": "^2.8"
+    }
+}

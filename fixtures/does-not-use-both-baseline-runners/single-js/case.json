@@ -1,0 +1,8 @@
+{
+    "check": "doesNotUseBothBaselineRunners",
+    "description": "passes on a js project with no composer.json at all",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

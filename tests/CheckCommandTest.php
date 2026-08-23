@@ -41,14 +41,14 @@ it('has correct command description', function (): void {
 })->group('command');
 
 it('has expected number of checks registered', function (): void {
-    expect(CheckRegistry::all())->toHaveCount(88);
+    expect(CheckRegistry::all())->toHaveCount(89);
 })->group('command');
 
 it('createAll returns check instances with shared comment collector', function (): void {
     $collector = new CommentCollector;
     $checks = CheckRegistry::createAll($collector);
 
-    expect($checks)->toHaveCount(88);
+    expect($checks)->toHaveCount(89);
     expect($checks[0])->toBeInstanceOf(CheckInterface::class);
 })->group('command');
 

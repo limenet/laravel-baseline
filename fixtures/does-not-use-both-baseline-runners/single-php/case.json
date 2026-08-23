@@ -1,0 +1,8 @@
+{
+    "check": "doesNotUseBothBaselineRunners",
+    "description": "passes on a php project that does not also install the npm runner",
+    "engines": [
+        "php"
+    ],
+    "expect": "pass"
+}

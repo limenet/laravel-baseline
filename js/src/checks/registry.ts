@@ -5,6 +5,7 @@ import type { Check, CommentCollector } from './check.js'
 import { CiSetsNodeVersionCheck } from './ci-sets-node-version-check.js'
 import { DeniesEnvReadsInClaudeSettingsCheck } from './denies-env-reads-in-claude-settings-check.js'
 import { DoesNotHaveCopilotOrJunieAgentFilesCheck } from './does-not-have-copilot-or-junie-agent-files-check.js'
+import { DoesNotUseBothBaselineRunnersCheck } from './does-not-use-both-baseline-runners-check.js'
 import { HardensNpmSupplyChainCheck } from './hardens-npm-supply-chain-check.js'
 import { HasCiJobsCheck } from './has-ci-jobs-check.js'
 import { HasEditorconfigCheck } from './has-editorconfig-check.js'
@@ -33,6 +34,7 @@ const checks: CheckConstructor[] = [
     CiSetsNodeVersionCheck,
     DeniesEnvReadsInClaudeSettingsCheck,
     DoesNotHaveCopilotOrJunieAgentFilesCheck,
+    DoesNotUseBothBaselineRunnersCheck,
     HardensNpmSupplyChainCheck,
     HasCiJobsCheck,
     HasEditorconfigCheck,
