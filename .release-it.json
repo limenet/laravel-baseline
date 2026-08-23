@@ -5,7 +5,10 @@
         "tagName": "v${version}",
         "tagAnnotation": "Release v${version}"
     },
-    "npm": false,
+    "npm": {
+        "publish": true,
+        "allowSameVersion": true
+    },
     "github": {
         "release": true,
         "releaseName": "v${version}"

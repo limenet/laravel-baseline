@@ -375,8 +375,17 @@ create the GitHub release via the API and falls back to opening a browser.
 two artifacts in lockstep — the same version means the same `policy/`, which is the only
 compatibility guarantee available given they share a file rather than a dependency edge.
 
-**release-it does not publish to npm** (`"npm": false`) and that is deliberate: it pushes the tag
-*before* publishing, and npm versions are immutable, so a failed publish would strand a tag that
-Packagist has already served and npm can never receive. `.github/workflows/npm-publish.yml` runs on
-the published GitHub release instead, re-verifies that the tag and both manifests agree, and is
-re-runnable via `workflow_dispatch` without retagging.
+**release-it publishes to npm** as the last step of the same run (`"npm": {"publish": true}`), so
+one command produces the tag, the GitHub release and the npm version. Two details make that safe
+enough to keep in one place:
+
+- The npm plugin's *init* checks — registry reachable, authenticated, and a collaborator on
+  `@limenet-ch/baseline` — run **before** anything is bumped or tagged, so the usual reason a
+  publish fails is caught while a release is still cancellable.
+- `allowSameVersion` is on because `@release-it/bumper` is an *external* plugin and therefore bumps
+  first: by the time the npm plugin runs `npm version`, `package.json` already carries the new
+  version, and without the flag npm would refuse the no-op.
+
+If a publish still fails after the tag was pushed, do **not** retag — npm versions are immutable and
+Packagist is already serving that tag. Check out the tag and re-run `npm publish` by hand once the
+cause is fixed; `prepack` rebuilds `js/dist` on the way.

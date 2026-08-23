@@ -14,7 +14,7 @@ it('versions the npm and composer packages in lockstep', () => {
     // there is no dependency edge that could express a compatibility range
     // between them, so "same version => same policy" is the only guarantee
     // available. @release-it/bumper writes both files; this catches a drift
-    // introduced by hand before the publish workflow refuses the release.
+    // introduced by hand before `npm run release` publishes it.
     expect(manifest('package.json').version).toBe(manifest('composer.json').version)
 })
 
