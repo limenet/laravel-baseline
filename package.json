@@ -50,18 +50,18 @@
         "release": "GITHUB_TOKEN=$(gh auth token) release-it"
     },
     "dependencies": {
-        "semver": "^7.7.4",
+        "semver": "^7.8.5",
         "yaml": "^2.9.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.1",
+        "@biomejs/biome": "^2.5.10",
         "@release-it/bumper": "^8.0.0",
         "@release-it/conventional-changelog": "^12.0.0",
         "@types/node": "^24.10.1",
-        "@types/semver": "^7.7.4",
-        "conventional-changelog-conventionalcommits": "^10.2.1",
-        "release-it": "^21.0.1",
-        "typescript": "^5.9.3",
-        "vitest": "^3.2.4"
+        "@types/semver": "^7.8.0",
+        "conventional-changelog-conventionalcommits": "^10.4.0",
+        "release-it": "^21.0.2",
+        "typescript": "^7.0.2",
+        "vitest": "^4.1.11"
     }
 }
