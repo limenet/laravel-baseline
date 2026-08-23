@@ -102,7 +102,8 @@ ddev artisan ide-helper:meta
 ### Modern Laravel idioms
 
 Prefer the current framework idioms — they keep static analysis clean and read more clearly.
-Both of the following require Laravel 12.45+ / 13.x.
+The cache and session idioms below require Laravel 12.45+ / 13.x; `whenFilledEnum()` requires
+Laravel 13.16+.
 
 **Typed cache getters.** When you read a cached value you expect to be a specific scalar or array
 type, use the typed getter instead of `Cache::get()`. The typed getters return a properly-typed
@@ -125,6 +126,30 @@ Cache::put(CacheKey::Profile, $data);
 session()->put(CheckoutSession::Cart, $items);
 // not: CacheKey::Profile->value / CheckoutSession::Cart->value
 ```
+
+**`whenFilledEnum()` for backed enums in request data.** When a request key holds the backing value
+of a `BackedEnum`, use `whenFilledEnum()` instead of `whenFilled()` plus a manual `tryFrom()` and
+null guard. The callback only fires when the key is filled *and* the value maps to a valid case,
+and it receives a typed enum instance:
+
+```php
+$request->whenFilledEnum('status', Status::class, function (Status $status) use ($query): void {
+    $query->where('status', $status);
+});
+
+// not:
+$request->whenFilled('status', function (string $input) use ($query): void {
+    $status = Status::tryFrom($input);
+    if ($status === null) {
+        return;
+    }
+    $query->where('status', $status);
+});
+```
+
+It takes an optional fourth callback that runs when the primary one doesn't — use it to handle a
+missing or invalid value without throwing. The method lives on `InteractsWithData`, so it is
+available on `Request`, form requests, and anything else using that trait.
 
 ### Best practices
 
