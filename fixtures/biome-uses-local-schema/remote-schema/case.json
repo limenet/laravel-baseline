@@ -1,0 +1,15 @@
+{
+    "check": "biomeUsesLocalSchema",
+    "description": "rewrites a version-pinned remote $schema without reformatting the file",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "biome.json": "{\n  \"$schema\": \"./node_modules/@biomejs/biome/configuration_schema.json\",\n  \"formatter\": {\n    \"indentStyle\": \"space\"\n  }\n}\n"
+        }
+    }
+}

@@ -8,6 +8,7 @@
     "required": [
         "node",
         "npm",
+        "biome",
         "editorconfig",
         "agentFiles",
         "claude",
@@ -56,6 +57,22 @@
                 "engineStrict": {
                     "type": "boolean",
                     "description": "Whether .npmrc must set engine-strict, making the engines requirement enforced rather than advisory."
+                }
+            }
+        },
+        "biome": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["configFile", "schema"],
+            "description": "Biome's config file and the $schema it must point at. The local path under node_modules always matches the installed Biome, so the file does not need editing on every Biome update — a versioned remote URL does.",
+            "properties": {
+                "configFile": {
+                    "type": "string",
+                    "description": "Project-relative path of Biome's config file. Checked only when it exists; the baseline does not require a project to use Biome."
+                },
+                "schema": {
+                    "type": "string",
+                    "description": "The value $schema must hold, resolved from node_modules rather than pinned to a released version."
                 }
             }
         },

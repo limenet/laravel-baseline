@@ -9,6 +9,10 @@
         "minReleaseAgeDays": 7,
         "engineStrict": true
     },
+    "biome": {
+        "configFile": "biome.json",
+        "schema": "./node_modules/@biomejs/biome/configuration_schema.json"
+    },
     "editorconfig": {
         "template": "editorconfig",
         "requiredProperties": [

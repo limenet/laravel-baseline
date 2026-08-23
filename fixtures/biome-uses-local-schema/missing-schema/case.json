@@ -1,0 +1,15 @@
+{
+    "check": "biomeUsesLocalSchema",
+    "description": "inserts a missing $schema as the first key, matching the file's indentation",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "biome.json": "{\n\t\"$schema\": \"./node_modules/@biomejs/biome/configuration_schema.json\",\n\t\"linter\": {\n\t\t\"enabled\": true\n\t}\n}\n"
+        }
+    }
+}

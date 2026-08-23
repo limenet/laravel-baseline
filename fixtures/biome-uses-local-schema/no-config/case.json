@@ -1,0 +1,9 @@
+{
+    "check": "biomeUsesLocalSchema",
+    "description": "passes when the project does not use Biome",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "pass"
+}

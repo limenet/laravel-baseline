@@ -1,5 +1,6 @@
 import type { Project } from '../project.js'
 import { AllowsToolingInClaudeSettingsCheck } from './allows-tooling-in-claude-settings-check.js'
+import { BiomeUsesLocalSchemaCheck } from './biome-uses-local-schema-check.js'
 import { CallsBaselineCheck } from './calls-baseline-check.js'
 import type { Check, CommentCollector } from './check.js'
 import { CiSetsNodeVersionCheck } from './ci-sets-node-version-check.js'
@@ -31,6 +32,7 @@ type CheckConstructor = (new (
  */
 const checks: CheckConstructor[] = [
     AllowsToolingInClaudeSettingsCheck,
+    BiomeUsesLocalSchemaCheck,
     CallsBaselineCheck,
     CiSetsNodeVersionCheck,
     DeniesEnvReadsInClaudeSettingsCheck,
