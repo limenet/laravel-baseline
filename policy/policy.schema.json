@@ -107,7 +107,7 @@
         "claude": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["allow", "deny", "ciLintHookCommand"],
+            "required": ["allow", "deny", "ask", "ciLintHookCommand"],
             "properties": {
                 "allow": {
                     "type": "object",
@@ -135,6 +135,18 @@
                             "type": "array",
                             "items": { "type": "string" },
                             "description": "permissions.deny entries that apply to every project type. Dynamic per-environment entries are derived at runtime, not listed here."
+                        }
+                    }
+                },
+                "ask": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php"],
+                    "properties": {
+                        "php": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.ask entries for the artisan commands that destroy database contents. Laravel/DDEV only. These prompt rather than deny, so the developer keeps an approval path."
                         }
                     }
                 },

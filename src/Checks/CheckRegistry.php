@@ -3,6 +3,7 @@
 namespace Limenet\LaravelBaseline\Checks;
 
 use Limenet\LaravelBaseline\Checks\Checks\AllowsToolingInClaudeSettingsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\AsksBeforeDestructiveDbCommandsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\BiomeUsesLocalSchemaCheck;
 use Limenet\LaravelBaseline\Checks\Checks\BumpsComposerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CacheAllowsPulseSerializableClassesCheck;
@@ -98,6 +99,7 @@ class CheckRegistry
     /** @var list<class-string<CheckInterface>> */
     private static array $checks = [
         AllowsToolingInClaudeSettingsCheck::class,
+        AsksBeforeDestructiveDbCommandsInClaudeSettingsCheck::class,
         BiomeUsesLocalSchemaCheck::class,
         BumpsComposerCheck::class,
         CacheAllowsPulseSerializableClassesCheck::class,

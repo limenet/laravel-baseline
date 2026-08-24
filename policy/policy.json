@@ -63,6 +63,20 @@
         "deny": {
             "shared": ["Read(./.env)"]
         },
+        "ask": {
+            "php": [
+                "Bash(ddev artisan migrate:fresh:*)",
+                "Bash(php artisan migrate:fresh:*)",
+                "Bash(ddev artisan migrate:refresh:*)",
+                "Bash(php artisan migrate:refresh:*)",
+                "Bash(ddev artisan migrate:reset:*)",
+                "Bash(php artisan migrate:reset:*)",
+                "Bash(ddev artisan migrate:rollback:*)",
+                "Bash(php artisan migrate:rollback:*)",
+                "Bash(ddev artisan db:wipe:*)",
+                "Bash(php artisan db:wipe:*)"
+            ]
+        },
         "ciLintHookCommand": {
             "php": "ddev composer run ci-lint",
             "js": "npm run ci-lint"
