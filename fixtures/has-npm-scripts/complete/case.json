@@ -1,0 +1,9 @@
+{
+    "check": "hasNpmScripts",
+    "description": "passes when every required npm script is defined",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "pass"
+}

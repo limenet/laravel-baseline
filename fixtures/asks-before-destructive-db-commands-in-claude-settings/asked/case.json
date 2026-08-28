@@ -1,0 +1,8 @@
+{
+    "check": "asksBeforeDestructiveDbCommandsInClaudeSettings",
+    "description": "passes when every destructive artisan database command is in permissions.ask",
+    "engines": [
+        "php"
+    ],
+    "expect": "pass"
+}

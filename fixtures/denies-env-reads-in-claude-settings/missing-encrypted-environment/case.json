@@ -1,0 +1,20 @@
+{
+    "check": "deniesEnvReadsInClaudeSettings",
+    "description": "fails when an encrypted environment has no matching deny entry, and adds it on fix",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "json": {
+            ".claude/settings.json": {
+                "permissions.deny": [
+                    "Read(./.env)",
+                    "Read(./.env.staging)"
+                ]
+            }
+        }
+    }
+}

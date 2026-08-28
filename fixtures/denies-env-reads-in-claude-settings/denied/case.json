@@ -1,0 +1,9 @@
+{
+    "check": "deniesEnvReadsInClaudeSettings",
+    "description": "passes when the base .env read is denied",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "pass"
+}

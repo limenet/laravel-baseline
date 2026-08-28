@@ -1,0 +1,10 @@
+{
+    "check": "hardensNpmSupplyChain",
+    "description": "fails when the cooldown is shorter than the policy minimum, and raises it on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": { ".npmrc": "engine-strict=true\nmin-release-age=7\n" }
+    }
+}

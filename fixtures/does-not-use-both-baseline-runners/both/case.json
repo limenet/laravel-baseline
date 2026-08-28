@@ -1,0 +1,9 @@
+{
+    "check": "doesNotUseBothBaselineRunners",
+    "description": "fails when a project declares both runners",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail"
+}

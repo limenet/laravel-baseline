@@ -1,0 +1,10 @@
+{
+    "check": "hardensNpmSupplyChain",
+    "description": "fails without an .npmrc, and writes both hardening keys on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": { ".npmrc": "engine-strict=true\nmin-release-age=7\n" }
+    }
+}

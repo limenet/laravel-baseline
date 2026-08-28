@@ -1,0 +1,9 @@
+{
+    "check": "hasTrivyConfig",
+    "description": "fails when the pipeline declares no security job",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail"
+}

@@ -1,0 +1,11 @@
+{
+    "check": "nodeVersion",
+    "description": "fails when both declarations sit below the floor, and bumps both on fix",
+    "engines": ["php", "js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": { ".nvmrc": "24\n" },
+        "json": { "package.json": { "engines.node": "^24" } }
+    }
+}

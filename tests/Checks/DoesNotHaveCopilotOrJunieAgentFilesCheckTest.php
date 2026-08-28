@@ -28,7 +28,7 @@ it('doesNotHaveCopilotOrJunieAgentFiles fails when .junie directory exists', fun
 
     [$check, $collector] = makeCheckWithCollector(DoesNotHaveCopilotOrJunieAgentFilesCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Remove the .junie directory — it is generated for the Junie Boost agent, which is no longer required');
+    expect($collector->all())->toContain("Remove .junie — it is the Junie Boost agent's directory, which is no longer required");
 });
 
 it('doesNotHaveCopilotOrJunieAgentFiles fails when .github/skills directory exists', function (): void {
@@ -39,7 +39,7 @@ it('doesNotHaveCopilotOrJunieAgentFiles fails when .github/skills directory exis
 
     [$check, $collector] = makeCheckWithCollector(DoesNotHaveCopilotOrJunieAgentFilesCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($collector->all())->toContain('Remove the .github/skills directory — it is generated for the Copilot Boost agent, which is no longer required');
+    expect($collector->all())->toContain("Remove .github/skills — it is the Copilot Boost agent's skills directory, which is no longer required");
 });
 
 it('doesNotHaveCopilotOrJunieAgentFiles fix deletes AGENTS.md, .junie, and .github/skills', function (): void {

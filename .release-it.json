@@ -5,10 +5,17 @@
         "tagName": "v${version}",
         "tagAnnotation": "Release v${version}"
     },
-    "npm": false,
+    "npm": {
+        "publish": true,
+        "allowSameVersion": true
+    },
     "github": {
         "release": true,
         "releaseName": "v${version}"
+    },
+    "hooks": {
+        "before:init": ["composer test", "npm run ci-lint", "npm run build", "npm test"],
+        "after:bump": ["npm install --package-lock-only --ignore-scripts"]
     },
     "plugins": {
         "@release-it/bumper": {
@@ -16,10 +23,16 @@
                 "file": "composer.json",
                 "path": "version"
             },
-            "out": {
-                "file": "composer.json",
-                "path": "version"
-            }
+            "out": [
+                {
+                    "file": "composer.json",
+                    "path": "version"
+                },
+                {
+                    "file": "package.json",
+                    "path": "version"
+                }
+            ]
         },
         "@release-it/conventional-changelog": {
             "infile": "CHANGELOG.md",

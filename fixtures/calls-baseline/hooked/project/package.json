@@ -1,0 +1,6 @@
+{
+    "name": "test-project",
+    "scripts": {
+        "ci-lint": "biome ci . && baseline check"
+    }
+}

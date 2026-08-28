@@ -30,3 +30,6 @@ testbench.yaml
 /coverage
 coverage.xml
 junit.xml
+
+# JS build output
+/js/dist

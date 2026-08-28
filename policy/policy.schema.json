@@ -1,0 +1,284 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/limenet/laravel-baseline/policy/policy.schema.json",
+    "title": "limenet baseline policy",
+    "description": "Policy values shared verbatim by the PHP (limenet/laravel-baseline) and JS (@limenet-ch/baseline) runners. Anything that is a value rather than logic belongs here, so a floor is bumped in one place.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "node",
+        "npm",
+        "biome",
+        "editorconfig",
+        "agentFiles",
+        "claude",
+        "ci",
+        "ciLint",
+        "trivy",
+        "baseline",
+        "npmScripts",
+        "periodic"
+    ],
+    "$defs": {
+        "ciJobTemplates": {
+            "description": "A single shared template the job must extend, or a list of templates any one of which is accepted.",
+            "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }]
+        }
+    },
+    "properties": {
+        "$schema": { "type": "string" },
+        "node": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minMajor"],
+            "properties": {
+                "minMajor": {
+                    "type": "string",
+                    "description": "Lowest permitted Node major. Declarations below it are bumped to it; newer lines are left alone.",
+                    "pattern": "^\\d+$"
+                }
+            }
+        },
+        "npm": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minMajor", "constraint", "minReleaseAgeDays", "engineStrict"],
+            "properties": {
+                "minMajor": { "type": "string", "pattern": "^\\d+$" },
+                "constraint": {
+                    "type": "string",
+                    "description": "The engines.npm constraint written when none is present or the present one is too low."
+                },
+                "minReleaseAgeDays": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Install-time cooldown in days: npm skips versions younger than this."
+                },
+                "engineStrict": {
+                    "type": "boolean",
+                    "description": "Whether .npmrc must set engine-strict, making the engines requirement enforced rather than advisory."
+                }
+            }
+        },
+        "biome": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["configFile", "schema"],
+            "description": "Biome's config file and the $schema it must point at. The local path under node_modules always matches the installed Biome, so the file does not need editing on every Biome update — a versioned remote URL does.",
+            "properties": {
+                "configFile": {
+                    "type": "string",
+                    "description": "Project-relative path of Biome's config file. Checked only when it exists; the baseline does not require a project to use Biome."
+                },
+                "schema": {
+                    "type": "string",
+                    "description": "The value $schema must hold, resolved from node_modules rather than pinned to a released version."
+                }
+            }
+        },
+        "editorconfig": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["template", "requiredProperties"],
+            "properties": {
+                "template": {
+                    "type": "string",
+                    "description": "Filename under policy/templates/ holding the canonical .editorconfig body."
+                },
+                "requiredProperties": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Substrings that must appear in an existing .editorconfig for it to count as complete."
+                }
+            }
+        },
+        "agentFiles": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["forbidden"],
+            "properties": {
+                "forbidden": {
+                    "type": "object",
+                    "description": "Project-relative path => reason it must not exist. Rendered as \"Remove {path} — {reason}\".",
+                    "additionalProperties": { "type": "string" }
+                }
+            }
+        },
+        "claude": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["allow", "deny", "ask", "ciLintHookCommand"],
+            "properties": {
+                "allow": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["shared", "php"],
+                    "properties": {
+                        "shared": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.allow entries that apply to every project type."
+                        },
+                        "php": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.allow entries that only make sense in a Laravel/DDEV project."
+                        }
+                    }
+                },
+                "deny": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["shared"],
+                    "properties": {
+                        "shared": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.deny entries that apply to every project type. Dynamic per-environment entries are derived at runtime, not listed here."
+                        }
+                    }
+                },
+                "ask": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php"],
+                    "properties": {
+                        "php": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.ask entries for the artisan commands that destroy database contents. Laravel/DDEV only. These prompt rather than deny, so the developer keeps an approval path."
+                        }
+                    }
+                },
+                "ciLintHookCommand": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php", "js"],
+                    "properties": {
+                        "php": { "type": "string" },
+                        "js": { "type": "string" }
+                    }
+                }
+            }
+        },
+        "ci": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["nodeVersionVariable", "requiredJobs"],
+            "properties": {
+                "nodeVersionVariable": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["name", "value"],
+                    "description": "The CI variable that pins the Node version. Setting it lets the shared template resolve the version, which is what keeps CI and local in step now that DDEV's nodejs_version: auto is not in play.",
+                    "properties": {
+                        "name": { "type": "string" },
+                        "value": { "type": "string" }
+                    }
+                },
+                "requiredJobs": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php", "js"],
+                    "description": "GitLab CI job name => the shared template it must extend, or a list of templates any one of which is accepted. The js set omits the php job.",
+                    "properties": {
+                        "php": {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
+                        },
+                        "js": {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
+                        }
+                    }
+                }
+            }
+        },
+        "ciLint": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["required", "baselineCommand"],
+            "properties": {
+                "required": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["php", "js"],
+                    "description": "Substrings the project's ci-lint script must contain — a composer script for php, an npm script for js.",
+                    "properties": {
+                        "php": { "type": "array", "items": { "type": "string" } },
+                        "js": { "type": "array", "items": { "type": "string" } }
+                    }
+                },
+                "baselineCommand": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["js"],
+                    "description": "How the baseline runner invokes itself from a project. The php runner hooks composer's post-update-cmd instead, which npm has no equivalent of.",
+                    "properties": {
+                        "js": { "type": "string" }
+                    }
+                }
+            }
+        },
+        "trivy": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["template", "configFile", "ignoreFile", "gitignoreEntry", "forbiddenKeys", "ciJob"],
+            "description": "Trivy's canonical setup. The template under policy/templates/ is both what a fix writes into an empty project and the requirement set itself: every scalar leaf must be equal in the project's file, every list leaf must be contained in it, and unlisted keys are the project's own business.",
+            "properties": {
+                "template": {
+                    "type": "string",
+                    "description": "Filename under policy/templates/ holding the canonical trivy.yaml body."
+                },
+                "configFile": {
+                    "type": "string",
+                    "description": "Project-relative path of Trivy's config file."
+                },
+                "ignoreFile": {
+                    "type": "string",
+                    "description": "Project-relative path of the ignore file, which must exist even when empty."
+                },
+                "gitignoreEntry": {
+                    "type": "string",
+                    "description": "The cache directory, as it must appear in .gitignore."
+                },
+                "forbiddenKeys": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Top-level keys that must NOT be set, leaving Trivy's own default behaviour in place."
+                },
+                "ciJob": { "type": "object", "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" } }
+            }
+        },
+        "baseline": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["composerPackage", "npmPackage"],
+            "description": "The two runners' own package names, so each can recognise the other's presence in a project.",
+            "properties": {
+                "composerPackage": { "type": "string" },
+                "npmPackage": { "type": "string" }
+            }
+        },
+        "npmScripts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["required"],
+            "properties": {
+                "required": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "npm scripts every project must define."
+                }
+            }
+        },
+        "periodic": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["defaultIntervalDays"],
+            "properties": {
+                "defaultIntervalDays": { "type": "integer", "minimum": 1 }
+            }
+        }
+    }
+}

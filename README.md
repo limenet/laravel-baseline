@@ -8,6 +8,19 @@
 
 Checks your Laravel installation against a highly opinionated baseline.
 
+This repository ships **two runners** from one policy:
+
+| | Composer | npm |
+| --- | --- | --- |
+| Package | `limenet/laravel-baseline` | `@limenet-ch/baseline` |
+| For | Laravel projects (DDEV, composer) | JS/TS-only projects (no PHP, no DDEV) |
+| Command | `php artisan limenet:laravel-baseline:check` | `npx baseline check` |
+| Checks | all of them | [the portable subset](#js-only-projects) |
+
+Both read `policy/`, so the version floors and required keys are defined once, and both are
+executed against the shared behavioural fixtures in `fixtures/`. They are released in lockstep:
+the same version number means the same policy in both ecosystems.
+
 
 ## Installation
 
@@ -57,6 +70,69 @@ conventions) and on-demand skills (e.g. `creating-a-release`). When a project th
 `laravel/boost` installed runs `php artisan boost:install` or `php artisan boost:update --discover`,
 Boost discovers and publishes these to the consuming project's coding agents automatically.
 
+## JS-only projects
+
+Projects with no PHP and no DDEV use the npm runner instead. It is a second implementation, not a
+wrapper: PHP cannot reach into a JS project (and by this baseline's own convention `npm` runs on
+the host while artisan runs inside DDEV), so the portable checks are reimplemented in TypeScript and
+kept honest by the shared fixtures rather than by shared code.
+
+```bash
+npm install --save-dev @limenet-ch/baseline
+```
+
+```bash
+npx baseline check              # report issues
+npx baseline check --fix        # apply safe fixes, then report what is left
+npx baseline periodic           # walk through expired periodic checks
+npx baseline install-skills     # copy the packaged skills into .claude/skills/
+```
+
+Wire it into the `ci-lint` npm script so CI and the Claude Stop hook both run it — npm has no
+`post-update-cmd` equivalent, and npm 12 blocks dependency lifecycle scripts by default:
+
+```json
+"scripts": {
+    "ci-lint": "biome ci . && tsc --noEmit && baseline check"
+}
+```
+
+State lives in `.baseline.json` at the project root (a JS project has no `config/` directory):
+
+```json
+{
+    "excludes": ["hasNpmScripts"],
+    "periodic": { "updatesDependencies": "2026-08-16T09:00:00.000Z" }
+}
+```
+
+### What the npm runner checks
+
+| Check | Relationship to the Laravel runner |
+| --- | --- |
+| `nodeVersion` | identical |
+| `hardensNpmSupplyChain` | identical |
+| `hasEditorconfig` | identical |
+| `biomeUsesLocalSchema` | identical |
+| `doesNotHaveCopilotOrJunieAgentFiles` | identical |
+| `doesNotUseBothBaselineRunners` | mirrored: fails when `composer.json` requires `limenet/laravel-baseline`, since the Composer runner wins |
+| `allowsToolingInClaudeSettings` | requires only the shared allow entries, not the DDEV/artisan ones |
+| `deniesEnvReadsInClaudeSettings` | identical |
+| `runsCiLintHookInClaudeSettings` | hooks `npm run ci-lint` instead of `ddev composer run ci-lint` |
+| `updatesDependencies` | identical (periodic, every 30 days) |
+| `hasNpmScripts` | identical |
+| `hasCiJobs` | same GitLab CI templates, without the `php` job |
+| `hasTrivyConfig` | identical, canonical config included: its `vendor/**`, `storage/logs/` and `.ddev/` skips are inert in a JS project |
+| `ciSetsNodeVersion` | identical |
+| `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
+| `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
+| `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
+
+Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
+the DDEV checks (`ddevNodeVersionIsAuto`, `ddevMutagenIgnoresNodeModules`, …); and
+`hasClaudeSettingsWithLaravelSkills` / `doesNotHaveLaravelSimplifierInClaudeSettings`, which are
+vacuous without Laravel.
+
 ## Checks
 
 This package validates your Laravel installation against the following checks:
@@ -89,6 +165,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`doesNotHaveLaravelSimplifierInClaudeSettings()`** - Fails if the deprecated `laravel-simplifier@laravel` plugin is still enabled in `.claude/settings.json` *(removes the entry)*
 - 🔧 **`deniesEnvReadsInClaudeSettings()`** - Validates `.claude/settings.json` `permissions.deny` blocks reading `.env` plus every environment that ships an encrypted file (each `.env.{env}.encrypted` in the project root requires denying `.env.{env}`); `.env.example` stays readable *(merges the deny entries)*
 - 🔧 **`allowsToolingInClaudeSettings()`** - Validates `.claude/settings.json` `permissions.allow` includes the DDEV dev-loop commands (`ddev composer run ci-lint`, `ddev composer test`, and safe artisan commands: `test`, `make:*`, `route:list`, `about`, `config:show`, `ide-helper`, `optimize:clear`, `cache:clear`, `config:clear`, `route:clear`, `view:clear`) so the dev loop runs without prompts *(merges the allow entries)*
+- 🔧 **`asksBeforeDestructiveDbCommandsInClaudeSettings()`** - Validates `.claude/settings.json` `permissions.ask` requires a confirmation before the artisan commands that destroy database contents (`migrate:fresh`, `migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`), covering both the `ddev artisan` and `php artisan` forms; `ask` rather than `deny` so the developer keeps an approval path *(merges the ask entries)*
 - 🔧 **`runsCiLintHookInClaudeSettings()`** - Validates `.claude/settings.json` has a `Stop` hook running `ddev composer run ci-lint` *(appends the hook)*
 - 🔧 **`usesIdeHelpers()`** - Validates Laravel IDE Helper is configured: `post-update-cmd` runs `ide-helper:generate`, `ide-helper:models`, and `ide-helper:meta`, and `.gitignore` ignores the generated `_ide_helper.php`, `_ide_helper_models.php`, and `.phpstorm.meta.php` files *(partial: adds post-update scripts and gitignore entries if package installed)*
 - 🔧 **`gitignoresLspFiles()`** - Validates `.gitignore` ignores `storage/framework/lsp-*.php`, the per-editor files the Laravel language server writes into `storage/framework` *(appends the entry, creating `.gitignore` if missing)*
@@ -125,6 +202,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`doesNotUseSail()`** - Validates Sail is NOT used *(partial: deletes docker-compose.yml; run `composer remove laravel/sail` manually)*
 - 🔧 **`doesNotUsePhpInsights()`** - Validates PHP Insights is NOT used *(removes the `nunomaduro/phpinsights` composer.json entry, leftover ci-lint script entries, and config/insights.php; run `composer update` afterward to sync composer.lock)*
 - **`doesNotUseSpatiePasskeysWithFortify()`** - Fails if both `spatie/laravel-passkeys` and `laravel/fortify` are installed, as they overlap in authentication responsibility
+- **`doesNotUseBothBaselineRunners()`** - Fails when `package.json` also declares `@limenet-ch/baseline`: the npm runner is the fallback for projects this package cannot reach, and in a Laravel project this one wins (reports the `npm uninstall` to run; never uninstalls for you)
 - **`doesNotUseHorizonWatcher()`** - Validates Spatie Horizon Watcher is NOT installed
 - 🔧 **`doesNotUseGreaterThanOrEqualConstraints()`** - Validates no `>=` version constraints in composer.json (use `^` or `~` instead) *(replaces `>=X.Y` with `^X.Y` in composer.json)*
 
@@ -134,21 +212,24 @@ This package validates your Laravel installation against the following checks:
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline
+- 🔧 **`ciSetsNodeVersion()`** - Validates `.gitlab-ci.yml` sets `variables.NODE_VERSION` to `latest`, so the shared CI template resolves the Node version instead of drifting from the project *(adds the variable, creating the `variables` mapping if needed, preserving comments and existing entries)*
 - **`doesNotUseIgnition()`** - Validates Ignition debugger is NOT installed
 
 ### Local Development
 - **`phpVersionMatchesDdev()`** - Validates PHP version consistency with DDEV
-- 🔧 **`nodeVersionMatchesDdev()`** - Validates the project pins Node >= 24 (the current LTS) in both `package.json` `engines.node` and `.nvmrc` (compatible with each other) and that `.ddev/config.yaml` sets `nodejs_version: auto` so DDEV derives the Node version from the project *(creates the missing constraint — establishing Node 24 when none is declared — bumps a declaration that allows anything older to 24, and sets `nodejs_version: auto`; a newer line such as Node 26 is left alone, and a conflict between existing `engines.node` and `.nvmrc` is reported, not auto-resolved)*
+- 🔧 **`nodeVersion()`** - Validates the project pins Node >= 24 (the current LTS) in both `package.json` `engines.node` and `.nvmrc`, compatible with each other *(creates the missing constraint — establishing Node 24 when none is declared — and bumps a declaration that allows anything older to 24; a newer line such as Node 26 is left alone, and a conflict between existing `engines.node` and `.nvmrc` is reported, not auto-resolved)*
 - 🔧 **`hardensNpmSupplyChain()`** - Hardens npm against supply-chain attacks: requires `package.json` `engines.npm` >= 12 (npm 12 blocks dependency lifecycle scripts by default and refuses git/remote deps), `.npmrc` `engine-strict=true` so that requirement is enforced rather than advisory, and `.npmrc` `min-release-age=7` for a 7-day install cooldown that skips freshly-published (potentially compromised) versions *(sets `engines.npm` to `^12`, and upserts both `.npmrc` keys while preserving existing lines)*
 - 🔧 **`ddevHasPcovPackage()`** - Validates DDEV coverage configuration *(adds pcov to webimage_extra_packages and creates .ddev/php/90-custom.ini)*
 - **`ddevHasRedisAddon()`** - Validates DDEV Redis addon is installed and at minimum version 2.2.0
 - 🔧 **`ddevMutagenIgnoresNodeModules()`** - Validates DDEV Mutagen sync configuration *(creates mutagen.yml and fixes .gitignore)*
+- 🔧 **`ddevNodeVersionIsAuto()`** - Validates `.ddev/config.yaml` sets `nodejs_version: auto` so DDEV derives the Node version from the project's `.nvmrc` instead of pinning its own *(sets `nodejs_version: auto`, preserving surrounding comments and formatting)*
 - **`updatesDdevAddons()`** - Fails if any installed DDEV add-on (`.ddev/addon-metadata/*/manifest.yaml`) has an `install_date` older than 3 months; comment shows the `ddev add-on get <repository>` command to refresh each stale add-on
 
 ### Build & Release
 - 🔧 **`bumpsComposer()`** - Validates automatic composer dependency bumping *(adds `composer bump` to post-update-cmd)*
 - 🔧 **`usesReleaseIt()`** - Validates automated release management *(partial: creates/fixes .release-it.json and adds release npm script if packages installed)*
 - **`hasNpmScripts()`** - Validates required npm build scripts
+- 🔧 **`biomeUsesLocalSchema()`** - Validates that `biome.json`, when the project has one, points `$schema` at `./node_modules/@biomejs/biome/configuration_schema.json` rather than a version-pinned remote URL, so the schema follows the installed Biome instead of needing a manual bump on every update. Passes when the project does not use Biome. *(rewrites or inserts the `$schema` line as a targeted text edit, leaving the rest of the file — comments included — byte-identical, since Biome formats `biome.json` itself)*
 
 ### Security & Configuration
 - 🔧 **`modelShouldBeStrict()`** - Validates `Model::shouldBeStrict()` is called in AppServiceProvider with `true`, no argument, or a dynamic expression (not `false`) *(adds `Model::shouldBeStrict(! app()->isProduction())` to boot())*

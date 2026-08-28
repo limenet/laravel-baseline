@@ -1,0 +1,8 @@
+{
+    "check": "isCiLintComplete",
+    "description": "fails when the ci-lint npm script skips the type checker",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail"
+}

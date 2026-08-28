@@ -1,0 +1,15 @@
+{
+    "check": "hasTrivyConfig",
+    "description": "writes the canonical trivy.yaml when the project has none",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "trivy.yaml": "@template:trivy.yaml"
+        }
+    }
+}

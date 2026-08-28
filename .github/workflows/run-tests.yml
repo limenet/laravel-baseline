@@ -8,6 +8,10 @@ on:
       - "phpunit.xml"
       - "composer.json"
       - "composer.lock"
+      # The PHP checks read policy/ at runtime and the conformance test executes
+      # fixtures/, so a change to either must run this suite.
+      - "policy/**"
+      - "fixtures/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

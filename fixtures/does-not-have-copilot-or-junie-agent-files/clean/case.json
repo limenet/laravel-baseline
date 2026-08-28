@@ -1,0 +1,6 @@
+{
+    "check": "doesNotHaveCopilotOrJunieAgentFiles",
+    "description": "passes when none of the forbidden agent paths exist",
+    "engines": ["php", "js"],
+    "expect": "pass"
+}

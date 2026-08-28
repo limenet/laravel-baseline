@@ -1,0 +1,9 @@
+{
+    "check": "hasCiJobs",
+    "description": "fails when the CI configuration declares none of the required jobs",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail"
+}

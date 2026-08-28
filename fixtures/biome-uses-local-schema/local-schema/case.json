@@ -1,0 +1,9 @@
+{
+    "check": "biomeUsesLocalSchema",
+    "description": "passes when $schema resolves out of node_modules",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "pass"
+}

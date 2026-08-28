@@ -1,0 +1,8 @@
+{
+    "check": "usesReleaseIt",
+    "description": "fails when the bumper plugin is configured, which a JS project never needs",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail"
+}

@@ -7,15 +7,6 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class HasEditorconfigCheck extends AbstractFixableCheck
 {
-    private const REQUIRED_PROPERTIES = [
-        'root = true',
-        'charset = utf-8',
-        'end_of_line = lf',
-        'indent_style = space',
-        'insert_final_newline = true',
-        'trim_trailing_whitespace = true',
-    ];
-
     public function fix(bool $dry = false): CheckResult
     {
         $editorconfigFile = base_path('.editorconfig');
@@ -47,7 +38,7 @@ class HasEditorconfigCheck extends AbstractFixableCheck
         }
 
         if ($dry) {
-            foreach (self::REQUIRED_PROPERTIES as $property) {
+            foreach ($this->requiredProperties() as $property) {
                 if (!str_contains($content, $property)) {
                     $this->addComment("Editorconfig incomplete: Add \"{$property}\" to .editorconfig");
 
@@ -60,7 +51,7 @@ class HasEditorconfigCheck extends AbstractFixableCheck
 
         $needsFix = false;
 
-        foreach (self::REQUIRED_PROPERTIES as $property) {
+        foreach ($this->requiredProperties() as $property) {
             if (!str_contains($content, $property)) {
                 $needsFix = true;
                 break;
@@ -74,28 +65,20 @@ class HasEditorconfigCheck extends AbstractFixableCheck
         return $this->fix(dry: true);
     }
 
+    /**
+     * Substrings that must appear in an existing .editorconfig for it to count
+     * as complete — a subset of the canonical file, so a project may add its own
+     * sections without failing.
+     *
+     * @return list<string>
+     */
+    private function requiredProperties(): array
+    {
+        return $this->policy()->strings('editorconfig.requiredProperties');
+    }
+
     private function canonicalContent(): string
     {
-        return implode("\n", [
-            'root = true',
-            '',
-            '[*]',
-            'charset = utf-8',
-            'end_of_line = lf',
-            'indent_style = space',
-            'indent_size = 4',
-            'insert_final_newline = true',
-            'trim_trailing_whitespace = true',
-            '',
-            '[*.md]',
-            'trim_trailing_whitespace = false',
-            '',
-            '[*.{yml,yaml}]',
-            'indent_size = 2',
-            '',
-            '[*.{js,css,json}]',
-            'indent_size = 2',
-            '',
-        ]);
+        return $this->policy()->template($this->policy()->string('editorconfig.template'));
     }
 }

@@ -10,44 +10,33 @@ class DoesNotHaveCopilotOrJunieAgentFilesCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $agentsMdFile = base_path('AGENTS.md');
-        $junieDir = base_path('.junie');
-        $githubSkillsDir = base_path('.github/skills');
+        $present = [];
 
-        $agentsMdClean = !file_exists($agentsMdFile);
-        $junieDirClean = !File::isDirectory($junieDir);
-        $githubSkillsDirClean = !File::isDirectory($githubSkillsDir);
+        foreach ($this->policy()->stringMap('agentFiles.forbidden') as $path => $reason) {
+            $absolute = base_path($path);
 
-        if ($agentsMdClean && $junieDirClean && $githubSkillsDirClean) {
+            if (file_exists($absolute) || File::isDirectory($absolute)) {
+                $present[$path] = $absolute;
+                $this->addComment("Remove {$path} — {$reason}");
+            }
+        }
+
+        if ($present === []) {
             return CheckResult::PASS;
-        }
-
-        if (!$agentsMdClean) {
-            $this->addComment('Remove AGENTS.md — it is generated for the Copilot/Junie Boost agents, which are no longer required');
-        }
-
-        if (!$junieDirClean) {
-            $this->addComment('Remove the .junie directory — it is generated for the Junie Boost agent, which is no longer required');
-        }
-
-        if (!$githubSkillsDirClean) {
-            $this->addComment('Remove the .github/skills directory — it is generated for the Copilot Boost agent, which is no longer required');
         }
 
         if ($dry) {
             return CheckResult::FAIL;
         }
 
-        if (!$agentsMdClean) {
-            unlink($agentsMdFile);
-        }
+        foreach ($present as $absolute) {
+            if (File::isDirectory($absolute)) {
+                File::deleteDirectory($absolute);
 
-        if (!$junieDirClean) {
-            File::deleteDirectory($junieDir);
-        }
+                continue;
+            }
 
-        if (!$githubSkillsDirClean) {
-            File::deleteDirectory($githubSkillsDir);
+            unlink($absolute);
         }
 
         return $this->fix(dry: true);

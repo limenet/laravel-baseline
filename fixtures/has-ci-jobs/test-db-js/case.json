@@ -1,0 +1,8 @@
+{
+    "check": "hasCiJobs",
+    "description": "passes on a js project whose test job extends .test_db",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

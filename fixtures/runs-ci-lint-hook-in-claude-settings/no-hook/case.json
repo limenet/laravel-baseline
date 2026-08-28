@@ -1,0 +1,12 @@
+{
+    "check": "runsCiLintHookInClaudeSettings",
+    "description": "fails when no Stop hook runs ci-lint, and adds one on fix",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass"
+    }
+}

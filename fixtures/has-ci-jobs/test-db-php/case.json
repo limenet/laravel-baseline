@@ -1,0 +1,8 @@
+{
+    "check": "hasCiJobs",
+    "description": "passes on a php project whose test job extends .test_db",
+    "engines": [
+        "php"
+    ],
+    "expect": "pass"
+}
