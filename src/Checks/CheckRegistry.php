@@ -58,6 +58,7 @@ use Limenet\LaravelBaseline\Checks\Checks\LaravelBoostMcpUsesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\ModelShouldBeStrictCheck;
 use Limenet\LaravelBaseline\Checks\Checks\NodeVersionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
+use Limenet\LaravelBaseline\Checks\Checks\PhpstanParsesModelCastsMethodCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsBoostUpdateCheck;
@@ -154,6 +155,7 @@ class CheckRegistry
         ModelShouldBeStrictCheck::class,
         NodeVersionCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
+        PhpstanParsesModelCastsMethodCheck::class,
         PhpVersionMatchesCiCheck::class,
         PhpVersionMatchesDdevCheck::class,
         UsesIdeHelpersCheck::class,

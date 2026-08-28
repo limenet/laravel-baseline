@@ -145,6 +145,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
+- 🔧 **`phpstanParsesModelCastsMethod()`** - Validates `phpstan.neon` sets `parseModelCastsMethod: true`: `ModelCastsPropertyToCastsMethodRector` rewrites `protected $casts = [...]` into a `casts(): array` method, and without this parameter Larastan reads only the generated `@return array<string, string>` — not a constant array — so every cast is lost and datetime attributes report as strings *(inserts the parameter into the `parameters` block)*
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*
 - 🔧 **`hasRectorConfigWithComposerBased()`** - Validates Rector `withComposerBased(phpunit, symfony, laravel)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithConfiguredRules()`** - Validates Rector `withConfiguredRule()` calls are present for `RouteActionCallableRector` and `WhereToWhereLikeRector` *(appends calls to rector.php)*
