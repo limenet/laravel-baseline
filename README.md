@@ -123,7 +123,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `hasNpmScripts` | identical |
 | `hasCiJobs` | same GitLab CI templates, without the `php` job |
 | `hasTrivyConfig` | identical, canonical config included: its `vendor/**`, `storage/logs/` and `.ddev/` skips are inert in a JS project |
-| `ciSetsNodeVersion` | identical |
+| `ciSetsNodeVersion` | **npm-only**: the Laravel runner does not register it |
 | `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
 | `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
 | `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
@@ -213,7 +213,6 @@ This package validates your Laravel installation against the following checks:
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline
-- 🔧 **`ciSetsNodeVersion()`** - Validates `.gitlab-ci.yml` sets `variables.NODE_VERSION` to `latest`, so the shared CI template resolves the Node version instead of drifting from the project *(adds the variable, creating the `variables` mapping if needed, preserving comments and existing entries)*
 - **`doesNotUseIgnition()`** - Validates Ignition debugger is NOT installed
 
 ### Local Development

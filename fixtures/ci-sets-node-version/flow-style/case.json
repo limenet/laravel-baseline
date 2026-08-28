@@ -2,7 +2,6 @@
     "check": "ciSetsNodeVersion",
     "description": "adds the variable to a mapping written in flow style",
     "engines": [
-        "php",
         "js"
     ],
     "expect": "fail",

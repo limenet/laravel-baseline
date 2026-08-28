@@ -2,7 +2,6 @@
     "check": "ciSetsNodeVersion",
     "description": "adds the variable to a mapping whose header carries a trailing comment",
     "engines": [
-        "php",
         "js"
     ],
     "expect": "fail",

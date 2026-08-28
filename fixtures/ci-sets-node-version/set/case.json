@@ -2,7 +2,6 @@
     "check": "ciSetsNodeVersion",
     "description": "passes when the CI pipeline sets NODE_VERSION to \"latest\"",
     "engines": [
-        "php",
         "js"
     ],
     "expect": "pass"
