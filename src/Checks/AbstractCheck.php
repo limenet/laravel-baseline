@@ -19,6 +19,14 @@ abstract class AbstractCheck implements CheckInterface
 {
     use CommentManagement;
 
+    /**
+     * The lowest driftingly/rector-laravel the rector.php this package writes is
+     * valid against: 2.6.0 deleted LaravelSetProvider and moved its rules into
+     * LaravelSetList::COMPOSER_BASED, and 2.6.1 is the first release requiring
+     * the rector/rector ^2.6.4 that goes with it.
+     */
+    protected const MIN_RECTOR_LARAVEL = '2.6.1';
+
     public function __construct(CommentCollector $commentCollector)
     {
         $this->commentCollector = $commentCollector;
@@ -119,15 +127,7 @@ abstract class AbstractCheck implements CheckInterface
 
     protected function composerPackageSatisfies(string $package, string $constraint): bool
     {
-        $composerJson = $this->getComposerJson();
-
-        if ($composerJson === null) {
-            return false;
-        }
-
-        $installedConstraint = $composerJson['require'][$package]
-            ?? $composerJson['require-dev'][$package]
-            ?? null;
+        $installedConstraint = $this->declaredComposerConstraint($package);
 
         if ($installedConstraint === null) {
             return false;
@@ -138,6 +138,50 @@ abstract class AbstractCheck implements CheckInterface
         return Intervals::haveIntersections(
             $parser->parseConstraints($installedConstraint),
             $parser->parseConstraints($constraint),
+        );
+    }
+
+    /**
+     * The constraint composer.json declares for a package, from either require
+     * section, or null when it names the package in neither.
+     */
+    protected function declaredComposerConstraint(string $package): ?string
+    {
+        $composerJson = $this->getComposerJson();
+
+        if ($composerJson === null) {
+            return null;
+        }
+
+        $constraint = $composerJson['require'][$package]
+            ?? $composerJson['require-dev'][$package]
+            ?? null;
+
+        return is_string($constraint) ? $constraint : null;
+    }
+
+    /**
+     * Whether the constraint declared for a package still admits versions below
+     * $version — the question a floor has to ask, since composerPackageSatisfies()
+     * only reports whether two ranges overlap anywhere, and `^2.0` overlaps
+     * `>=2.6` while still resolving to 2.0.
+     *
+     * A package composer.json does not name is nobody's floor to violate (it is
+     * pulled in transitively, if at all), so that reports false.
+     */
+    protected function composerPackageAllowsBelow(string $package, string $version): bool
+    {
+        $declaredConstraint = $this->declaredComposerConstraint($package);
+
+        if ($declaredConstraint === null) {
+            return false;
+        }
+
+        $parser = new VersionParser;
+
+        return Intervals::haveIntersections(
+            $parser->parseConstraints($declaredConstraint),
+            $parser->parseConstraints('<'.$version),
         );
     }
 

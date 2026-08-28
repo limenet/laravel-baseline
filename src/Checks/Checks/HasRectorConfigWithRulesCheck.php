@@ -9,8 +9,11 @@ class HasRectorConfigWithRulesCheck extends AbstractHasRectorConfigCheck
 {
     protected function makeVisitor(): AbstractRectorVisitor
     {
+        // AddGenericReturnTypeToRelationsRector deliberately absent: it comes in
+        // through LaravelSetList::LARAVEL_TYPE_DECLARATIONS, and listing it here
+        // too makes Rector warn about the duplicate. See
+        // DoesNotDuplicateRectorSetRulesCheck, which takes it back out.
         return new RectorVisitorArrayArgument($this->commentCollector, 'withRules', [
-            'AddGenericReturnTypeToRelationsRector',
             'MinutesToSecondsInCacheRector',
             'UseForwardsCallsTraitRector',
         ]);
@@ -18,13 +21,12 @@ class HasRectorConfigWithRulesCheck extends AbstractHasRectorConfigCheck
 
     protected function fixCodeSnippet(): string
     {
-        return '->withRules([AddGenericReturnTypeToRelationsRector::class, MinutesToSecondsInCacheRector::class, UseForwardsCallsTraitRector::class])';
+        return '->withRules([MinutesToSecondsInCacheRector::class, UseForwardsCallsTraitRector::class])';
     }
 
     protected function fixImports(): array
     {
         return [
-            'RectorLaravel\\Rector\\ClassMethod\\AddGenericReturnTypeToRelationsRector',
             'RectorLaravel\\Rector\\StaticCall\\MinutesToSecondsInCacheRector',
             'RectorLaravel\\Rector\\Class_\\UseForwardsCallsTraitRector',
         ];

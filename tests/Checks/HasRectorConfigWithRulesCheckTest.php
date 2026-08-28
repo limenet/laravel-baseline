@@ -6,9 +6,7 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 $validRector = <<<'PHP'
 <?php
 use Rector\Config\RectorConfig;
-use RectorLaravel\Set\LaravelSetProvider;
-use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
-use RectorLaravel\Rector\MethodCall\MinutesToSecondsInCacheRector;
+use RectorLaravel\Rector\StaticCall\MinutesToSecondsInCacheRector;
 use RectorLaravel\Rector\Class_\UseForwardsCallsTraitRector;
 use Limenet\LaravelBaseline\Rector\LaravelBaselineSetList;
 
@@ -21,12 +19,10 @@ return static function (RectorConfig $config): void {
         ->withAttributesSets()
         ->withImportNames(importShortClasses: false)
         ->withRules([
-            AddGenericReturnTypeToRelationsRector::class,
             MinutesToSecondsInCacheRector::class,
             UseForwardsCallsTraitRector::class,
         ])
         ->withSets([LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS]);
-    $config->withSetProviders(LaravelSetProvider::class);
 };
 PHP;
 
@@ -37,21 +33,20 @@ it('hasRectorConfigWithRules fails when rector.php is missing', function (): voi
     expect(makeCheck(HasRectorConfigWithRulesCheck::class)->check())->toBe(CheckResult::FAIL);
 });
 
-it('hasRectorConfigWithRules fails when AddGenericReturnTypeToRelationsRector is missing', function (): void {
+it('hasRectorConfigWithRules fails when UseForwardsCallsTraitRector is missing', function (): void {
     bindFakeComposer([]);
     $rector = <<<'PHP'
 <?php
 use Rector\Config\RectorConfig;
-use RectorLaravel\Set\LaravelSetProvider;
 return static function (RectorConfig $config): void {
-    $config->withComposerBased(phpunit: true, symfony: true, laravel: true)->withPreparedSets(deadCode: true)->withPhpSets()->withAttributesSets()->withImportNames(importShortClasses: false)->withSetProviders(LaravelSetProvider::class)->withRules([]);
+    $config->withComposerBased(phpunit: true, symfony: true, laravel: true)->withPreparedSets(deadCode: true)->withPhpSets()->withAttributesSets()->withImportNames(importShortClasses: false)->withRules([]);
 };
 PHP;
     $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
 
     $check = makeCheck(HasRectorConfigWithRulesCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
-    expect($check->getComments()[0])->toContain('withRules()')->toContain('AddGenericReturnTypeToRelationsRector');
+    expect($check->getComments()[0])->toContain('withRules()')->toContain('UseForwardsCallsTraitRector');
 });
 
 it('hasRectorConfigWithRules fails when MinutesToSecondsInCacheRector is missing', function (): void {
@@ -59,9 +54,9 @@ it('hasRectorConfigWithRules fails when MinutesToSecondsInCacheRector is missing
     $rector = <<<'PHP'
 <?php
 use Rector\Config\RectorConfig;
-use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
+use RectorLaravel\Rector\Class_\UseForwardsCallsTraitRector;
 return static function (RectorConfig $config): void {
-    $config->withRules([AddGenericReturnTypeToRelationsRector::class]);
+    $config->withRules([UseForwardsCallsTraitRector::class]);
 };
 PHP;
     $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
@@ -76,4 +71,33 @@ it('hasRectorConfigWithRules passes when correctly configured', function () use 
     $this->withTempBasePath(['rector.php' => $validRector, 'composer.json' => json_encode(['name' => 'tmp'])]);
 
     expect(makeCheck(HasRectorConfigWithRulesCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
+it('hasRectorConfigWithRules no longer mandates AddGenericReturnTypeToRelationsRector', function (): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+use RectorLaravel\Rector\StaticCall\MinutesToSecondsInCacheRector;
+use RectorLaravel\Rector\Class_\UseForwardsCallsTraitRector;
+return static function (RectorConfig $config): void {
+    $config->withRules([MinutesToSecondsInCacheRector::class, UseForwardsCallsTraitRector::class]);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode(['name' => 'tmp'])]);
+
+    $check = makeCheck(HasRectorConfigWithRulesCheck::class);
+    expect($check->check())->toBe(CheckResult::PASS);
+});
+
+it('hasRectorConfigWithRules fix does not write AddGenericReturnTypeToRelationsRector', function (): void {
+    bindFakeComposer([]);
+    $this->withTempBasePath(['composer.json' => json_encode(['name' => 'tmp'])]);
+
+    expect(makeCheck(HasRectorConfigWithRulesCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    $written = (string) file_get_contents(base_path('rector.php'));
+    expect($written)->toContain('MinutesToSecondsInCacheRector')
+        ->toContain('UseForwardsCallsTraitRector')
+        ->not->toContain('AddGenericReturnTypeToRelationsRector');
 });

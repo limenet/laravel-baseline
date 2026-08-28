@@ -234,6 +234,12 @@ npm run ci-lint && npm run build && npm test
 - `hasPostDeployScript(string $match): bool` - Check ci-deploy-post scripts
 - `getComposerJson(): ?array` - Get parsed composer.json
 - `getComposerPhpVersion(): ?string` - Extract PHP version from composer.json
+- `declaredComposerConstraint(string $package): ?string` - The constraint composer.json declares, from either require section
+- `composerPackageSatisfies(string $package, string $constraint): bool` - Whether the declared constraint *overlaps* the given one. Use for "this project might be on X"
+- `composerPackageAllowsBelow(string $package, string $version): bool` - Whether the declared constraint still admits anything below `$version`. Use for a **floor** — `composerPackageSatisfies()` is not one, since `^2.0` overlaps `>=2.6` while resolving to 2.0
+
+Note that `checkComposerPackages()` and `checkComposerScript()` add a comment as a side effect, so
+they are not safe to call from an applicability guard whose comments a passing check would leak.
 
 ### NPM/Package.json Checks
 - `checkNpmPackages(string|array $packages, string $packageType = 'devDependencies'): bool`
@@ -254,6 +260,39 @@ npm run ci-lint && npm run build && npm test
 ### Comments
 - `addComment(string $comment): void` - Add error message shown to user
 - `getComments(): array` - Get all comments
+
+## Rector Config Checks
+
+Checks that read or write `rector.php` come in two families, and a change to what the baseline
+mandates usually needs both:
+
+- **`AbstractHasRectorConfigCheck`** — assert a call is present and append it when it is not.
+  `fixCodeSnippet()`/`fixImports()` describe what to write; `appendToRectorChain()` splices it onto
+  the end of the chain. When the call already exists but is incomplete, `mergeIntoArrayArgument()`
+  adds the missing class constants to its array argument rather than giving up with a FAIL — see
+  `HasRectorConfigWithSkipCheck`. It writes a `use` statement for every entry that ends up
+  referenced by a bare short name without one, which also repairs the unimported `withSkip()` an
+  older version of this fix produced; Rector rejects the whole config over those ("These rules from
+  skip() do not exist"). An entry written out in full needs no import and does not get one.
+- **`AbstractRemovesFromRectorConfigCheck`** — the mirror image, for a call that *used* to be
+  mandated and is now wrong. Relaxing the assertion is never enough on its own: every consumer that
+  already ran the old fix still carries the call, so the removal has to be active. Declare
+  `methodName()`, `classShortNames()` and `removalComment()`; `RectorRemovalVisitor` strips the
+  matching `X::class` arguments (direct or inside the first array argument), drops the call once
+  nothing is left in it, and removes the bare `$config;` statement that can leave behind.
+
+Do **not** gate a removal on the consumer's declared constraint for the extension. `^2.5` resolves
+to 2.6.1, so the project whose config is actually broken is the one the gate would silence — it
+reads the declaration, not what composer installed. A floor belongs in the check that *reports* the
+constraint (`usesRector`), where being too loose is the finding; the fix path should just repair the
+file.
+
+Neither family cleans up a use-statement a removal orphans. Every project the baseline governs runs
+Pint and Rector over its own tree, and both drop an unused import on the next pass, so a check that
+did it too would be duplicating the linter's job on a file the linter already owns.
+
+Both families compare class references on the **last** namespace segment, so a consumer who writes
+an entry out in full counts as having it rather than getting a duplicate appended.
 
 ## Check Result Types
 

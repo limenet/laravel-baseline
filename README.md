@@ -141,7 +141,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesPest()`** - Validates Pest testing framework is configured (not PHPUnit directly)
 - **`usesPestPhpstanPlugin()`** - Validates `pestphp/pest-plugin-phpstan` is installed when Pest 5+ and PHPStan are both present (warns if not applicable)
 - **`usesPestRectorPlugin()`** - Validates `pestphp/pest-plugin-rector` is installed when Pest 5+ and Rector are both present (warns if not applicable)
-- 🔧 **`usesRector()`** - Validates Rector automated code modernization is installed *(partial: fixes ci-lint script if packages installed)*
+- 🔧 **`usesRector()`** - Validates Rector automated code modernization is installed, with `driftingly/rector-laravel` constrained to at least `^2.6.1` — the release where `LaravelSetProvider` is gone and its rules arrive through `LaravelSetList::COMPOSER_BASED` instead *(partial: fixes ci-lint script if packages installed)*
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
@@ -153,12 +153,11 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`hasRectorConfigWithImportNames()`** - Validates Rector `withImportNames(importShortClasses: false)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithPhpSets()`** - Validates Rector `withPhpSets()` is called *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithAttributesSets()`** - Validates Rector `withAttributesSets()` is called *(appends call to rector.php)*
-- 🔧 **`hasRectorConfigWithSetProviders()`** - Validates Rector `withSetProviders(LaravelSetProvider)` is configured *(appends call to rector.php)*
-- 🔧 **`hasRectorConfigWithRules()`** - Validates Rector `withRules([AddGenericReturnTypeToRelationsRector, MinutesToSecondsInCacheRector, UseForwardsCallsTraitRector])` is configured *(appends call to rector.php)*
+- 🔧 **`hasRectorConfigWithRules()`** - Validates Rector `withRules([MinutesToSecondsInCacheRector, UseForwardsCallsTraitRector])` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithSets()`** - Validates Rector `withSets([LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS, LaravelSetList::LARAVEL_*])` is configured with all required sets *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithPaths()`** - Validates Rector `withPaths([app, database, routes, tests])` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithPestSet()`** - Validates Rector `withSets([PestSetList::CODING_STYLE])` is configured when Pest 5+ and Rector are both present *(appends call to rector.php; warns if not applicable)*
-- 🔧 **`hasRectorConfigWithSkip()`** - Validates Rector `withSkip()` contains required skipped rules (always: 6 Laravel rules; Laravel 13+: TablePropertyToTableAttributeRector; when server.php exists: ServerVariableToRequestFacadeRector) *(appends call to rector.php)*
+- 🔧 **`hasRectorConfigWithSkip()`** - Validates Rector `withSkip()` contains required skipped rules (always: 6 Laravel rules plus `StringToClassConstantRector`, which maps the Laravel 5.2-era string events context-free and so rewrites any matching literal — `view('auth.login')` becomes `Illuminate\Auth\Events\Login::class`; Laravel 13+: `TablePropertyToTableAttributeRector`; `AddGenericBuilderToScopesRector`, new in rector-laravel 2.6 and shipped in `LARAVEL_TYPE_DECLARATIONS`, which downgrades an already-correct `Builder<$this>` to `Builder<static>`; when server.php exists: `ServerVariableToRequestFacadeRector`) *(appends an imported `withSkip()` call, or merges the missing classes into one that already exists)*
 
 ### IDE & Developer Tools
 - 🔧 **`hasEditorconfig()`** - Validates `.editorconfig` exists with required settings (`root = true`, `charset`, `end_of_line`, `indent_style`, `insert_final_newline`, `trim_trailing_whitespace`) *(creates `.editorconfig` with canonical content if missing or incomplete)*
@@ -213,6 +212,8 @@ This package validates your Laravel installation against the following checks:
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline
+- 🔧 **`doesNotUseRectorSetProviders()`** - Fails while `rector.php` still passes `LaravelSetProvider` to `withSetProviders()`: `driftingly/rector-laravel` 2.6.0 deleted the class, so Rector aborts before doing any work, and `withComposerBased(laravel: true)` already loads the rules it used to provide *(removes the argument, and the call once nothing is left in it; the orphaned import is left to Pint/Rector)*
+- 🔧 **`doesNotDuplicateRectorSetRules()`** - Fails while `rector.php` lists `AddGenericReturnTypeToRelationsRector` in `withRules()`: it already ships in `LaravelSetList::LARAVEL_TYPE_DECLARATIONS`, which `hasRectorConfigWithSets()` mandates, and Rector 2.6 warns about the duplicate *(removes the entry; the orphaned import is left to Pint/Rector)*
 - **`doesNotUseIgnition()`** - Validates Ignition debugger is NOT installed
 
 ### Local Development

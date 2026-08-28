@@ -90,6 +90,98 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
     }
 
     /**
+     * Add class-constant entries to an array argument that is already there —
+     * `->withSkip([...])` exists but is missing a class, say. Returns false when
+     * there is no such call to merge into, and nothing needed importing.
+     *
+     * An import is written for every entry that ends up referenced by a bare
+     * short name with no use-statement behind it. That covers the classes just
+     * appended, and repairs the ones an older version of this fix wrote without
+     * imports — Rector rejects the whole config over those ("These rules from
+     * skip() do not exist"). An entry spelled out in full needs no import and
+     * does not get one.
+     *
+     * @param  array<string, string>  $classImports  short class name => fully-qualified name
+     */
+    protected function mergeIntoArrayArgument(string $rectorFile, string $methodName, array $classImports): bool
+    {
+        $writer = PhpFileWriter::open($rectorFile);
+
+        $array = null;
+
+        foreach ((new NodeFinder)->findInstanceOf($writer->stmts, Node\Expr\MethodCall::class) as $call) {
+            if (!$call->name instanceof Node\Identifier || $call->name->toString() !== $methodName) {
+                continue;
+            }
+
+            $firstArg = $call->args[0] ?? null;
+
+            if ($firstArg instanceof Node\Arg && $firstArg->value instanceof Node\Expr\Array_) {
+                $array = $firstArg->value;
+                break;
+            }
+        }
+
+        if (!$array instanceof Node\Expr\Array_) {
+            return false;
+        }
+
+        // Entries already in the array, and which of them are written as a bare
+        // short name rather than spelled out in full.
+        $present = [];
+        $unqualified = [];
+
+        foreach ($array->items as $item) {
+            foreach ([$item->value, $item->key] as $part) {
+                if (!$part instanceof Node\Expr\ClassConstFetch || !$part->class instanceof Node\Name) {
+                    continue;
+                }
+
+                $present[] = $part->class->getLast();
+
+                if ($part->class->isUnqualified()) {
+                    $unqualified[] = $part->class->getLast();
+                }
+            }
+        }
+
+        $appended = false;
+
+        foreach ($classImports as $name => $fqn) {
+            if (in_array($name, $present, true)) {
+                continue;
+            }
+
+            $array->items[] = new Node\ArrayItem(
+                new Node\Expr\ClassConstFetch(new Node\Name($name), new Node\Identifier('class')),
+            );
+            $unqualified[] = $name;
+            $appended = true;
+        }
+
+        $imported = $this->importedShortNames($writer);
+
+        $imports = [];
+
+        foreach ($classImports as $name => $fqn) {
+            if (in_array($name, $unqualified, true) && !in_array($name, $imported, true)) {
+                $imports[] = $fqn;
+            }
+        }
+
+        if (!$appended && $imports === []) {
+            return false;
+        }
+
+        $writer->addMissingUseStatements($imports);
+        // The array is reprinted from scratch either way; one entry per line
+        // keeps a long withSkip() readable instead of collapsing it.
+        $writer->save(multilineArrays: true);
+
+        return true;
+    }
+
+    /**
      * @param  list<string>  $imports
      */
     protected function appendToRectorChain(string $rectorFile, string $snippet, array $imports = []): void
@@ -128,5 +220,25 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
 
         $writer->addMissingUseStatements($imports);
         $writer->save();
+    }
+
+    /**
+     * Short names the file already has a use-statement for.
+     *
+     * @return list<string>
+     */
+    private function importedShortNames(PhpFileWriter $writer): array
+    {
+        $names = [];
+
+        foreach ((new NodeFinder)->findInstanceOf($writer->stmts, Node\Stmt\Use_::class) as $use) {
+            foreach ($use->uses as $useItem) {
+                $names[] = $useItem->alias instanceof Node\Identifier
+                    ? $useItem->alias->toString()
+                    : $useItem->name->getLast();
+            }
+        }
+
+        return $names;
     }
 }

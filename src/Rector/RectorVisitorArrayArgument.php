@@ -6,8 +6,24 @@ use PhpParser\Node;
 
 class RectorVisitorArrayArgument extends AbstractRectorVisitor
 {
+    /**
+     * Entries that the call was found to be missing, once one has been examined.
+     *
+     * @var list<string>
+     */
+    private array $missing = [];
+
     public function getErrorMessage(): string
     {
+        if ($this->missing !== []) {
+            return sprintf(
+                'Rector configuration incomplete: %s() in rector.php is missing %s - add %s to the array',
+                $this->methodName,
+                implode(', ', $this->missing),
+                implode(', ', array_map(static fn (string $class): string => $class.'::class', $this->missing)),
+            );
+        }
+
         return sprintf(
             'Rector configuration incomplete: Missing or incorrect call to %s() in rector.php - Expected array containing: %s',
             $this->methodName,
@@ -28,27 +44,25 @@ class RectorVisitorArrayArgument extends AbstractRectorVisitor
 
         if ($arg0 instanceof Node\Expr\Array_) {
             foreach ($arg0->items as $arg) {
-                if ($arg !== null
-                    && $arg->value instanceof Node\Expr\ClassConstFetch
+                // Compared on the last segment, so an entry written out in full
+                // (`\RectorLaravel\...\CarbonToDateFacadeRector::class`) counts
+                // as present rather than being reported missing and duplicated.
+                if ($arg->value instanceof Node\Expr\ClassConstFetch
                     && $arg->value->class instanceof Node\Name) {
-                    $args[] = $arg->value->class->toString();
+                    $args[] = $arg->value->class->getLast();
                 }
-                if ($arg !== null
-                    && $arg->key instanceof Node\Expr\ClassConstFetch
+                if ($arg->key instanceof Node\Expr\ClassConstFetch
                     && $arg->key->class instanceof Node\Name) {
-                    $args[] = $arg->key->class->toString();
+                    $args[] = $arg->key->class->getLast();
                 }
             }
         }
 
-        $errors = 0;
+        $this->missing = array_values(array_filter(
+            $this->payload,
+            static fn (string $name): bool => !in_array($name, $args, true),
+        ));
 
-        foreach ($this->payload as $name) {
-            if (!in_array($name, $args, true)) {
-                $errors++;
-            }
-        }
-
-        return $errors === 0;
+        return $this->missing === [];
     }
 }

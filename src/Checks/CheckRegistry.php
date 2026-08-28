@@ -16,6 +16,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DdevMutagenIgnoresNodeModulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DdevNodeVersionIsAutoCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DeniesEnvReadsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotDuplicateRectorSetRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveCopilotOrJunieAgentFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveGuidelinesScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
@@ -25,6 +26,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraint
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUsePhpInsightsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseRectorSetProvidersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSpatiePasskeysWithFortifyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\FollowsModernLaravelIdiomsCheck;
@@ -46,7 +48,6 @@ use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPestSetCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPhpSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithPreparedSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithRulesCheck;
-use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetProvidersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSkipCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasTrivyConfigCheck;
@@ -106,6 +107,7 @@ class CheckRegistry
         CallsBaselineCheck::class,
         DeniesEnvReadsInClaudeSettingsCheck::class,
         DoesNotCallPeriodicBaselineOnUpdateCheck::class,
+        DoesNotDuplicateRectorSetRulesCheck::class,
         DoesNotHaveCopilotOrJunieAgentFilesCheck::class,
         DoesNotHaveGuidelinesScriptCheck::class,
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
@@ -120,6 +122,7 @@ class CheckRegistry
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,
         DoesNotUsePhpInsightsCheck::class,
+        DoesNotUseRectorSetProvidersCheck::class,
         DoesNotUseSailCheck::class,
         DoesNotUseSpatiePasskeysWithFortifyCheck::class,
         DoesNotPinOldMailTemplateCheck::class,
@@ -141,7 +144,6 @@ class CheckRegistry
         HasRectorConfigWithPreparedSetsCheck::class,
         HasRectorConfigWithRulesCheck::class,
         HasRectorConfigWithSetsCheck::class,
-        HasRectorConfigWithSetProvidersCheck::class,
         HasRectorConfigWithSkipCheck::class,
         HasEncryptedEnvFileCheck::class,
         HasNpmScriptsCheck::class,
