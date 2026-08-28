@@ -5,6 +5,7 @@ import { CallsBaselineCheck } from './calls-baseline-check.js'
 import type { Check, CommentCollector } from './check.js'
 import { CiSetsNodeVersionCheck } from './ci-sets-node-version-check.js'
 import { DeniesEnvReadsInClaudeSettingsCheck } from './denies-env-reads-in-claude-settings-check.js'
+import { DoesNotExcludeUnknownChecksCheck } from './does-not-exclude-unknown-checks-check.js'
 import { DoesNotHaveCopilotOrJunieAgentFilesCheck } from './does-not-have-copilot-or-junie-agent-files-check.js'
 import { DoesNotUseBothBaselineRunnersCheck } from './does-not-use-both-baseline-runners-check.js'
 import { HardensNpmSupplyChainCheck } from './hardens-npm-supply-chain-check.js'
@@ -29,39 +30,47 @@ type CheckConstructor = (new (
  * This is intentionally a subset of the PHP runner's registry: only the checks
  * that mean something in a project with no PHP and no DDEV are here. See the
  * README for the ported / not-ported table.
+ *
+ * Built on first call rather than at module scope: doesNotExcludeUnknownChecks
+ * imports this module back to learn which names are real, and a top-level array
+ * would capture that binding while it is still uninitialised — leaving a hole in
+ * the registry whenever the check module is the one loaded first.
  */
-const checks: CheckConstructor[] = [
-    AllowsToolingInClaudeSettingsCheck,
-    BiomeUsesLocalSchemaCheck,
-    CallsBaselineCheck,
-    CiSetsNodeVersionCheck,
-    DeniesEnvReadsInClaudeSettingsCheck,
-    DoesNotHaveCopilotOrJunieAgentFilesCheck,
-    DoesNotUseBothBaselineRunnersCheck,
-    HardensNpmSupplyChainCheck,
-    HasCiJobsCheck,
-    HasEditorconfigCheck,
-    HasNpmScriptsCheck,
-    HasTrivyConfigCheck,
-    IsCiLintCompleteCheck,
-    NodeVersionCheck,
-    RunsCiLintHookInClaudeSettingsCheck,
-    UpdatesDependenciesCheck,
-    UsesReleaseItCheck,
-]
+function checks(): CheckConstructor[] {
+    return [
+        AllowsToolingInClaudeSettingsCheck,
+        BiomeUsesLocalSchemaCheck,
+        CallsBaselineCheck,
+        CiSetsNodeVersionCheck,
+        DeniesEnvReadsInClaudeSettingsCheck,
+        DoesNotExcludeUnknownChecksCheck,
+        DoesNotHaveCopilotOrJunieAgentFilesCheck,
+        DoesNotUseBothBaselineRunnersCheck,
+        HardensNpmSupplyChainCheck,
+        HasCiJobsCheck,
+        HasEditorconfigCheck,
+        HasNpmScriptsCheck,
+        HasTrivyConfigCheck,
+        IsCiLintCompleteCheck,
+        NodeVersionCheck,
+        RunsCiLintHookInClaudeSettingsCheck,
+        UpdatesDependenciesCheck,
+        UsesReleaseItCheck,
+    ]
+}
 
 export function allChecks(): CheckConstructor[] {
-    return [...checks]
+    return checks()
 }
 
 export function checkNames(): string[] {
-    return checks.map((check) => check.checkName)
+    return checks().map((check) => check.checkName)
 }
 
 export function findCheck(name: string): CheckConstructor | undefined {
-    return checks.find((check) => check.checkName === name)
+    return checks().find((check) => check.checkName === name)
 }
 
 export function createChecks(project: Project, comments: CommentCollector): Check[] {
-    return checks.map((Constructor) => new Constructor(project, comments))
+    return checks().map((Constructor) => new Constructor(project, comments))
 }

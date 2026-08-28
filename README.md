@@ -126,6 +126,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `ciSetsNodeVersion` | **npm-only**: the Laravel runner does not register it |
 | `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
 | `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
+| `doesNotExcludeUnknownChecks` | identical, against this runner's smaller registry: a name only the Laravel runner knows is as dead here as one that exists nowhere |
 | `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
 
 Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
@@ -240,6 +241,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesReadableEncryptedEnvFile()`** - Validates the encrypted env file uses the readable line-per-variable format produced by `ddev artisan env:encrypt --readable` (variable names stay visible in diffs), not the opaque blob format. Passes when no encrypted file exists (existence is `hasEncryptedEnvFile`'s concern).
 - **`doesNotPinOldMailTemplate()`** - Fails if a published mail view that pins the old template (`resources/views/vendor/mail/html/themes/default.css` or `html/header.blade.php`) exists, preventing adoption of Laravel's modernized mail template.
 - 🔧 **`callsBaseline()`** - Validates self-validation runs after updates *(adds/upgrades post-update-cmd entry to include `--fix`)*
+- 🔧 **`doesNotExcludeUnknownChecks()`** - Fails when `config/baseline.php` excludes a name no registered check answers to: excludes are matched against the registry, so an entry left behind by a check this package renamed or removed silences nothing and only hides that the exclusion is no longer in force *(drops the dead entries, leaving the remaining excludes and the periodic state intact)*
 - **`doesNotCallPeriodicBaselineOnUpdate()`** - Fails if `php artisan limenet:laravel-baseline:periodic` is in the `post-update-cmd` scripts (it shouldn't be — periodic checks fail CI automatically when expired)
 - 🔧 **`doesNotHaveGuidelinesScript()`** - Fails if the removed `php artisan limenet:laravel-baseline:guidelines` command is still in `post-update-cmd` (removed in v2.1.0) *(removes the entry from composer.json)*
 - 🔧 **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`) *(moves from require-dev to require in composer.json)*

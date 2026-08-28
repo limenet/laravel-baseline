@@ -218,6 +218,13 @@ Adding a new check to the registry can affect other tests (e.g., tests that coun
 
 When **renaming** a check class, the `name()` return value changes automatically (it is derived from the class name). Update the README.md entry to match — the `ReadmeChecksTest` will catch any mismatch. Also rename the fixture directory (it must be the kebab-case of the check name, which the conformance test asserts) and, if the check exists on both sides, the `checkName` in the TS class.
 
+Renaming or removing a check also invalidates every consumer that excluded it by the old name — the
+exclude is matched against the registry, so the entry silences nothing afterwards. Nothing extra is
+needed for that: `doesNotExcludeUnknownChecks` finds those entries in the consumer's
+`config/baseline.php` / `.baseline.json` and `--fix` drops them. It is the reason the npm registry
+builds its list inside a function instead of at module scope — the check imports the registry back,
+so a top-level array would capture an uninitialised binding.
+
 If you touched `policy/`, `fixtures/` or anything under `js/`, run the npm side too — a policy
 change can break the *other* runner without touching a single PHP file:
 

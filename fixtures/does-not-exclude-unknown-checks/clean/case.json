@@ -1,0 +1,6 @@
+{
+    "check": "doesNotExcludeUnknownChecks",
+    "description": "passes when every exclude names a check the runner registers",
+    "engines": ["php", "js"],
+    "expect": "pass"
+}

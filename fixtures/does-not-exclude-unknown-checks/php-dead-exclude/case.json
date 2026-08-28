@@ -1,0 +1,12 @@
+{
+    "check": "doesNotExcludeUnknownChecks",
+    "description": "fails on an exclude naming no registered check, and drops it on fix",
+    "engines": ["php"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "config/baseline.php": "<?php\n\nreturn [\n    'excludes' => [\n        'hasEditorconfig',\n    ],\n    'periodic' => [\n        'updatesDependencies' => '2026-01-01T00:00:00+00:00',\n    ],\n];\n"
+        }
+    }
+}

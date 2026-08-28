@@ -1,0 +1,15 @@
+{
+    "check": "doesNotExcludeUnknownChecks",
+    "description": "fails on an exclude naming no registered check, and drops it on fix",
+    "engines": ["js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "json": {
+            ".baseline.json": {
+                "excludes": ["hasEditorconfig"],
+                "periodic.updatesDependencies": "2026-01-01T00:00:00.000Z"
+            }
+        }
+    }
+}

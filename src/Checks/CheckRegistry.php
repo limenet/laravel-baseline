@@ -17,6 +17,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DdevNodeVersionIsAutoCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DeniesEnvReadsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotCallPeriodicBaselineOnUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotDuplicateRectorSetRulesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotExcludeUnknownChecksCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveCopilotOrJunieAgentFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveGuidelinesScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
@@ -108,6 +109,7 @@ class CheckRegistry
         DeniesEnvReadsInClaudeSettingsCheck::class,
         DoesNotCallPeriodicBaselineOnUpdateCheck::class,
         DoesNotDuplicateRectorSetRulesCheck::class,
+        DoesNotExcludeUnknownChecksCheck::class,
         DoesNotHaveCopilotOrJunieAgentFilesCheck::class,
         DoesNotHaveGuidelinesScriptCheck::class,
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,

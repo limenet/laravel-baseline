@@ -1,0 +1,12 @@
+<?php
+
+// config for Limenet/LaravelBaseline
+return [
+    'excludes' => [
+        'hasEditorconfig',
+        'hasRectorConfigWithSetProviders',
+    ],
+    'periodic' => [
+        'updatesDependencies' => '2026-01-01T00:00:00+00:00',
+    ],
+];
