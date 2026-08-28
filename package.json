@@ -57,7 +57,7 @@
         "@biomejs/biome": "^2.5.10",
         "@release-it/bumper": "^8.0.0",
         "@release-it/conventional-changelog": "^12.0.0",
-        "@types/node": "^24.10.1",
+        "@types/node": "^26.3.0",
         "@types/semver": "^7.8.0",
         "conventional-changelog-conventionalcommits": "^10.4.0",
         "release-it": "^21.0.2",
