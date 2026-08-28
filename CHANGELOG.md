@@ -3,6 +3,27 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.9.0](https://github.com/limenet/laravel-baseline/compare/v2.8.1...v2.9.0) (2026-08-28)
+
+### Features
+
+* add the ciSetsNodeVersion check to both runners ([95d409e](https://github.com/limenet/laravel-baseline/commit/95d409e94183e01a4cc519f0d6b6336d65c53f88))
+* add the doesNotUseBothBaselineRunners check to both runners ([2728f5a](https://github.com/limenet/laravel-baseline/commit/2728f5a296ef93d2629d6f30cb68ed4c99ed27fb))
+* audit whenFilledEnum in followsModernLaravelIdioms ([09a1c48](https://github.com/limenet/laravel-baseline/commit/09a1c4800e875e9e476eb9918c9283edf6891c15)), references [laravel/framework#60486](https://github.com/laravel/framework/issues/60486)
+* install the portable skills into JS projects with `baseline install-skills` ([89d6bc0](https://github.com/limenet/laravel-baseline/commit/89d6bc07d8684aee0978061acef43311c3173975))
+* **php:** add asksBeforeDestructiveDbCommandsInClaudeSettings check ([07603bc](https://github.com/limenet/laravel-baseline/commit/07603bc64b5097ada1dafe0697c82998cef64e47))
+* **policy:** add the biomeUsesLocalSchema check to both runners ([a87e90b](https://github.com/limenet/laravel-baseline/commit/a87e90b9d56f968f35213f1df7e7850fc99d43a9))
+* port hasTrivyConfig to the npm runner ([138c3c9](https://github.com/limenet/laravel-baseline/commit/138c3c9cda08d78b40a8aa45dbbe526fd5ac95fb))
+* port the remaining shared checks and the CI siblings to the npm runner ([73c1f95](https://github.com/limenet/laravel-baseline/commit/73c1f95e056943685f1b11545d23e0f50dcc8b7e))
+* scaffold the @limenet-ch/baseline npm runner ([a3474ac](https://github.com/limenet/laravel-baseline/commit/a3474ac3e6a21f08d6a59877a9f7ef783c55c4d8))
+* split nodeVersionMatchesDdev into nodeVersion and ddevNodeVersionIsAuto ([d0f2380](https://github.com/limenet/laravel-baseline/commit/d0f2380464f4bea98939ee6f859817d6bbe337bd))
+
+### Bug Fixes
+
+* **js:** stop --fix writing over what it could not read ([6d649a9](https://github.com/limenet/laravel-baseline/commit/6d649a91718140f68f46e77659cf665ce64234ac))
+* **php:** keep setYamlMappingScalar out of a nested mapping ([4e0d7f0](https://github.com/limenet/laravel-baseline/commit/4e0d7f065949574585eebb21a28f746b4b058a41))
+* **php:** stop --fix writing a duplicate YAML mapping key ([e03579a](https://github.com/limenet/laravel-baseline/commit/e03579a838920c44f1f51ded1749030ed26568ea))
+
 ## [2.8.1](https://github.com/limenet/laravel-baseline/compare/v2.8.0...v2.8.1) (2026-08-21)
 
 ### Bug Fixes

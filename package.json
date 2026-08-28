@@ -1,6 +1,6 @@
 {
     "name": "@limenet-ch/baseline",
-    "version": "2.8.1",
+    "version": "2.9.0",
     "description": "A highly opinionated baseline for JS/TS projects.",
     "keywords": [
         "baseline",
