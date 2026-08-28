@@ -3,6 +3,18 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.10.0](https://github.com/limenet/laravel-baseline/compare/v2.9.0...v2.10.0) (2026-08-28)
+
+### Features
+
+* add doesNotExcludeUnknownChecks check ([9cea579](https://github.com/limenet/laravel-baseline/commit/9cea579d771a69e60dc16c32180474fa25a7977a))
+* **php:** add phpstanParsesModelCastsMethod check ([4d6daa4](https://github.com/limenet/laravel-baseline/commit/4d6daa43830b2dc670f367ab044aa6417fa60a13))
+* **php:** replace hasRectorConfigWithSetProviders with doesNotUseRectorSetProviders ([6454f0d](https://github.com/limenet/laravel-baseline/commit/6454f0d444cd4bcffe7af019920cb237b963de5d))
+
+### Bug Fixes
+
+* **php:** make ciSetsNodeVersion an npm-only check ([85541a0](https://github.com/limenet/laravel-baseline/commit/85541a06c7e6e215f33a06236f5acc346d584b03))
+
 ## [2.9.0](https://github.com/limenet/laravel-baseline/compare/v2.8.1...v2.9.0) (2026-08-28)
 
 ### Features
