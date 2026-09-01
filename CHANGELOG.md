@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.11.0](https://github.com/limenet/laravel-baseline/compare/v2.10.0...v2.11.0) (2026-09-01)
+
+### Features
+
+* **php:** skip MigrateToSimplifiedAttributeRector ([4c741a8](https://github.com/limenet/laravel-baseline/commit/4c741a8a80fafc02a66fc3af4751cd2e7f35705c))
+
 ## [2.10.0](https://github.com/limenet/laravel-baseline/compare/v2.9.0...v2.10.0) (2026-08-28)
 
 ### Features
