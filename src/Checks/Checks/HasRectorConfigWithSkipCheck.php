@@ -28,6 +28,11 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
         // downgrade wherever it lands: it rewrites `Builder<$this>` — which
         // Larastan reads as the more precise generic — to `Builder<static>`.
         'AddGenericBuilderToScopesRector',
+        // Rewrites the classic getFooAttribute()/setFooAttribute() accessors
+        // into a single Attribute-returning method. A mechanical style change
+        // on code that works, and it loses the docblocks and the separate
+        // get/set seams the surrounding code may rely on.
+        'MigrateToSimplifiedAttributeRector',
     ];
 
     /** @var array<string, string> */
@@ -36,6 +41,7 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
         'AppToResolveRector' => 'RectorLaravel\\Rector\\FuncCall\\AppToResolveRector',
         'CarbonToDateFacadeRector' => 'RectorLaravel\\Rector\\StaticCall\\CarbonToDateFacadeRector',
         'EloquentOrderByToLatestOrOldestRector' => 'RectorLaravel\\Rector\\MethodCall\\EloquentOrderByToLatestOrOldestRector',
+        'MigrateToSimplifiedAttributeRector' => 'RectorLaravel\\Rector\\ClassMethod\\MigrateToSimplifiedAttributeRector',
         'NowFuncWithStartOfDayMethodCallToTodayFuncRector' => 'RectorLaravel\\Rector\\FuncCall\\NowFuncWithStartOfDayMethodCallToTodayFuncRector',
         'RedirectBackToBackHelperRector' => 'RectorLaravel\\Rector\\MethodCall\\RedirectBackToBackHelperRector',
         'RedirectRouteToToRouteHelperRector' => 'RectorLaravel\\Rector\\MethodCall\\RedirectRouteToToRouteHelperRector',

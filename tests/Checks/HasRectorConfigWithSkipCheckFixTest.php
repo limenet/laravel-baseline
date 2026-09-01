@@ -27,7 +27,9 @@ it('hasRectorConfigWithSkip fix writes an imported withSkip when rector.php has 
         ->toContain('AddGenericBuilderToScopesRector::class')
         ->toContain('TablePropertyToTableAttributeRector::class')
         ->toContain('use Rector\Transform\Rector\String_\StringToClassConstantRector;')
+        ->toContain('MigrateToSimplifiedAttributeRector::class')
         ->toContain('use RectorLaravel\Rector\ClassMethod\AddGenericBuilderToScopesRector;')
+        ->toContain('use RectorLaravel\Rector\ClassMethod\MigrateToSimplifiedAttributeRector;')
         ->toContain('use RectorLaravel\Rector\StaticCall\CarbonToDateFacadeRector;');
 });
 
@@ -56,6 +58,7 @@ PHP;
     $written = (string) file_get_contents(base_path('rector.php'));
     expect($written)->toContain('StringToClassConstantRector::class')
         ->toContain('AddGenericBuilderToScopesRector::class')
+        ->toContain('MigrateToSimplifiedAttributeRector::class')
         ->toContain('TablePropertyToTableAttributeRector::class')
         // the entries that were already there survive, exactly once
         ->toContain('CarbonToDateFacadeRector::class');

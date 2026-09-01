@@ -25,6 +25,7 @@ return static function (RectorConfig \$config): void {
             EloquentOrderByToLatestOrOldestRector::class,
             StringToClassConstantRector::class,
             AddGenericBuilderToScopesRector::class,
+            MigrateToSimplifiedAttributeRector::class,
 {$extraSkips}        ]);
 };
 PHP;
@@ -112,6 +113,31 @@ PHP;
     $check = makeCheck(HasRectorConfigWithSkipCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($check->getComments()[0])->toContain('AddGenericBuilderToScopesRector');
+});
+
+it('hasRectorConfigWithSkip fails when MigrateToSimplifiedAttributeRector is missing', function () use ($laravel12Composer): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+use Rector\Config\RectorConfig;
+return static function (RectorConfig $config): void {
+    $config->withSkip([
+        CarbonToDateFacadeRector::class,
+        AppToResolveRector::class,
+        RedirectBackToBackHelperRector::class,
+        RedirectRouteToToRouteHelperRector::class,
+        NowFuncWithStartOfDayMethodCallToTodayFuncRector::class,
+        EloquentOrderByToLatestOrOldestRector::class,
+        StringToClassConstantRector::class,
+        AddGenericBuilderToScopesRector::class,
+    ]);
+};
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode($laravel12Composer)]);
+
+    $check = makeCheck(HasRectorConfigWithSkipCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($check->getComments()[0])->toContain('MigrateToSimplifiedAttributeRector');
 });
 
 it('hasRectorConfigWithSkip fails when ServerVariableToRequestFacadeRector is missing with server.php', function () use ($laravel12Composer): void {
