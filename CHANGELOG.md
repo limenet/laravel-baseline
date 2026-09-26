@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.12.1](https://github.com/limenet/laravel-baseline/compare/v2.12.0...v2.12.1) (2026-09-26)
+
+### Bug Fixes
+
+* **js:** only require tsc in ci-lint when the project has TypeScript ([ee57359](https://github.com/limenet/laravel-baseline/commit/ee57359985cb3ff58bad69093ed763d4ed817fd8))
+
 ## [2.12.0](https://github.com/limenet/laravel-baseline/compare/v2.11.0...v2.12.0) (2026-09-26)
 
 ### Features
