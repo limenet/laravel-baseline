@@ -93,6 +93,32 @@ ddev composer run ci-lint
 npm run ci-lint
 ```
 
+### 6. Record the run (last)
+
+Once both `ci-lint` runs pass, mark the `updatesDependencies` periodic check as done so it stops
+prompting for the next 30 days. `limenet:laravel-baseline:periodic` asks for confirmation
+interactively, so write the timestamp into `config/baseline.php` directly instead. Get the current
+time in the format the baseline writes:
+
+```bash
+ddev php -r 'echo date(DATE_ATOM), PHP_EOL;'
+```
+
+Set it under the `periodic` key, adding that key if it does not exist yet, and leave `excludes` and
+every other entry untouched:
+
+```php
+return [
+    'excludes' => [],
+    'periodic' => [
+        'updatesDependencies' => '2026-01-31T09:15:00+00:00',
+    ],
+];
+```
+
+Skip this step if the update was abandoned or `ci-lint` still fails — the date records a completed
+update, not an attempted one.
+
 ## What to report
 
 Produce a written summary:

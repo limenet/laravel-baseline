@@ -75,6 +75,31 @@ Run the lint suite and fix every issue before considering the update complete:
 npm run ci-lint
 ```
 
+### 6. Record the run (last)
+
+Once `ci-lint` passes, mark the `updatesDependencies` periodic check as done so it stops prompting
+for the next 30 days. `baseline periodic` asks for confirmation interactively, so write the
+timestamp into `.baseline.json` at the project root directly instead. Get the current time in the
+format the runner writes:
+
+```bash
+node -e "console.log(new Date().toISOString())"
+```
+
+Set it as `periodic.updatesDependencies`, creating the `periodic` object (or the file) if it does
+not exist yet, and leave every other key untouched:
+
+```json
+{
+    "periodic": {
+        "updatesDependencies": "2026-01-31T09:15:00.000Z"
+    }
+}
+```
+
+Skip this step if the update was abandoned or `ci-lint` still fails — the date records a completed
+update, not an attempted one.
+
 ## What to report
 
 Produce a written summary:
