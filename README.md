@@ -83,9 +83,9 @@ npm install --save-dev @limenet-ch/baseline
 
 ```bash
 npx baseline check              # report issues
-npx baseline check --fix        # apply safe fixes, then report what is left
+npx baseline check --fix        # apply safe fixes and install/update the skills, then report what is left
 npx baseline periodic           # walk through expired periodic checks
-npx baseline install-skills     # copy the packaged skills into .claude/skills/
+npx baseline install-skills     # copy the packaged skills into .claude/skills/ without running the checks
 ```
 
 Wire it into the `ci-lint` npm script so CI and the Claude Stop hook both run it — npm has no

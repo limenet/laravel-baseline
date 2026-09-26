@@ -13,7 +13,7 @@ Usage:
   baseline install-skills [--force] [--cwd <path>]
 
 Options:
-  --fix        Repair what can be repaired, then re-verify
+  --fix        Repair what can be repaired, install/update the skills, then re-verify
   --verbose    Show passing checks too
   --force      Overwrite skills that are already installed
   --cwd        Project root to inspect (default: the current directory)

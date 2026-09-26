@@ -2,7 +2,12 @@ import { mkdtempSync, readdirSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, it, vi } from 'vitest'
-import { runInstallSkills, skillsDirectory } from '../src/commands/install-skills.js'
+import {
+    packagedSkills,
+    runInstallSkills,
+    skillsDirectory,
+    syncSkills,
+} from '../src/commands/install-skills.js'
 import { Project } from '../src/project.js'
 
 function scratch(): Project {
@@ -51,6 +56,25 @@ it('leaves an existing skill alone unless forced', () => {
 
     expect(silently(() => runInstallSkills(project, { force: true }))).toBe(0)
     expect(project.read(target)).not.toBe('# mine\n')
+})
+
+it('syncs missing and outdated skills, and nothing else', () => {
+    const project = scratch()
+    const all = packagedSkills().map((skill) => skill.target)
+
+    expect(all.length).toBeGreaterThan(0)
+    expect(syncSkills(project)).toEqual(all)
+    expect(syncSkills(project)).toEqual([])
+
+    const target = '.claude/skills/creating-a-release/SKILL.md'
+    project.write(target, '# outdated\n')
+    project.write('.claude/skills/project-specific/SKILL.md', '# mine\n')
+
+    expect(syncSkills(project)).toEqual([target])
+    expect(project.read(target)).toBe(
+        readFileSync(join(skillsDirectory(), 'creating-a-release', 'SKILL.md'), 'utf8'),
+    )
+    expect(project.read('.claude/skills/project-specific/SKILL.md')).toBe('# mine\n')
 })
 
 it('ships no DDEV or composer instructions in the JS skills', () => {

@@ -17,6 +17,56 @@ export function skillsDirectory(): string {
     return join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'skills')
 }
 
+export interface PackagedSkill {
+    name: string
+    target: string
+    contents: string
+}
+
+/**
+ * Every skill this package ships, with the path it is installed to. Shared by
+ * the install-skills command and hasInstalledSkills, so the two can never
+ * disagree about what "installed" means.
+ */
+export function packagedSkills(): PackagedSkill[] {
+    const source = skillsDirectory()
+
+    if (!existsSync(source)) {
+        return []
+    }
+
+    return readdirSync(source)
+        .sort()
+        .filter((name) => existsSync(join(source, name, 'SKILL.md')))
+        .map((name) => ({
+            name,
+            target: `.claude/skills/${name}/SKILL.md`,
+            contents: readFileSync(join(source, name, 'SKILL.md'), 'utf8'),
+        }))
+}
+
+/**
+ * Brings .claude/skills/ in line with the packaged skills and returns the paths
+ * it wrote. Run by `check --fix`, so upgrading the package and fixing is enough
+ * to pick up new and changed skills. The skills belong to the package, like the
+ * canonical .editorconfig: a local edit is drift and gets overwritten. Skills the
+ * package does not ship are left alone.
+ */
+export function syncSkills(project: Project): string[] {
+    const written: string[] = []
+
+    for (const skill of packagedSkills()) {
+        if (project.read(skill.target) === skill.contents) {
+            continue
+        }
+
+        project.write(skill.target, skill.contents)
+        written.push(skill.target)
+    }
+
+    return written
+}
+
 export interface InstallSkillsOptions {
     force: boolean
 }
@@ -33,24 +83,16 @@ export function runInstallSkills(project: Project, options: InstallSkillsOptions
     let installed = 0
     let skipped = 0
 
-    for (const skill of readdirSync(source).sort()) {
-        const file = join(source, skill, 'SKILL.md')
-
-        if (!existsSync(file)) {
-            continue
-        }
-
-        const target = `.claude/skills/${skill}/SKILL.md`
-
-        if (project.exists(target) && !options.force) {
-            console.log(`⏭  ${skill} (already installed — pass --force to overwrite)`)
+    for (const skill of packagedSkills()) {
+        if (project.exists(skill.target) && !options.force) {
+            console.log(`⏭  ${skill.name} (already installed — pass --force to overwrite)`)
             skipped += 1
 
             continue
         }
 
-        project.write(target, readFileSync(file, 'utf8'))
-        console.log(`✅ ${skill} → ${target}`)
+        project.write(skill.target, skill.contents)
+        console.log(`✅ ${skill.name} → ${skill.target}`)
         installed += 1
     }
 

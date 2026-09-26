@@ -3,6 +3,7 @@ import { isPeriodic } from '../checks/periodic-check.js'
 import { createChecks } from '../checks/registry.js'
 import type { Project } from '../project.js'
 import { excludedChecks } from '../state.js'
+import { syncSkills } from './install-skills.js'
 
 export interface CheckOptions {
     fix: boolean
@@ -15,6 +16,14 @@ export function runCheck(project: Project, options: CheckOptions): number {
     const excluded = excludedChecks(project)
 
     let errors = 0
+
+    // Not a check: there is nothing to decide, only files to keep current. Laravel
+    // Boost does the same for the PHP runner on boost:update.
+    if (options.fix) {
+        for (const target of syncSkills(project)) {
+            console.log(`🔧 Skill installed: ${target}`)
+        }
+    }
 
     for (const check of createChecks(project, comments)) {
         // A periodic check that does not apply yields no result at all, matching
