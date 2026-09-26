@@ -88,7 +88,7 @@ class RectorRemovalVisitor extends NodeVisitorAbstract
     {
         $kept = array_values(array_filter(
             $node->args,
-            fn (Node\Arg|Node\VariadicPlaceholder $arg): bool => !$arg instanceof Node\Arg || !$this->matches($arg->value),
+            fn (Node $arg): bool => !$arg instanceof Node\Arg || !$this->matches($arg->value),
         ));
 
         if (count($kept) === count($node->args)) {

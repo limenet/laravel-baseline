@@ -28,7 +28,7 @@ class RectorVisitorNamedArgument extends AbstractRectorVisitor
     {
         $args = [];
         foreach ($node->args as $arg) {
-            if ($arg->name) {
+            if ($arg instanceof Node\Arg && $arg->name) {
                 $args[$arg->name->toString()] = $arg->value instanceof Node\Expr\ConstFetch
                     ? $arg->value->name->toString()
                     : null;

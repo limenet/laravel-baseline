@@ -1,24 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Access to an undefined property PhpParser\\Node\\Arg\|PhpParser\\Node\\VariadicPlaceholder\:\:\$value\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Rector/RectorVisitorClassFetch.php
-
-		-
-			message: '#^Access to an undefined property PhpParser\\Node\\Arg\|PhpParser\\Node\\VariadicPlaceholder\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Rector/RectorVisitorNamedArgument.php
-
-		-
-			message: '#^Access to an undefined property PhpParser\\Node\\Arg\|PhpParser\\Node\\VariadicPlaceholder\:\:\$value\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Rector/RectorVisitorNamedArgument.php
-
-		-
 			message: '#^Strict comparison using \=\=\= between 803 and 803 will always evaluate to true\.$#'
 			identifier: identical.alwaysTrue
 			count: 1
