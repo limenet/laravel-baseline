@@ -13,6 +13,7 @@ on:
       - "vitest.config.ts"
       - ".gitattributes"
       - ".github/workflows/js-tests.yml"
+      - ".nvmrc"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,12 +24,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    # .nvmrc is the toolchain this repo develops on; 24 is the floor the
+    # published package promises in engines.node, so it stays tested too.
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [24, 26]
+
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies
