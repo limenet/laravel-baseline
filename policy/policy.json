@@ -7,6 +7,9 @@
         "minMajor": "12",
         "constraint": "^12",
         "minReleaseAgeDays": 7,
+        "minReleaseAgeExclude": {
+            "js": ["@limenet-ch/baseline"]
+        },
         "engineStrict": true
     },
     "biome": {

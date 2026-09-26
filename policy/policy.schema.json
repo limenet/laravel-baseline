@@ -42,7 +42,13 @@
         "npm": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["minMajor", "constraint", "minReleaseAgeDays", "engineStrict"],
+            "required": [
+                "minMajor",
+                "constraint",
+                "minReleaseAgeDays",
+                "minReleaseAgeExclude",
+                "engineStrict"
+            ],
             "properties": {
                 "minMajor": { "type": "string", "pattern": "^\\d+$" },
                 "constraint": {
@@ -53,6 +59,15 @@
                     "type": "integer",
                     "minimum": 0,
                     "description": "Install-time cooldown in days: npm skips versions younger than this."
+                },
+                "minReleaseAgeExclude": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["js"],
+                    "description": "Packages .npmrc must exempt from the cooldown via min-release-age-exclude[]. js only: it is the npm runner itself, which a Laravel project never installs, and a baseline fix should not wait a week to reach its consumers.",
+                    "properties": {
+                        "js": { "type": "array", "items": { "type": "string" } }
+                    }
                 },
                 "engineStrict": {
                     "type": "boolean",

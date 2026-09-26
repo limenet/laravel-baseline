@@ -1,0 +1,6 @@
+{
+    "check": "hardensNpmSupplyChain",
+    "description": "passes when a scope glob already exempts the baseline package, as npm matches excludes with minimatch",
+    "engines": ["js"],
+    "expect": "pass"
+}

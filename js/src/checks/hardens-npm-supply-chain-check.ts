@@ -1,5 +1,6 @@
+import { posix } from 'node:path'
 import { policy } from '../policy.js'
-import { parseNpmrc, upsertNpmrc } from '../support/npmrc.js'
+import { appendNpmrcList, npmrcList, parseNpmrc, upsertNpmrc } from '../support/npmrc.js'
 import { guaranteesAtLeast } from '../support/versions.js'
 import { type CheckResult, FixableCheck } from './check.js'
 
@@ -80,8 +81,21 @@ export class HardensNpmSupplyChainCheck extends FixableCheck {
             }
         }
 
+        // Patterns are minimatch globs matched against the package name, the same
+        // way npm applies them, so an existing `@scope/*` counts as covering it.
+        const excluded = npmrcList(npmrcContents, 'min-release-age-exclude')
+        const notExcluded = policy()
+            .strings('npm.minReleaseAgeExclude.js')
+            .filter((name) => !excluded.some((pattern) => posix.matchesGlob(name, pattern)))
+
+        for (const name of notExcluded) {
+            this.comment(
+                `.npmrc does not exempt ${name} from the cooldown: add "min-release-age-exclude[]=${name}" so baseline fixes reach this project on release rather than ${minReleaseAgeDays} days later`,
+            )
+        }
+
         if (dry) {
-            return 'pass'
+            return notExcluded.length === 0 ? 'pass' : 'fail'
         }
 
         if (npm === null || npmTooLow) {
@@ -91,10 +105,14 @@ export class HardensNpmSupplyChainCheck extends FixableCheck {
 
         this.project.write(
             '.npmrc',
-            upsertNpmrc(npmrcContents, {
-                'engine-strict': 'true',
-                'min-release-age': String(minReleaseAgeDays),
-            }),
+            appendNpmrcList(
+                upsertNpmrc(npmrcContents, {
+                    'engine-strict': 'true',
+                    'min-release-age': String(minReleaseAgeDays),
+                }),
+                'min-release-age-exclude',
+                notExcluded,
+            ),
         )
 
         return this.fix(true)

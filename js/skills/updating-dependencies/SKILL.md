@@ -96,6 +96,8 @@ Produce a written summary:
   ones the developer approves. Never cross a version constraint automatically.
 - **Respect the install cooldown.** `.npmrc` sets `min-release-age`, so a version published within
   that window is deliberately skipped. Do not lower or bypass it to pull in a fresh release.
+  Packages listed under `min-release-age-exclude[]` (at least `@limenet-ch/baseline`) are exempt
+  and resolve to their newest version right away.
 - **Keep Biome's `$schema` in sync.** If `biome` is installed and its version changed, update the
   `$schema` URL in `biome.json` to match the new version (e.g.
   `https://biomejs.dev/schemas/<new-version>/schema.json`). Skip this if there is no `biome.json` or

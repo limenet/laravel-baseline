@@ -111,7 +111,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | Check | Relationship to the Laravel runner |
 | --- | --- |
 | `nodeVersion` | identical |
-| `hardensNpmSupplyChain` | identical |
+| `hardensNpmSupplyChain` | also requires `.npmrc` to exempt `@limenet-ch/baseline` from the cooldown (`min-release-age-exclude[]=@limenet-ch/baseline`, or a glob covering it), so a baseline fix lands without the 7-day wait |
 | `hasEditorconfig` | identical |
 | `biomeUsesLocalSchema` | identical |
 | `doesNotHaveCopilotOrJunieAgentFiles` | identical |

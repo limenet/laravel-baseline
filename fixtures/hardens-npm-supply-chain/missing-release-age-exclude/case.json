@@ -1,0 +1,10 @@
+{
+    "check": "hardensNpmSupplyChain",
+    "description": "fails when the cooldown does not exempt the baseline package, and appends it on fix without touching other excludes",
+    "engines": ["js"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": { ".npmrc": "engine-strict=true\nmin-release-age=7\nmin-release-age-exclude[]=left-pad\nmin-release-age-exclude[]=@limenet-ch/baseline\n" }
+    }
+}

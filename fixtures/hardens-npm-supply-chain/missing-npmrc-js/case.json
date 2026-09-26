@@ -1,7 +1,7 @@
 {
     "check": "hardensNpmSupplyChain",
-    "description": "fails when the cooldown is shorter than the policy minimum, and raises it on fix",
-    "engines": ["php", "js"],
+    "description": "fails without an .npmrc, and writes both hardening keys plus the baseline's cooldown exclude on fix",
+    "engines": ["js"],
     "expect": "fail",
     "fix": {
         "expect": "pass",

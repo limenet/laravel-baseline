@@ -1,7 +1,7 @@
 {
     "check": "hardensNpmSupplyChain",
-    "description": "fails without an .npmrc, and writes both hardening keys on fix",
-    "engines": ["php", "js"],
+    "description": "fails without an .npmrc, and writes both hardening keys on fix (the npm runner also writes the cooldown exclude, see missing-npmrc-js)",
+    "engines": ["php"],
     "expect": "fail",
     "fix": {
         "expect": "pass",
