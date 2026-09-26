@@ -48,11 +48,15 @@ ddev composer update
 ```
 
 ```bash
-npm update
+npx npm-check-updates -u --target semver
 ```
 
-If `biome` moved (here or in step 4), sync the `$schema` in `biome.json` to the new version — see
-the Biome convention below.
+```bash
+npm install
+```
+
+`npm-check-updates` rewrites the ranges in `package.json` to the newest version each constraint
+allows, where `npm update` would only move the lock file.
 
 ### 3. Review changelogs against this project
 

@@ -33,14 +33,16 @@ npx npm-check-updates --format group
 
 ### 2. Apply the in-constraint updates
 
-Update everything that fits the existing constraints and refresh the lock file:
+Bump every dependency to the newest version its existing constraint allows — rewriting the ranges
+in `package.json`, not just the lock file — then install:
 
 ```bash
-npm update
+npx npm-check-updates -u --target semver
 ```
 
-If `biome` moved (here or in step 4), sync the `$schema` in `biome.json` to the new version — see
-the Biome convention below.
+```bash
+npm install
+```
 
 ### 3. Review changelogs against this project
 
