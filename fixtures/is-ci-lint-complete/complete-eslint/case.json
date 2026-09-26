@@ -1,0 +1,8 @@
+{
+    "check": "isCiLintComplete",
+    "description": "passes when ESLint is the installed linter and ci-lint runs it instead of biome",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

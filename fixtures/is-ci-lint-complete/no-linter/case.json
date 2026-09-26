@@ -1,0 +1,8 @@
+{
+    "check": "isCiLintComplete",
+    "description": "fails when package.json installs no linter at all",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail"
+}

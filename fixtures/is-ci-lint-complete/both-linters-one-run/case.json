@@ -1,0 +1,8 @@
+{
+    "check": "isCiLintComplete",
+    "description": "fails when both linters are installed but ci-lint runs only one",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail"
+}

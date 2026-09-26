@@ -124,7 +124,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `hasCiJobs` | same GitLab CI templates, without the `php` job |
 | `hasTrivyConfig` | identical, canonical config included: its `vendor/**`, `storage/logs/` and `.ddev/` skips are inert in a JS project |
 | `ciSetsNodeVersion` | **npm-only**: the Laravel runner does not register it |
-| `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script |
+| `isCiLintComplete` | asserts the JS toolchain in the npm script, not pint/phpstan in a composer script: `tsc` plus whichever linter is installed (`biome` for `@biomejs/biome`, `eslint` for `eslint`), failing if neither is |
 | `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
 | `doesNotExcludeUnknownChecks` | identical, against this runner's smaller registry: a name only the Laravel runner knows is as dead here as one that exists nowhere |
 | `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |

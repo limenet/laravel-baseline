@@ -1,9 +1,9 @@
 {
     "name": "test-project",
     "scripts": {
-        "ci-lint": "biome ci ."
+        "ci-lint": "tsc --noEmit"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.0.0"
+        "typescript": "^5.0.0"
     }
 }

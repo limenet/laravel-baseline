@@ -1,0 +1,8 @@
+{
+    "check": "isCiLintComplete",
+    "description": "fails when ci-lint runs biome but the installed linter is ESLint",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail"
+}

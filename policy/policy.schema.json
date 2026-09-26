@@ -197,7 +197,7 @@
         "ciLint": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["required", "baselineCommand"],
+            "required": ["required", "linters", "baselineCommand"],
             "properties": {
                 "required": {
                     "type": "object",
@@ -207,6 +207,19 @@
                     "properties": {
                         "php": { "type": "array", "items": { "type": "string" } },
                         "js": { "type": "array", "items": { "type": "string" } }
+                    }
+                },
+                "linters": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["js"],
+                    "description": "Linter package => the command ci-lint must run when that package is installed. At least one must be installed.",
+                    "properties": {
+                        "js": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" },
+                            "minProperties": 1
+                        }
                     }
                 },
                 "baselineCommand": {
