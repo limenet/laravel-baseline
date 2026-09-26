@@ -3,6 +3,16 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.12.0](https://github.com/limenet/laravel-baseline/compare/v2.11.0...v2.12.0) (2026-09-26)
+
+### Features
+
+* **js:** exempt @limenet-ch/baseline from the npm install cooldown ([74e160a](https://github.com/limenet/laravel-baseline/commit/74e160a1712135e95b1aad91cc19ff1d00e0cb31))
+
+### Bug Fixes
+
+* **js:** require the installed linter in isCiLintComplete ([4b59f99](https://github.com/limenet/laravel-baseline/commit/4b59f99570ce55882bea6552a660189d8b510b31))
+
 ## [2.11.0](https://github.com/limenet/laravel-baseline/compare/v2.10.0...v2.11.0) (2026-09-01)
 
 ### Features
