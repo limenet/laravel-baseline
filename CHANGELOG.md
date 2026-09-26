@@ -3,6 +3,13 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.12.2](https://github.com/limenet/laravel-baseline/compare/v2.12.1...v2.12.2) (2026-09-26)
+
+### Bug Fixes
+
+* **js:** install and update the packaged skills on check --fix ([0b856f1](https://github.com/limenet/laravel-baseline/commit/0b856f12225be78fbe03feb6f81017c3e7d764d4))
+* record the updatesDependencies run at the end of the updating-dependencies skill ([ea41842](https://github.com/limenet/laravel-baseline/commit/ea41842f726cc2d848ccaa420be168865904510d))
+
 ## [2.12.1](https://github.com/limenet/laravel-baseline/compare/v2.12.0...v2.12.1) (2026-09-26)
 
 ### Bug Fixes
