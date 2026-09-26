@@ -1,0 +1,8 @@
+{
+    "check": "isCiLintComplete",
+    "description": "passes without tsc when the project has no TypeScript files for it to check",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

@@ -13,7 +13,8 @@ interface PackageJson {
  * just be installed.
  *
  * Which linter is the project's choice: every one it installs has to run, and it
- * has to install at least one.
+ * has to install at least one. The type checker is only required once there is
+ * TypeScript for it to check.
  */
 export class IsCiLintCompleteCheck extends Check {
     static override readonly checkName = 'isCiLintComplete'
@@ -47,6 +48,10 @@ export class IsCiLintCompleteCheck extends Check {
             ...installed.map((name) => linters[name] as string),
             ...policy().strings('ciLint.required.js'),
         ]
+
+        if (this.project.containsFileWithExtension(policy().strings('ciLint.typeChecker.js.extensions'))) {
+            required.push(policy().string('ciLint.typeChecker.js.command'))
+        }
 
         for (const command of required) {
             if (!script.includes(command)) {

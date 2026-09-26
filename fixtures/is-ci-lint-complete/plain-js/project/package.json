@@ -1,0 +1,9 @@
+{
+    "name": "test-project",
+    "scripts": {
+        "ci-lint": "eslint ."
+    },
+    "devDependencies": {
+        "eslint": "^9.0.0"
+    }
+}

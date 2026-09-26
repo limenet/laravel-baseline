@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 
 /**
@@ -71,5 +71,29 @@ export class Project {
 
     remove(relative: string): void {
         rmSync(this.path(relative), { recursive: true, force: true })
+    }
+
+    /**
+     * Whether any file in the project ends in one of the extensions. node_modules
+     * and dot-directories (.git, .claude, .ddev, …) are not the project's own
+     * source, and symlinks are not followed; the walk stops at the first match.
+     */
+    containsFileWithExtension(extensions: string[], directory = ''): boolean {
+        for (const entry of readdirSync(this.path(directory), { withFileTypes: true })) {
+            if (entry.isFile() && extensions.some((extension) => entry.name.endsWith(extension))) {
+                return true
+            }
+
+            if (
+                entry.isDirectory() &&
+                entry.name !== 'node_modules' &&
+                !entry.name.startsWith('.') &&
+                this.containsFileWithExtension(extensions, join(directory, entry.name))
+            ) {
+                return true
+            }
+        }
+
+        return false
     }
 }

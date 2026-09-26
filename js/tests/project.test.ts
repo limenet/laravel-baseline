@@ -30,3 +30,22 @@ it('throws on malformed JSON rather than reporting the file as absent', () => {
     // or --fix would silently discard the developer's hooks and env.
     expect(() => project.readJson('.claude/settings.json')).toThrow(/settings\.json is not valid JSON/)
 })
+
+it('finds a file by extension at any depth', () => {
+    const project = scratch()
+
+    project.write('src/deep/nested/index.ts', '')
+
+    expect(project.containsFileWithExtension(['.ts'])).toBe(true)
+    expect(project.containsFileWithExtension(['.tsx'])).toBe(false)
+})
+
+it('does not count files under node_modules or dot-directories as the project’s own', () => {
+    const project = scratch()
+
+    project.write('node_modules/some-package/index.d.ts', '')
+    project.write('.claude/hooks/hook.ts', '')
+    project.write('src/index.js', '')
+
+    expect(project.containsFileWithExtension(['.ts'])).toBe(false)
+})

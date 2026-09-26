@@ -1,6 +1,6 @@
 {
     "check": "isCiLintComplete",
-    "description": "fails when the ci-lint npm script skips the type checker",
+    "description": "fails when the project has TypeScript but the ci-lint npm script skips the type checker",
     "engines": [
         "js"
     ],

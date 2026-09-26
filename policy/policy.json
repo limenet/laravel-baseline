@@ -107,12 +107,18 @@
     "ciLint": {
         "required": {
             "php": ["pint --parallel", "phpstan"],
-            "js": ["tsc"]
+            "js": []
         },
         "linters": {
             "js": {
                 "@biomejs/biome": "biome",
                 "eslint": "eslint"
+            }
+        },
+        "typeChecker": {
+            "js": {
+                "command": "tsc",
+                "extensions": [".ts", ".tsx", ".mts", ".cts"]
             }
         },
         "baselineCommand": {
