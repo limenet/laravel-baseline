@@ -87,6 +87,33 @@ Notes to include with the report:
   cached value's runtime type is uncertain. Only suggest a typed getter where the expected type is
   clear, and call out any case where it isn't.
 
+## Record the run (last)
+
+Once the report has been presented, mark the `followsModernLaravelIdioms` periodic check as done so
+it stops prompting for the next 30 days. `limenet:laravel-baseline:periodic` asks for confirmation
+interactively, so write the timestamp into `config/baseline.php` directly instead. Get the current
+time in the format the baseline writes:
+
+```bash
+ddev php -r 'echo date(DATE_ATOM), PHP_EOL;'
+```
+
+Set it under the `periodic` key, adding that key if it does not exist yet, and leave `excludes` and
+every other entry untouched:
+
+```php
+return [
+    'excludes' => [],
+    'periodic' => [
+        'followsModernLaravelIdioms' => '2026-01-31T09:15:00+00:00',
+    ],
+];
+```
+
+Record the run even when there are no findings or the developer declines every suggestion — the
+date records a completed audit, not applied rewrites. Skip it only if the audit was abandoned before
+the whole app code was scanned.
+
 ## Conventions
 
 - **Typed cache getters.** Prefer `Cache::string()`, `Cache::integer()`, `Cache::float()`,

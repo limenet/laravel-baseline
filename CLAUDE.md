@@ -343,6 +343,22 @@ class RunsMyTaskCheck extends AbstractPeriodicCheck
 - `promptDescription()` — shown to the developer in the interactive command
 - `check()` is `final` in `AbstractPeriodicCheck` — do not override; use `isApplicable()` for preconditions
 
+### Periodic checks backed by a skill
+
+When `promptDescription()` points at a skill (`updating-dependencies`, `auditing-laravel-idioms`),
+that skill **must end with a "Record the run (last)" step** that writes the check's timestamp into
+the runner's state file itself. The periodic command confirms interactively, which an agent cannot
+answer, so without that step the check keeps prompting after the skill has completed. Copy the step
+from `updating-dependencies` in every variant of the skill that exists:
+
+- **PHP** (`resources/boost/skills/`) — `config/baseline.php`, `periodic.<checkName>`, value from
+  `ddev php -r 'echo date(DATE_ATOM), PHP_EOL;'`, leaving `excludes` untouched.
+- **npm** (`js/skills/`) — `.baseline.json`, `periodic.<checkName>`, value from
+  `node -e "console.log(new Date().toISOString())"`.
+
+State what "completed" means for that skill (e.g. `ci-lint` passes; the report was delivered) and
+say to skip the step otherwise — the date records a completed run, not an attempted one.
+
 ### How periodic state is stored
 
 Timestamps are persisted in `config/baseline.php` under a `periodic` key by `PeriodicStateManager`. The file is rewritten via `PhpFileWriter::writeConfig` (nikic/php-parser) each time a check is confirmed. `PeriodicStateManager` reads directly via `require` (bypassing Laravel's config cache) so state is always fresh.
