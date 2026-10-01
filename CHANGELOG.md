@@ -3,6 +3,19 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.13.0](https://github.com/limenet/laravel-baseline/compare/v2.12.2...v2.13.0) (2026-10-01)
+
+### Features
+
+* **skill:** add ignoring-trivy-findings and prune expired ignores when updating dependencies ([a73b017](https://github.com/limenet/laravel-baseline/commit/a73b0171cddb96881b933503ff86d146239fa898))
+* **skill:** wait for green CI and support non-conventional commits in creating-a-release ([f72c6ba](https://github.com/limenet/laravel-baseline/commit/f72c6bae1f417b1962420a794a4d9f5b76ee73da))
+
+### Bug Fixes
+
+* bump package.json ranges in the updating-dependencies skill ([ffac8f9](https://github.com/limenet/laravel-baseline/commit/ffac8f9c54fb320f163b2e821256093c8951d51c))
+* **php:** raise rector floor to 2.5.8 for PHPStan 2.2 compatibility ([cf7de73](https://github.com/limenet/laravel-baseline/commit/cf7de736b906eebf4bbb75a803d022faa1aad8d9))
+* **php:** record the followsModernLaravelIdioms run at the end of the auditing-laravel-idioms skill ([7996220](https://github.com/limenet/laravel-baseline/commit/79962202e0a4a245fd589f0d8ab034897e242e20))
+
 ## [2.12.2](https://github.com/limenet/laravel-baseline/compare/v2.12.1...v2.12.2) (2026-09-26)
 
 ### Bug Fixes
