@@ -84,7 +84,22 @@ npx npm-check-updates -u <package>
 npm install
 ```
 
-### 5. Verify (always)
+### 5. Prune expired Trivy ignores (always)
+
+Open `.trivyignore.yaml` and delete every entry whose `expired_at` is on or before today (Trivy
+stops applying it at that point anyway). Get today's date:
+
+```bash
+ddev php -r 'echo date("Y-m-d"), PHP_EOL;'
+```
+
+The updates above are often what makes those findings go away: a `cooldown:` entry expires once
+its fix is installable, and step 2 just installed it. If an expired entry's finding is still
+reported, handle it with the `ignoring-trivy-findings` skill — upgrade, or renew it deliberately
+with a new expiry and statement — rather than bumping the date. Leave the file in place even if it
+ends up empty.
+
+### 6. Verify (always)
 
 Run both lint suites and fix every issue before considering the update complete. Run each
 separately:
@@ -97,7 +112,7 @@ ddev composer run ci-lint
 npm run ci-lint
 ```
 
-### 6. Record the run (last)
+### 7. Record the run (last)
 
 Once both `ci-lint` runs pass, mark the `updatesDependencies` periodic check as done so it stops
 prompting for the next 30 days. `limenet:laravel-baseline:periodic` asks for confirmation
@@ -132,6 +147,8 @@ Produce a written summary:
   migration step, if any).
 - **Blocked by semver** — the majors / upgrades held back by the constraints, each with a
   recommendation: bump now, defer, or skip, and why.
+- **Trivy ignores** — expired entries removed from `.trivyignore.yaml`, and how any finding they
+  were still hiding was handled.
 - **Lint fixes** — anything the `ci-lint` run required you to fix.
 
 ## Conventions

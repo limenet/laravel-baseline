@@ -69,7 +69,22 @@ npm install
 Watch for `engines` conflicts: this project sets `engine-strict=true`, so a package requiring a
 newer Node than `engines.node` allows will refuse to install rather than warn.
 
-### 5. Verify (always)
+### 5. Prune expired Trivy ignores (always)
+
+Open `.trivyignore.yaml` and delete every entry whose `expired_at` is on or before today (Trivy
+stops applying it at that point anyway). Get today's date:
+
+```bash
+node -e "console.log(new Date().toISOString().slice(0, 10))"
+```
+
+The updates above are often what makes those findings go away: a `cooldown:` entry expires once
+its fix is installable, and step 2 just installed it. If an expired entry's finding is still
+reported, handle it with the `ignoring-trivy-findings` skill — upgrade, or renew it deliberately
+with a new expiry and statement — rather than bumping the date. Leave the file in place even if it
+ends up empty.
+
+### 6. Verify (always)
 
 Run the lint suite and fix every issue before considering the update complete:
 
@@ -77,7 +92,7 @@ Run the lint suite and fix every issue before considering the update complete:
 npm run ci-lint
 ```
 
-### 6. Record the run (last)
+### 7. Record the run (last)
 
 Once `ci-lint` passes, mark the `updatesDependencies` periodic check as done so it stops prompting
 for the next 30 days. `baseline periodic` asks for confirmation interactively, so write the
@@ -111,6 +126,8 @@ Produce a written summary:
   migration step, if any).
 - **Blocked by semver** — the majors / upgrades held back by the constraints, each with a
   recommendation: bump now, defer, or skip, and why.
+- **Trivy ignores** — expired entries removed from `.trivyignore.yaml`, and how any finding they
+  were still hiding was handled.
 - **Lint fixes** — anything the `ci-lint` run required you to fix.
 
 ## Conventions
