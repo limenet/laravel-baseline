@@ -3,6 +3,25 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.14.0](https://github.com/limenet/laravel-baseline/compare/v2.13.0...v2.14.0) (2026-10-02)
+
+### Features
+
+* **php:** add doesNotUsePhpCsFixer check ([b40d2f2](https://github.com/limenet/laravel-baseline/commit/b40d2f21b379d43a2c26e941f4e153659c7516a4))
+* **php:** add phpstanCoversAllPhpFiles check ([f0713c2](https://github.com/limenet/laravel-baseline/commit/f0713c28f52914d30d9464f352691e0ce2382014))
+* **php:** add rectorCoversAllPhpFiles check ([83e4a36](https://github.com/limenet/laravel-baseline/commit/83e4a36f8fe7880676ad40bf315e158aad3528c8))
+* **php:** add releaseItBumpsWordpressThemeVersion check ([a853701](https://github.com/limenet/laravel-baseline/commit/a8537016447f9b44eca116fd6ba6d77e37a2a156))
+* **php:** add standalone vendor/bin/baseline runner ([16a5c3a](https://github.com/limenet/laravel-baseline/commit/16a5c3a0bc47b6054272412ab39a817c0b7697c5))
+* **php:** add usesPhpstanWordpress check ([1849019](https://github.com/limenet/laravel-baseline/commit/1849019b4bc0044cb64d60dcf28077612ddda609))
+* **php:** add wordpressThemeVersionMatchesComposer check ([1802d91](https://github.com/limenet/laravel-baseline/commit/1802d9109d0d565c44112d8f53896ac676d9fc1b))
+* **php:** install and sync skills for standalone projects ([fc53680](https://github.com/limenet/laravel-baseline/commit/fc536809ec4947fddb05345f29a121dabbaeba1f))
+* **php:** profile-aware behaviour for generic checks ([a7ec01c](https://github.com/limenet/laravel-baseline/commit/a7ec01c900774a3e8d2a380f26e2e6b7d8924d53))
+* **php:** require the standalone runner as a dev dependency ([4a395bc](https://github.com/limenet/laravel-baseline/commit/4a395bcdf61f06f82eb059c39c259e5b1d8b8e10))
+
+### Bug Fixes
+
+* **php:** address review findings in the standalone checks ([dd9ae29](https://github.com/limenet/laravel-baseline/commit/dd9ae291fb585cfb591fa8ee4235e0e0580ea077))
+
 ## [2.13.0](https://github.com/limenet/laravel-baseline/compare/v2.12.2...v2.13.0) (2026-10-01)
 
 ### Features
