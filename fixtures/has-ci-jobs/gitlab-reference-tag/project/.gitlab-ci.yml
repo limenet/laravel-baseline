@@ -1,0 +1,15 @@
+build:
+  extends:
+    - .build
+php:
+  extends:
+    - .lint_php
+js:
+  extends:
+    - .lint_js
+test:
+  extends:
+    - .test_db
+  before_script:
+    - !reference [.test_db, before_script]
+    - php scripts/install-test-wordpress.php

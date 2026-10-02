@@ -470,9 +470,10 @@ abstract class AbstractCheck implements CheckInterface
 
     /**
      * @param  (callable(string): string)|null  $normalize  applied to the raw contents before parsing
+     * @param  int-mask-of<Yaml::PARSE_*>  $flags
      * @return array<string,mixed>|null
      */
-    protected function loadYamlConfig(string $relativePath, ?callable $normalize = null): ?array
+    protected function loadYamlConfig(string $relativePath, ?callable $normalize = null, int $flags = 0): ?array
     {
         $file = $this->path($relativePath);
         $path = ltrim($relativePath, '/');
@@ -485,7 +486,7 @@ abstract class AbstractCheck implements CheckInterface
 
         try {
             $contents = (string) file_get_contents($file);
-            $data = Yaml::parse($normalize === null ? $contents : $normalize($contents));
+            $data = Yaml::parse($normalize === null ? $contents : $normalize($contents), $flags);
         } catch (ParseException $e) {
             // A malformed file is a finding, not a crash: the fixable checks
             // re-read the file to verify their own write, so an exception here
@@ -505,11 +506,15 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
+     * GitLab CI's own tags (`!reference [.job, script]`) are parsed into
+     * TaggedValue objects rather than rejected: without the flag a single
+     * `!reference` makes the whole file unreadable to every CI check.
+     *
      * @return array<string,mixed>|null
      */
     protected function getGitlabCiData(): ?array
     {
-        return $this->loadYamlConfig('/.gitlab-ci.yml');
+        return $this->loadYamlConfig('/.gitlab-ci.yml', flags: Yaml::PARSE_CUSTOM_TAGS);
     }
 
     /**

@@ -21,7 +21,8 @@ class CallsSentryHookCheck extends AbstractCheck
 
         if (
             ($data['release']['extends'][0] ?? null) !== '.release'
-            || !str_starts_with($data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? '', 'https://sentry.io/api/hooks/release/builtin/')
+            || !is_string($webhook = $data['release']['variables']['SENTRY_RELEASE_WEBHOOK'] ?? null)
+            || !str_starts_with($webhook, 'https://sentry.io/api/hooks/release/builtin/')
         ) {
             $this->addComment('Sentry release hook missing or misconfigured in .gitlab-ci.yml: Job "release" must extend ".release" and set SENTRY_RELEASE_WEBHOOK variable to a valid Sentry webhook URL');
 
