@@ -21,6 +21,11 @@ final class JsonStateStore implements StateStore
         return self::FILE;
     }
 
+    public function excludeHint(): string
+    {
+        return 'the <info>excludes</info> in <info>'.self::FILE.'</info>';
+    }
+
     public function excludes(): array
     {
         return array_values(array_filter($this->storedExcludes(), is_string(...)));

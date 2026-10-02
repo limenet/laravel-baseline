@@ -19,6 +19,11 @@ final class PhpConfigStateStore implements StateStore
         return 'config/baseline.php';
     }
 
+    public function excludeHint(): string
+    {
+        return 'the <info>baseline.excludes</info> config';
+    }
+
     public function excludes(): array
     {
         $excludes = config('baseline.excludes', []);

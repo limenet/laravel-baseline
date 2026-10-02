@@ -3,14 +3,8 @@
 namespace Limenet\LaravelBaseline\Commands;
 
 use Illuminate\Console\Command;
-use Limenet\LaravelBaseline\Checks\CheckInterface;
-use Limenet\LaravelBaseline\Checks\CheckRegistry;
-use Limenet\LaravelBaseline\Checks\CommentCollector;
-use Limenet\LaravelBaseline\Checks\FixableInterface;
-use Limenet\LaravelBaseline\Checks\PeriodicCheckInterface;
-use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Project\LaravelProject;
-use Limenet\LaravelBaseline\Support\CheckName;
+use Limenet\LaravelBaseline\Runner\CheckRunner;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\intro;
@@ -26,17 +20,8 @@ class CheckCommand extends Command
     {
         intro('Running baseline checks...');
 
-        $collector = new CommentCollector;
-        $fix = (bool) $this->option('fix');
-
-        $results = collect(CheckRegistry::createAll($collector, new LaravelProject))
-            ->reject(fn (CheckInterface $check): bool => $this->isExcluded($check))
-            ->reject(fn (CheckInterface $check): bool => $check instanceof PeriodicCheckInterface && !$check->isApplicable())
-            ->map(fn (CheckInterface $check): CheckResult => $this->runCheck($check, $collector, $fix));
-
-        $errorCount = $results
-            ->filter(fn (CheckResult $result): bool => $result->isError())
-            ->count();
+        $errorCount = (new CheckRunner(new LaravelProject, $this->getOutput()))
+            ->run((bool) $this->option('fix'));
 
         if ($errorCount !== 0) {
             error(
@@ -49,86 +34,5 @@ class CheckCommand extends Command
         outro('Baseline check passed!');
 
         return Command::SUCCESS;
-    }
-
-    private function isExcluded(CheckInterface $check): bool
-    {
-        $name = $check::name();
-
-        if (in_array($name, config('baseline.excludes', []), true)) {
-            $this->line(
-                sprintf(
-                    '⚪ %s (excluded)',
-                    CheckName::display($name),
-                ),
-            );
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private function runCheck(CheckInterface $check, CommentCollector $collector, bool $fix = false): CheckResult
-    {
-        $collector->reset();
-
-        $useFix = $fix && $check instanceof FixableInterface;
-        $wasFixed = false;
-
-        if ($useFix) {
-            $dryResult = $check->check();
-            if ($dryResult->isError()) {
-                $collector->reset();
-                $result = $check->fix();
-                $wasFixed = !$result->isError();
-            } else {
-                $result = $dryResult;
-            }
-        } else {
-            $result = $check->check();
-        }
-
-        $checkName = $check::name();
-        $displayName = CheckName::display($checkName);
-
-        $hasOutput = $result->isError() || $this->getOutput()->isVerbose();
-        $hasComments = $result->isError() || $this->getOutput()->isVeryVerbose();
-
-        if ($wasFixed) {
-            $hasOutput = true;
-        }
-
-        if ($hasOutput) {
-            $this->newLine();
-            $icon = $wasFixed ? '🔧' : $result->icon();
-            $suffix = $wasFixed ? ' (fixed)' : '';
-            $this->line(sprintf(
-                '%s %s%s',
-                $icon,
-                $displayName,
-                $suffix,
-            ));
-        }
-
-        if ($hasComments) {
-            collect($collector->all())
-                ->each(fn (string $comment) => $this->comment($comment));
-        }
-
-        if ($hasOutput) {
-            if ($result->isError()) {
-                $this->line(
-                    sprintf(
-                        '  💡 To exclude, add <info>%s</info> to the <info>baseline.excludes</info> config',
-                        $checkName,
-                    ),
-                );
-            }
-
-            $this->newLine();
-        }
-
-        return $result;
     }
 }

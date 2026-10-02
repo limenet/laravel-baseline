@@ -16,6 +16,11 @@ interface StateStore
     public function location(): string;
 
     /**
+     * Where an exclude goes, completing "To exclude, add <name> to …".
+     */
+    public function excludeHint(): string;
+
+    /**
      * The excludes a run honours.
      *
      * @return list<string>

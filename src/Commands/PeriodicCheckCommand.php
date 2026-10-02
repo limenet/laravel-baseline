@@ -2,18 +2,9 @@
 
 namespace Limenet\LaravelBaseline\Commands;
 
-use DateTimeImmutable;
 use Illuminate\Console\Command;
-use Limenet\LaravelBaseline\Checks\CheckRegistry;
-use Limenet\LaravelBaseline\Checks\CommentCollector;
-use Limenet\LaravelBaseline\Checks\PeriodicCheckInterface;
-use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Project\LaravelProject;
-use Limenet\LaravelBaseline\State\PeriodicStateManager;
-use Limenet\LaravelBaseline\Support\CheckName;
-
-use function Laravel\Prompts\confirm;
-use function Laravel\Prompts\info;
+use Limenet\LaravelBaseline\Runner\PeriodicRunner;
 
 class PeriodicCheckCommand extends Command
 {
@@ -23,32 +14,7 @@ class PeriodicCheckCommand extends Command
 
     public function handle(): int
     {
-        $collector = new CommentCollector;
-
-        $expired = collect(CheckRegistry::createAll($collector, new LaravelProject))
-            ->filter(fn ($check) => $check instanceof PeriodicCheckInterface)
-            ->filter(fn (PeriodicCheckInterface $check) => $check->isApplicable())
-            ->filter(fn (PeriodicCheckInterface $check) => $check->check() === CheckResult::FAIL);
-
-        if ($expired->isEmpty()) {
-            info('All periodic checks are up to date!');
-
-            return Command::SUCCESS;
-        }
-
-        foreach ($expired as $check) {
-            $this->newLine();
-            $this->line(sprintf('<info>%s</info>', CheckName::display($check::name())));
-            $this->line($check->promptDescription());
-            $this->newLine();
-
-            if (confirm('Have you completed this task?', default: false)) {
-                PeriodicStateManager::setLastRun($check::name(), new DateTimeImmutable);
-                $this->line('✅ Marked as done.');
-            } else {
-                $this->line('⏭ Skipped.');
-            }
-        }
+        (new PeriodicRunner(new LaravelProject, $this->getOutput()))->run();
 
         return Command::SUCCESS;
     }
