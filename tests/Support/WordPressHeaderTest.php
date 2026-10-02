@@ -32,3 +32,16 @@ it('reports a missing header instead of writing one', function (): void {
 
     expect(WordPressHeader::write($project->path('style.css'), 'Version', '1.1.0'))->toBeFalse();
 });
+
+it('keeps what closes the comment and the line ending when rewriting', function (string $before, string $after): void {
+    $project = makeProject(Profile::WordPress, ['style.css' => $before]);
+
+    WordPressHeader::write($project->path('style.css'), 'Version', '1.2.0');
+
+    expect(file_get_contents($project->path('style.css')))->toBe($after);
+})->with([
+    'comment closed on the same line' => ["/* Theme Name: X\nVersion: 1.0.0 */\nbody{}\n", "/* Theme Name: X\nVersion: 1.2.0 */\nbody{}\n"],
+    'CRLF' => ["/*\r\nTheme Name: X\r\nVersion: 1.0.0\r\n*/\r\n", "/*\r\nTheme Name: X\r\nVersion: 1.2.0\r\n*/\r\n"],
+    'no space after the colon' => ["/*\nVersion:1.0.0\n*/\n", "/*\nVersion:1.2.0\n*/\n"],
+    'only the first header' => ["/*\nVersion: 1.0.0\nRequires PHP Version: 8.5\n*/\n", "/*\nVersion: 1.2.0\nRequires PHP Version: 8.5\n*/\n"],
+]);

@@ -17,14 +17,15 @@ function rectorCoverageProject(string $chain, array $files = []): Project
     ]);
 }
 
-it('rectorCoversAllPhpFiles passes when paths and root files cover everything', function (string $chain): void {
-    expect(makeCheck(RectorCoversAllPhpFilesCheck::class, rectorCoverageProject($chain))->check())->toBe(CheckResult::PASS);
+it('rectorCoversAllPhpFiles passes when paths and root files cover everything', function (string $chain, array $files = []): void {
+    expect(makeCheck(RectorCoversAllPhpFilesCheck::class, rectorCoverageProject($chain, $files))->check())->toBe(CheckResult::PASS);
 })->with([
     'dir paths + root files' => ["\n    ->withPaths([__DIR__ . '/app'])\n    ->withRootFiles()"],
     'whole project' => ["\n    ->withPaths([__DIR__])"],
     'listed files' => ["\n    ->withPaths([__DIR__ . '/app', __DIR__ . '/functions.php'])"],
     'relative strings' => ["\n    ->withPaths(['app', 'functions.php'])"],
     'skipped deliberately' => ["\n    ->withPaths([__DIR__ . '/app'])\n    ->withSkip([__DIR__ . '/functions.php'])"],
+    'skipped by an anywhere glob' => ["\n    ->withPaths([__DIR__ . '/app'])\n    ->withRootFiles()\n    ->withSkip(['*/tests/*'])", ['tests/FooTest.php' => "<?php\n"]],
 ]);
 
 it('rectorCoversAllPhpFiles reads the legacy closure config', function (): void {
@@ -78,4 +79,15 @@ it('rectorCoversAllPhpFiles fails on a rector.php it cannot parse', function ():
 it('rectorCoversAllPhpFiles is fixable and applies outside Laravel only', function (): void {
     expect(makeCheck(RectorCoversAllPhpFilesCheck::class, makeProject(Profile::Php)))->toBeInstanceOf(FixableInterface::class)
         ->and(RectorCoversAllPhpFilesCheck::profiles())->toBe([Profile::Php, Profile::WordPress]);
+});
+
+it('rectorCoversAllPhpFiles leaves a legacy closure config to the developer', function (): void {
+    $config = "<?php\n\nreturn static function (Rector\\Config\\RectorConfig \$rectorConfig): void {\n    \$rectorConfig->paths([__DIR__ . '/src']);\n};\n";
+    $project = makeProject(Profile::Php, ['rector.php' => $config, 'src/A.php' => "<?php\n", 'functions.php' => "<?php\n"]);
+
+    [$check, $collector] = makeCheckWithCollector(RectorCoversAllPhpFilesCheck::class, $project);
+
+    expect($check->fix())->toBe(CheckResult::FAIL)
+        ->and(implode("\n", $collector->all()))->toContain('Rector does not cover functions.php: add them (or their directory) to $rectorConfig->paths()')
+        ->and(file_get_contents($project->path('rector.php')))->toBe($config);
 });

@@ -25,8 +25,14 @@ class UsesPestCheck extends AbstractCheck
             return $this->profile() === Profile::Laravel ? CheckResult::FAIL : CheckResult::WARN;
         }
 
-        return $this->checkComposerPackages(['pestphp/pest-plugin-drift', 'spatie/phpunit-watcher'])
-            ? CheckResult::FAIL
-            : CheckResult::PASS;
+        foreach (['pestphp/pest-plugin-drift', 'spatie/phpunit-watcher'] as $forbidden) {
+            if ($this->project->hasComposerPackage($forbidden)) {
+                $this->addComment("Remove {$forbidden} from composer.json: it is not used alongside Pest");
+
+                return CheckResult::FAIL;
+            }
+        }
+
+        return CheckResult::PASS;
     }
 }

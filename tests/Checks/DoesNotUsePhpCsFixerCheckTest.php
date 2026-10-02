@@ -42,6 +42,7 @@ it('doesNotUsePhpCsFixer fix removes the package, the ci-lint entry, the config 
         ]),
         '.php-cs-fixer.php' => "<?php\nreturn (new PhpCsFixer\\Config);\n",
         '.php-cs-fixer.cache' => '{}',
+        'pint.json' => '{"preset": "per"}',
         'functions.php' => "<?php\n",
     ]);
 
@@ -61,4 +62,35 @@ it('doesNotUsePhpCsFixer fix removes the package, the ci-lint entry, the config 
 
 it('doesNotUsePhpCsFixer is fixable and applies to every profile', function (): void {
     expect(DoesNotUsePhpCsFixerCheck::profiles())->toBe(Profile::cases());
+});
+
+it('doesNotUsePhpCsFixer leaves an emptied require-dev as an object Composer accepts', function (): void {
+    $project = makeProject(Profile::Php, ['composer.json' => json_encode([
+        'name' => 'acme/lib',
+        'require-dev' => ['friendsofphp/php-cs-fixer' => '^3.0'],
+        'config' => new stdClass,
+    ])]);
+
+    makeCheck(DoesNotUsePhpCsFixerCheck::class, $project)->fix();
+
+    $composer = (string) file_get_contents($project->path('composer.json'));
+
+    expect($composer)->toContain('"require-dev": {}')
+        ->toContain('"config": {}');
+});
+
+it('doesNotUsePhpCsFixer keeps the config until its rules are ported to pint.json', function (): void {
+    $project = makeProject(Profile::WordPress, [
+        'composer.json' => json_encode(['require-dev' => ['friendsofphp/php-cs-fixer' => '^3.0', 'phpstan/phpstan' => '^2.0']]),
+        '.php-cs-fixer.php' => "<?php\nreturn (new PhpCsFixer\\Config);\n",
+        '.php-cs-fixer.cache' => '{}',
+    ]);
+
+    [$check, $collector] = makeCheckWithCollector(DoesNotUsePhpCsFixerCheck::class, $project);
+
+    expect($check->fix())->toBe(CheckResult::FAIL)
+        ->and($collector->all())->toContain('Port the rules in .php-cs-fixer.php to pint.json, then remove .php-cs-fixer.php')
+        ->and(file_exists($project->path('.php-cs-fixer.php')))->toBeTrue()
+        ->and(file_exists($project->path('.php-cs-fixer.cache')))->toBeFalse()
+        ->and(json_decode((string) file_get_contents($project->path('composer.json')), true)['require-dev'])->toBe(['phpstan/phpstan' => '^2.0']);
 });

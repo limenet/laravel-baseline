@@ -1,6 +1,6 @@
 {
     "check": "doesNotUsePhpCsFixer",
-    "description": "fails while PHP CS Fixer is required, run and configured, and removes all of it on fix",
+    "description": "fails while PHP CS Fixer is required, run and configured, and removes all of it on fix once pint.json exists",
     "engines": ["php"],
     "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",

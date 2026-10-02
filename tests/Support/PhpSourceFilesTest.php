@@ -30,4 +30,7 @@ it('matches files against configured paths', function (string $path, string $fil
     'glob' => ['inc/*.php', 'inc/setup.php', true],
     'glob directory' => ['templates/*', 'templates/parts/a.php', true],
     'other file' => ['app', 'functions.php', false],
+    'anywhere glob at the root' => ['*/tests/*', 'tests/FooTest.php', true],
+    'anywhere glob nested' => ['*/tests/*', 'inc/tests/FooTest.php', true],
+    'anywhere glob elsewhere' => ['*/tests/*', 'inc/setup.php', false],
 ]);

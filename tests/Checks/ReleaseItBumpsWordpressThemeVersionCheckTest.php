@@ -52,10 +52,8 @@ it('releaseItBumpsWordpressThemeVersion warns outside a theme', function (): voi
     expect(makeCheck(ReleaseItBumpsWordpressThemeVersionCheck::class, $project)->check())->toBe(CheckResult::WARN);
 });
 
-it('releaseItBumpsWordpressThemeVersion ships a hook that rewrites only the Version header', function (): void {
-    $project = makeProject(Profile::WordPress, [
-        'style.css' => "/*\nTheme Name: Acme\n * Version: 1.0.0\nRequires PHP Version: 8.5\n*/\n.v { content: 'Version: x'; }\n",
-    ]);
+it('releaseItBumpsWordpressThemeVersion ships a hook that rewrites only the Version header', function (string $before, string $after): void {
+    $project = makeProject(Profile::WordPress, ['style.css' => $before]);
 
     // What release-it runs after interpolating ${version}.
     $command = str_replace('${version}', '2.3.4', Policy::fromDirectory()->string('wordpress.themeVersionHook'));
@@ -63,9 +61,15 @@ it('releaseItBumpsWordpressThemeVersion ships a hook that rewrites only the Vers
     exec('cd '.escapeshellarg($project->path()).' && '.$command.' 2>&1', $output, $exitCode);
 
     expect($exitCode)->toBe(0, implode("\n", $output))
-        ->and(file_get_contents($project->path('style.css')))
-        ->toBe("/*\nTheme Name: Acme\n * Version: 2.3.4\nRequires PHP Version: 8.5\n*/\n.v { content: 'Version: x'; }\n");
-})->skip(fn (): bool => trim((string) shell_exec('command -v node')) === '', 'node is not installed');
+        ->and(file_get_contents($project->path('style.css')))->toBe($after);
+})->with([
+    'header block' => [
+        "/*\nTheme Name: Acme\n * Version: 1.0.0\nRequires PHP Version: 8.5\n*/\n.v { content: 'Version: x'; }\n",
+        "/*\nTheme Name: Acme\n * Version: 2.3.4\nRequires PHP Version: 8.5\n*/\n.v { content: 'Version: x'; }\n",
+    ],
+    'comment closed on the version line' => ["/* Theme Name: Acme\nVersion: 1.0.0 */\nbody{}\n", "/* Theme Name: Acme\nVersion: 2.3.4 */\nbody{}\n"],
+    'CRLF' => ["/*\r\nTheme Name: Acme\r\nVersion: 1.0.0\r\n*/\r\n", "/*\r\nTheme Name: Acme\r\nVersion: 2.3.4\r\n*/\r\n"],
+])->skip(fn (): bool => trim((string) shell_exec('command -v node')) === '', 'node is not installed');
 
 it('releaseItBumpsWordpressThemeVersion applies to WordPress only', function (): void {
     expect(ReleaseItBumpsWordpressThemeVersionCheck::profiles())->toBe([Profile::WordPress]);

@@ -18,15 +18,16 @@ class PhpstanParsesModelCastsMethodCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $phpstanConfigFile = $this->path('phpstan.neon');
+        $configFile = $this->phpstanConfigFile();
 
-        if (!file_exists($phpstanConfigFile)) {
+        if ($configFile === null) {
             $this->addComment('PHPStan configuration missing: Create phpstan.neon in project root');
 
             return CheckResult::FAIL;
         }
 
-        $phpstanConfig = $this->loadNeonConfig('phpstan.neon');
+        $phpstanConfigFile = $this->path($configFile);
+        $phpstanConfig = $this->loadNeonConfig($configFile);
 
         if ($phpstanConfig === null) {
             return CheckResult::FAIL;
@@ -36,7 +37,7 @@ class PhpstanParsesModelCastsMethodCheck extends AbstractFixableCheck
             return CheckResult::PASS;
         }
 
-        $this->addComment('PHPStan does not read the casts() method: Add "parseModelCastsMethod: true" to the parameters section of phpstan.neon so Larastan types attributes cast in casts() rather than the $casts property');
+        $this->addComment('PHPStan does not read the casts() method: Add "parseModelCastsMethod: true" to the parameters section of '.$configFile.' so Larastan types attributes cast in casts() rather than the $casts property');
 
         if ($dry) {
             return CheckResult::FAIL;

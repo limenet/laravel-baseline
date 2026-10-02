@@ -1,0 +1,18 @@
+{
+    "check": "doesNotUsePhpCsFixer",
+    "description": "removes the package on fix but keeps the config until its rules are ported to pint.json",
+    "engines": ["php"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "fail",
+        "json": {
+            "composer.json": {
+                "require-dev": { "phpstan/phpstan": "^2.0" }
+            }
+        },
+        "files": {
+            ".php-cs-fixer.php": "<?php\n\nreturn (new PhpCsFixer\\Config)->setRules(['@PER-CS' => true]);\n"
+        }
+    }
+}

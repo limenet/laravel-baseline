@@ -97,3 +97,19 @@ it('callsBaseline does not accept the artisan command outside Laravel', function
 
     expect(makeCheck(CallsBaselineCheck::class, $project)->check())->toBe(CheckResult::FAIL);
 });
+
+it('callsBaseline upgrades a post-update-cmd given as a single string', function (): void {
+    $project = makeProject(Profile::Php, ['composer.json' => json_encode(['scripts' => ['post-update-cmd' => '@php vendor/bin/baseline check']])]);
+
+    expect(makeCheck(CallsBaselineCheck::class, $project)->fix())->toBe(CheckResult::PASS)
+        ->and(json_decode((string) file_get_contents($project->path('composer.json')), true)['scripts']['post-update-cmd'])
+        ->toBe(['@php vendor/bin/baseline check --fix']);
+});
+
+it('callsBaseline appends to a post-update-cmd given as a single string', function (): void {
+    $project = makeProject(Profile::Php, ['composer.json' => json_encode(['scripts' => ['post-update-cmd' => '@composer bump']])]);
+
+    expect(makeCheck(CallsBaselineCheck::class, $project)->fix())->toBe(CheckResult::PASS)
+        ->and(json_decode((string) file_get_contents($project->path('composer.json')), true)['scripts']['post-update-cmd'])
+        ->toBe(['@composer bump', '@php vendor/bin/baseline check --fix']);
+});

@@ -270,3 +270,15 @@ it('checkPhpunit adds only the reports outside Laravel', function (): void {
         ->not->toContain('APP_KEY')
         ->not->toContain('./app');
 });
+
+it('checkPhpunit reads phpunit.xml.dist when there is no phpunit.xml', function (): void {
+    $project = makeProject(Profile::Php, ['phpunit.xml.dist' => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<phpunit>\n</phpunit>\n"]);
+
+    [$check, $collector] = makeCheckWithCollector(CheckPhpunitCheck::class, $project);
+
+    expect($check->check())->toBe(CheckResult::FAIL)
+        ->and(implode("\n", $collector->all()))->toContain('misconfigured in phpunit.xml.dist')
+        ->and($check->fix())->toBe(CheckResult::PASS)
+        ->and(file_get_contents($project->path('phpunit.xml.dist')))->toContain('cobertura.xml')
+        ->and(file_exists($project->path('phpunit.xml')))->toBeFalse();
+});

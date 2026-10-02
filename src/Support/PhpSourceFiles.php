@@ -48,7 +48,16 @@ final class PhpSourceFiles
         }
 
         if (str_contains($path, '*') || str_contains($path, '?') || str_contains($path, '[')) {
-            return fnmatch($path, $file) || fnmatch(rtrim($path, '/').'/*', $file);
+            // Rector and PHPStan match globs against absolute paths, so a
+            // pattern like `*/tests/*` needs something before tests/: match
+            // the root-anchored path as well as the relative one.
+            foreach ([$file, '/'.$file] as $candidate) {
+                if (fnmatch($path, $candidate) || fnmatch(rtrim($path, '/').'/*', $candidate)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         return $file === $path || str_starts_with($file, $path.'/');

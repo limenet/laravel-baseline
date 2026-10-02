@@ -11,8 +11,6 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
  */
 class PhpstanCoversAllPhpFilesCheck extends AbstractCoversAllPhpFilesCheck
 {
-    private const CONFIG_FILES = ['phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'];
-
     /**
      * Prefixes PHPStan resolves to the project root.
      */
@@ -20,7 +18,7 @@ class PhpstanCoversAllPhpFilesCheck extends AbstractCoversAllPhpFilesCheck
 
     public function check(): CheckResult
     {
-        $configFile = $this->configFile();
+        $configFile = $this->phpstanConfigFile();
 
         if ($configFile === null) {
             $this->addComment('No PHPStan configuration (phpstan.neon) to check the analysed paths of');
@@ -51,17 +49,6 @@ class PhpstanCoversAllPhpFilesCheck extends AbstractCoversAllPhpFilesCheck
         );
 
         return CheckResult::FAIL;
-    }
-
-    private function configFile(): ?string
-    {
-        foreach (self::CONFIG_FILES as $file) {
-            if (file_exists($this->path($file))) {
-                return $file;
-            }
-        }
-
-        return null;
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace Limenet\LaravelBaseline\Checks;
 
+use Limenet\LaravelBaseline\Support\JsonFile;
+
 abstract class AbstractClaudeSettingsCheck extends AbstractFixableCheck
 {
     protected function claudeSettingsFile(): string
@@ -62,10 +64,7 @@ abstract class AbstractClaudeSettingsCheck extends AbstractFixableCheck
             mkdir($this->path('.claude'), 0755, true);
         }
 
-        file_put_contents(
-            $this->claudeSettingsFile(),
-            json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n",
-        );
+        JsonFile::write($this->claudeSettingsFile(), $settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**

@@ -11,6 +11,7 @@ use Limenet\LaravelBaseline\Policy\Policy;
 use Limenet\LaravelBaseline\Project\Profile;
 use Limenet\LaravelBaseline\Project\Project;
 use Limenet\LaravelBaseline\Support\CheckName;
+use Limenet\LaravelBaseline\Support\JsonFile;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -380,9 +381,36 @@ abstract class AbstractCheck implements CheckInterface
 
     // === Config File Helpers ===
 
+    /**
+     * The PHPStan config PHPStan itself would load, project-relative:
+     * phpstan.neon wins over the .dist variants, as in PHPStan. Null if none.
+     */
+    protected function phpstanConfigFile(): ?string
+    {
+        foreach (['phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'] as $file) {
+            if (file_exists($this->path($file))) {
+                return $file;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The PHPUnit config PHPUnit itself would load, project-relative:
+     * phpunit.xml wins over phpunit.xml.dist. Falls back to phpunit.xml when
+     * neither exists, so messages and fixes name the conventional file.
+     */
+    protected function phpunitConfigFile(): string
+    {
+        return !file_exists($this->path('phpunit.xml')) && file_exists($this->path('phpunit.xml.dist'))
+            ? 'phpunit.xml.dist'
+            : 'phpunit.xml';
+    }
+
     protected function getPhpunitXml(): \SimpleXMLElement|false|null
     {
-        $xmlFile = $this->path('/phpunit.xml');
+        $xmlFile = $this->path($this->phpunitConfigFile());
 
         if (!file_exists($xmlFile)) {
             return null;
@@ -633,10 +661,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function writeComposerJson(array $data): void
     {
-        file_put_contents(
-            $this->path('composer.json'),
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
-        );
+        JsonFile::write($this->path('composer.json'), $data);
     }
 
     /**
@@ -644,10 +669,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function writePackageJson(array $data): void
     {
-        file_put_contents(
-            $this->path('package.json'),
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
-        );
+        JsonFile::write($this->path('package.json'), $data);
     }
 
     /**
@@ -743,7 +765,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function setPhpunitEnvVar(string $name, string $value): void
     {
-        $xmlFile = $this->path('phpunit.xml');
+        $xmlFile = $this->path($this->phpunitConfigFile());
 
         if (!file_exists($xmlFile)) {
             return;

@@ -15,9 +15,9 @@ class PhpstanLevelAtLeastEightCheck extends AbstractCheck
 
     public function check(): CheckResult
     {
-        $phpstanConfigFile = $this->path('phpstan.neon');
+        $phpstanConfigFile = $this->phpstanConfigFile();
 
-        if (!file_exists($phpstanConfigFile)) {
+        if ($phpstanConfigFile === null) {
             $this->addComment('PHPStan configuration missing: Create phpstan.neon in project root');
 
             return CheckResult::FAIL;
@@ -25,7 +25,7 @@ class PhpstanLevelAtLeastEightCheck extends AbstractCheck
 
         // Anything that still is not valid YAML becomes a finding rather than
         // an exception that aborts the whole run.
-        $phpstanConfig = $this->loadNeonConfig('phpstan.neon');
+        $phpstanConfig = $this->loadNeonConfig($phpstanConfigFile);
 
         if ($phpstanConfig === null) {
             return CheckResult::FAIL;
@@ -34,7 +34,7 @@ class PhpstanLevelAtLeastEightCheck extends AbstractCheck
         $level = $phpstanConfig['parameters']['level'] ?? null;
 
         if ($level === null) {
-            $this->addComment('PHPStan level not configured: Add "level" parameter to phpstan.neon');
+            $this->addComment('PHPStan level not configured: Add "level" parameter to '.$phpstanConfigFile);
 
             return CheckResult::FAIL;
         }
@@ -47,13 +47,13 @@ class PhpstanLevelAtLeastEightCheck extends AbstractCheck
         $levelInt = is_numeric($level) ? (int) $level : null;
 
         if ($levelInt === null) {
-            $this->addComment('PHPStan level must be a number or "max": Found "'.$level.'" in phpstan.neon');
+            $this->addComment('PHPStan level must be a number or "max": Found "'.$level.'" in '.$phpstanConfigFile);
 
             return CheckResult::FAIL;
         }
 
         if ($levelInt < 8) {
-            $this->addComment('PHPStan level must be at least 8: Found level '.$levelInt.' in phpstan.neon (set to 8 or higher)');
+            $this->addComment('PHPStan level must be at least 8: Found level '.$levelInt.' in '.$phpstanConfigFile.' (set to 8 or higher)');
 
             return CheckResult::FAIL;
         }

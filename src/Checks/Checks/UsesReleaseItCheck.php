@@ -5,6 +5,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Support\JsonFile;
 
 class UsesReleaseItCheck extends AbstractFixableCheck
 {
@@ -34,7 +35,7 @@ class UsesReleaseItCheck extends AbstractFixableCheck
             if (file_exists($packageFile)) {
                 $packageJson = json_decode(file_get_contents($packageFile) ?: '{}', true, flags: JSON_THROW_ON_ERROR);
                 $packageJson['scripts']['release'] = 'release-it';
-                file_put_contents($packageFile, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+                JsonFile::write($packageFile, $packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
         }
 
@@ -73,7 +74,7 @@ class UsesReleaseItCheck extends AbstractFixableCheck
             $config['plugins']['@release-it/bumper']['out']['file'] = 'composer.json';
             $config['plugins']['@release-it/bumper']['out']['path'] = 'version';
 
-            file_put_contents($releaseItFile, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+            JsonFile::write($releaseItFile, $config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
 
         return $this->fix(dry: true);

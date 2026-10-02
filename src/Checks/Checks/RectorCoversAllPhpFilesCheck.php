@@ -55,15 +55,20 @@ class RectorCoversAllPhpFilesCheck extends AbstractCoversAllPhpFilesCheck implem
             return CheckResult::PASS;
         }
 
-        $onlyRootFiles = !$config['rootFiles']
+        // withRootFiles() only exists on the RectorConfig::configure() chain;
+        // the legacy closure config has no equivalent to append.
+        $onlyRootFiles = $config['fluent']
+            && !$config['rootFiles']
             && array_filter($uncovered, fn (string $file): bool => str_contains($file, '/')) === [];
 
         $this->reportUncovered(
             'Rector',
             $uncovered,
-            $onlyRootFiles
-                ? 'add ->withRootFiles() to rector.php'
-                : 'add them (or their directory) to ->withPaths() in rector.php, or to ->withSkip() if leaving them unprocessed is deliberate',
+            match (true) {
+                $onlyRootFiles => 'add ->withRootFiles() to rector.php',
+                $config['fluent'] => 'add them (or their directory) to ->withPaths() in rector.php, or to ->withSkip() if leaving them unprocessed is deliberate',
+                default => 'add them (or their directory) to $rectorConfig->paths() in rector.php, or to $rectorConfig->skip() if leaving them unprocessed is deliberate',
+            },
         );
 
         if ($dry || !$onlyRootFiles) {
@@ -86,7 +91,7 @@ class RectorCoversAllPhpFilesCheck extends AbstractCoversAllPhpFilesCheck implem
     }
 
     /**
-     * @return array{paths: list<string>, rootFiles: bool, skipped: list<string>}|null
+     * @return array{paths: list<string>, rootFiles: bool, skipped: list<string>, fluent: bool}|null
      */
     private function readConfig(string $rectorFile): ?array
     {
@@ -100,7 +105,13 @@ class RectorCoversAllPhpFilesCheck extends AbstractCoversAllPhpFilesCheck implem
             return null;
         }
 
-        $config = ['paths' => [], 'rootFiles' => false, 'skipped' => []];
+        $config = ['paths' => [], 'rootFiles' => false, 'skipped' => [], 'fluent' => false];
+
+        foreach ((new NodeFinder)->findInstanceOf($ast, Node\Expr\StaticCall::class) as $call) {
+            if ($call->name instanceof Node\Identifier && $call->name->toString() === 'configure') {
+                $config['fluent'] = true;
+            }
+        }
 
         foreach ((new NodeFinder)->findInstanceOf($ast, Node\Expr\MethodCall::class) as $call) {
             if (!$call->name instanceof Node\Identifier) {

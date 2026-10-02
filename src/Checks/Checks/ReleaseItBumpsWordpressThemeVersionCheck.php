@@ -5,6 +5,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Support\JsonFile;
 use Limenet\LaravelBaseline\Support\WordPressHeader;
 
 /**
@@ -57,10 +58,7 @@ class ReleaseItBumpsWordpressThemeVersionCheck extends AbstractFixableCheck
 
         $config['hooks']['after:bump'] = [...array_values(array_filter($hooks, is_string(...))), $command];
 
-        file_put_contents(
-            $releaseItFile,
-            json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
-        );
+        JsonFile::write($releaseItFile, $config);
 
         return $this->fix(dry: true);
     }

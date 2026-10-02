@@ -12,7 +12,7 @@
     },
     "hooks": {
         "after:bump": [
-            "node -e 'const fs = require(\"fs\"); fs.writeFileSync(\"style.css\", fs.readFileSync(\"style.css\", \"utf8\").replace(/^([ \\t\\/*#@]*Version:).*$/mi, \"$1 ${version}\"))'"
+            "node -e 'const fs = require(\"fs\"); fs.writeFileSync(\"style.css\", fs.readFileSync(\"style.css\", \"utf8\").replace(/^([ \\t\\/*#@]*Version:[ \\t]*)[^\\r\\n]*?([ \\t]*(?:\\*\\/|\\?>)[^\\r\\n]*)?(\\r?)$/mi, \"$1${version}$2$3\"))'"
         ]
     }
 }

@@ -32,12 +32,14 @@ class CallsBaselineCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        // Upgrade existing entry (without --fix) to include --fix
-        $scripts = $composerJson['scripts']['post-update-cmd'] ?? [];
+        // Upgrade existing entry (without --fix) to include --fix. Composer
+        // also accepts a single command as a plain string.
+        $scripts = (array) ($composerJson['scripts']['post-update-cmd'] ?? []);
 
         foreach ($scripts as $i => $script) {
-            if (str_contains($script, $match) && !str_contains($script, '--fix')) {
-                $composerJson['scripts']['post-update-cmd'][$i] = rtrim($script).' --fix';
+            if (is_string($script) && str_contains($script, $match) && !str_contains($script, '--fix')) {
+                $scripts[$i] = rtrim($script).' --fix';
+                $composerJson['scripts']['post-update-cmd'] = $scripts;
                 $this->writeComposerJson($composerJson);
 
                 return $this->fix(dry: true);

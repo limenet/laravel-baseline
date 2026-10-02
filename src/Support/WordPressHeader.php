@@ -45,9 +45,13 @@ final class WordPressHeader
         $contents = (string) file_get_contents($file);
         $count = 0;
 
+        /*
+         * Only the value is replaced: whatever closes the comment or the PHP
+         * block on the same line, and a CRLF line ending, stay where they were.
+         */
         $updated = preg_replace_callback(
-            self::pattern($header),
-            static fn (array $m): string => str_replace($m[1], ' '.$value, $m[0]),
+            '/^((?:[ \t]*<\?php)?[ \t\/*#@]*'.preg_quote($header, '/').':[ \t]*)[^\r\n]*?([ \t]*(?:\*\/|\?>)[^\r\n]*)?(\r?)$/mi',
+            static fn (array $m): string => $m[1].$value.$m[2].$m[3],
             $contents,
             1,
             $count,

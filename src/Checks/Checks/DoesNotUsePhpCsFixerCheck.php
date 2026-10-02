@@ -15,14 +15,9 @@ class DoesNotUsePhpCsFixerCheck extends AbstractFixableCheck
 {
     private const PACKAGE = 'friendsofphp/php-cs-fixer';
 
-    private const FILES = [
-        '.php-cs-fixer.php',
-        '.php-cs-fixer.dist.php',
-        '.php-cs-fixer.cache',
-        '.php_cs',
-        '.php_cs.dist',
-        '.php_cs.cache',
-    ];
+    private const CONFIG_FILES = ['.php-cs-fixer.php', '.php-cs-fixer.dist.php', '.php_cs', '.php_cs.dist'];
+
+    private const CACHE_FILES = ['.php-cs-fixer.cache', '.php_cs.cache'];
 
     public static function profiles(): array
     {
@@ -33,9 +28,10 @@ class DoesNotUsePhpCsFixerCheck extends AbstractFixableCheck
     {
         $hasPackage = $this->project->hasComposerPackage(self::PACKAGE);
         $hasScript = $this->composerScriptContains('ci-lint', 'php-cs-fixer');
-        $files = array_values(array_filter(self::FILES, fn (string $file): bool => file_exists($this->path($file))));
+        $configs = $this->existing(self::CONFIG_FILES);
+        $caches = $this->existing(self::CACHE_FILES);
 
-        if (!$hasPackage && !$hasScript && $files === []) {
+        if (!$hasPackage && !$hasScript && $configs === [] && $caches === []) {
             return CheckResult::PASS;
         }
 
@@ -47,8 +43,18 @@ class DoesNotUsePhpCsFixerCheck extends AbstractFixableCheck
             $this->addComment("Remove the 'php-cs-fixer' entries from the ci-lint script in composer.json — Pint runs there instead");
         }
 
-        foreach ($files as $file) {
-            $this->addComment("Remove {$file} — port any custom rules to pint.json first");
+        // The config holds hand-tuned rules, and this fix runs unattended from
+        // post-update-cmd: it only goes once a pint.json shows they were ported.
+        $rulesPorted = file_exists($this->path('pint.json'));
+
+        foreach ($configs as $file) {
+            $this->addComment($rulesPorted
+                ? "Remove {$file} — Pint reads pint.json instead"
+                : "Port the rules in {$file} to pint.json, then remove {$file}");
+        }
+
+        foreach ($caches as $file) {
+            $this->addComment("Remove {$file}");
         }
 
         if ($dry) {
@@ -63,11 +69,20 @@ class DoesNotUsePhpCsFixerCheck extends AbstractFixableCheck
             $this->removeFromComposerScript('ci-lint', 'php-cs-fixer');
         }
 
-        foreach ($files as $file) {
+        foreach ([...$caches, ...($rulesPorted ? $configs : [])] as $file) {
             unlink($this->path($file));
         }
 
         return $this->fix(dry: true);
+    }
+
+    /**
+     * @param  list<string>  $files
+     * @return list<string>
+     */
+    private function existing(array $files): array
+    {
+        return array_values(array_filter($files, fn (string $file): bool => file_exists($this->path($file))));
     }
 
     /**
