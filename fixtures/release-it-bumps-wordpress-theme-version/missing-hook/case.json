@@ -1,0 +1,18 @@
+{
+    "check": "releaseItBumpsWordpressThemeVersion",
+    "description": "fails when release-it never touches style.css, and adds the after:bump hook on fix",
+    "engines": ["php"],
+    "profiles": ["wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "json": {
+            ".release-it.json": {
+                "hooks.after:bump": [
+                    "node -e 'const fs = require(\"fs\"); fs.writeFileSync(\"style.css\", fs.readFileSync(\"style.css\", \"utf8\").replace(/^([ \\t\\/*#@]*Version:).*$/mi, \"$1 ${version}\"))'"
+                ],
+                "plugins.@release-it/bumper.out.file": "composer.json"
+            }
+        }
+    }
+}

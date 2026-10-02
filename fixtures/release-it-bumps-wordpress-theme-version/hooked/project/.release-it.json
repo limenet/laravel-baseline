@@ -1,0 +1,18 @@
+{
+    "git": {
+        "commitMessage": "chore: release v${version}"
+    },
+    "plugins": {
+        "@release-it/bumper": {
+            "out": {
+                "file": "composer.json",
+                "path": "version"
+            }
+        }
+    },
+    "hooks": {
+        "after:bump": [
+            "node -e 'const fs = require(\"fs\"); fs.writeFileSync(\"style.css\", fs.readFileSync(\"style.css\", \"utf8\").replace(/^([ \\t\\/*#@]*Version:).*$/mi, \"$1 ${version}\"))'"
+        ]
+    }
+}

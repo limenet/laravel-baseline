@@ -18,6 +18,7 @@
         "baseline",
         "npmScripts",
         "periodic",
+        "wordpress",
         "phpFileCoverage"
     ],
     "$defs": {
@@ -374,6 +375,17 @@
             "required": ["defaultIntervalDays"],
             "properties": {
                 "defaultIntervalDays": { "type": "integer", "minimum": 1 }
+            }
+        },
+        "wordpress": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["themeVersionHook"],
+            "properties": {
+                "themeVersionHook": {
+                    "type": "string",
+                    "description": "The release-it after:bump hook releaseItBumpsWordpressThemeVersion adds: rewrites the Version: header of style.css to the version release-it just bumped to. release-it interpolates ${version} before the shell runs, so the script sits in single quotes to keep the shell off $1."
+                }
             }
         },
         "phpFileCoverage": {

@@ -43,7 +43,7 @@ it('has correct command description', function (): void {
 })->group('command');
 
 it('has expected number of checks registered', function (): void {
-    expect(CheckRegistry::all())->toHaveCount(98);
+    expect(CheckRegistry::all())->toHaveCount(99);
 })->group('command');
 
 it('createAll returns check instances with shared comment collector', function (): void {

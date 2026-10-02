@@ -169,6 +169,9 @@
     "periodic": {
         "defaultIntervalDays": 30
     },
+    "wordpress": {
+        "themeVersionHook": "node -e 'const fs = require(\"fs\"); fs.writeFileSync(\"style.css\", fs.readFileSync(\"style.css\", \"utf8\").replace(/^([ \\t\\/*#@]*Version:).*$/mi, \"$1 ${version}\"))'"
+    },
     "phpFileCoverage": {
         "ignoredDirectories": ["vendor", "node_modules"],
         "exempt": ["rector.php"]

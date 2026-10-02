@@ -281,6 +281,7 @@ This package validates your Laravel installation against the following checks:
 
 ### Build & Release
 - 🔧 **`bumpsComposer()`** - Validates automatic composer dependency bumping *(adds `composer bump` to post-update-cmd)*
+- 🔧 **`releaseItBumpsWordpressThemeVersion()`** - Validates `.release-it.json` has an `after:bump` hook that rewrites the `Version:` header of `style.css`, so a release bumps the theme along with composer.json *(wordpress profile, themes only; adds a `node -e` one-liner from `policy/policy.json` to the hooks)*
 - 🔧 **`usesReleaseIt()`** - Validates automated release management *(partial: creates/fixes .release-it.json and adds release npm script if packages installed)*
 - 🔧 **`wordpressThemeVersionMatchesComposer()`** - Validates the `Version:` header in `style.css` matches `composer.json`'s `version`, which `@release-it/bumper` keeps current *(wordpress profile, themes only; rewrites the header from composer.json, or seeds composer.json's `version` from the theme when it has none)*
 - **`hasNpmScripts()`** - Validates required npm build scripts
