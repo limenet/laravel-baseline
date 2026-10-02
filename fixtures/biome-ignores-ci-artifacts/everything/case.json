@@ -1,0 +1,16 @@
+{
+    "check": "biomeIgnoresCiArtifacts",
+    "description": "appends the exclusion on its own line, indented like the entry before it",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "biome.json": "{\n\t\"files\": {\n\t\t\"includes\": [\n\t\t\t\"**\",\n\t\t\t\"!composer.json\",\n\t\t\t\"!metadata.json\"\n\t\t]\n\t}\n}\n"
+        }
+    }
+}

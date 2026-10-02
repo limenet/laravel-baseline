@@ -14,7 +14,8 @@
     },
     "biome": {
         "configFile": "biome.json",
-        "schema": "./node_modules/@biomejs/biome/configuration_schema.json"
+        "schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+        "ciArtifacts": ["metadata.json"]
     },
     "editorconfig": {
         "template": "editorconfig",

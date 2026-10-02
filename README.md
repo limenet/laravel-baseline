@@ -125,6 +125,7 @@ Every check below also runs in Laravel projects unless marked standalone-only.
 | Check | `php` | `wordpress` | Relationship to the Laravel runner |
 | --- | --- | --- | --- |
 | `allowsToolingInClaudeSettings` | ✓ | ✓ | requires the shared and `ddev composer` allow entries, not the artisan ones |
+| `biomeIgnoresCiArtifacts` | ✓ | ✓ | identical |
 | `biomeUsesLocalSchema` | ✓ | ✓ | identical |
 | `bumpsComposer` | ✓ | ✓ | identical |
 | `callsBaseline` | ✓ | ✓ | hooks `@php vendor/bin/baseline check --fix` into `post-update-cmd` instead of the artisan command |
@@ -221,6 +222,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `hardensNpmSupplyChain` | also requires `.npmrc` to exempt `@limenet-ch/baseline` from the cooldown (`min-release-age-exclude[]=@limenet-ch/baseline`, or a glob covering it), so a baseline fix lands without the 7-day wait |
 | `hasEditorconfig` | identical |
 | `biomeUsesLocalSchema` | identical |
+| `biomeIgnoresCiArtifacts` | identical |
 | `doesNotHaveCopilotOrJunieAgentFiles` | identical |
 | `doesNotUseBothBaselineRunners` | mirrored: fails when `composer.json` requires `limenet/laravel-baseline`, since the Composer runner wins |
 | `allowsToolingInClaudeSettings` | requires only the shared allow entries, not the DDEV/artisan ones |
@@ -344,6 +346,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`usesReleaseIt()`** - Validates automated release management *(partial: creates/fixes .release-it.json and adds release npm script if packages installed)*
 - 🔧 **`wordpressThemeVersionMatchesComposer()`** - Validates the `Version:` header in `style.css` matches `composer.json`'s `version`, which `@release-it/bumper` keeps current *(wordpress profile, themes only; rewrites the header from composer.json, or seeds composer.json's `version` from the theme when it has none)*
 - **`hasNpmScripts()`** - Validates required npm build scripts
+- 🔧 **`biomeIgnoresCiArtifacts()`** - Validates that `biome.json`, when the project has one, keeps Biome away from the files a CI runner leaves in the project root — `metadata.json`, which the GitLab runner extracts with the cache key whenever it restores a cache. Evaluates `files.includes` the way Biome does (in order, last match wins, no `includes` meaning every file), so an allowlist that never reaches the root passes. *(appends `"!metadata.json"` to the end of `files.includes` as a targeted text edit; a config without `files.includes` is only reported)*
 - 🔧 **`biomeUsesLocalSchema()`** - Validates that `biome.json`, when the project has one, points `$schema` at `./node_modules/@biomejs/biome/configuration_schema.json` rather than a version-pinned remote URL, so the schema follows the installed Biome instead of needing a manual bump on every update. Passes when the project does not use Biome. *(rewrites or inserts the `$schema` line as a targeted text edit, leaving the rest of the file — comments included — byte-identical, since Biome formats `biome.json` itself)*
 
 ### Security & Configuration

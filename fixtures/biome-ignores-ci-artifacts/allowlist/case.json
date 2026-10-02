@@ -1,0 +1,10 @@
+{
+    "check": "biomeIgnoresCiArtifacts",
+    "description": "passes when files.includes is an allowlist that never reaches the artifact",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}

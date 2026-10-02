@@ -50,6 +50,7 @@
         "release": "GITHUB_TOKEN=$(gh auth token) release-it"
     },
     "dependencies": {
+        "jsonc-parser": "^3.3.1",
         "semver": "^7.8.5",
         "yaml": "^2.9.1"
     },

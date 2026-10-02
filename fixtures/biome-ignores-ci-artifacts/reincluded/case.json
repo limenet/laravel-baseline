@@ -1,0 +1,16 @@
+{
+    "check": "biomeIgnoresCiArtifacts",
+    "description": "fails when a later pattern takes the artifact back, and appends after it in a single-line array",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "biome.json": "{\n  // jsonc: comments and trailing commas are valid\n  \"files\": { \"includes\": [\"**\", \"!metadata.json\", \"*.json\", \"!metadata.json\",] },\n}\n"
+        }
+    }
+}

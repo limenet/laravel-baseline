@@ -1,0 +1,4 @@
+{
+  // jsonc: comments and trailing commas are valid
+  "files": { "includes": ["**", "!metadata.json", "*.json",] },
+}

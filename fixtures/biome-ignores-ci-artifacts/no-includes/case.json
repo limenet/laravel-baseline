@@ -1,0 +1,16 @@
+{
+    "check": "biomeIgnoresCiArtifacts",
+    "description": "fails without files.includes, since Biome then checks every file, and leaves the allowlist to a human",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "fail",
+        "files": {
+            "biome.json": "{\n  \"linter\": {\n    \"enabled\": true\n  }\n}\n"
+        }
+    }
+}

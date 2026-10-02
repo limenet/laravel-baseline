@@ -1,0 +1,16 @@
+{
+    "check": "biomeIgnoresCiArtifacts",
+    "description": "keeps a trailing comma and the last entry's line comment where they are",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "biome.json": "{\n    \"files\": {\n        \"includes\": [\n            \"**\",\n            \"!dist\", // build output\n            \"!metadata.json\",\n        ],\n    },\n}\n"
+        }
+    }
+}

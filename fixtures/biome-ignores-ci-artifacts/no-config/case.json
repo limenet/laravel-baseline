@@ -1,0 +1,10 @@
+{
+    "check": "biomeIgnoresCiArtifacts",
+    "description": "passes when the project does not use Biome",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}
