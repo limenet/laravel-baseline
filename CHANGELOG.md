@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.15.1](https://github.com/limenet/laravel-baseline/compare/v2.15.0...v2.15.1) (2026-10-02)
+
+### Bug Fixes
+
+* **php:** never wipe .gitlab-ci.yml when adding the security job ([9aa3c44](https://github.com/limenet/laravel-baseline/commit/9aa3c448634036a42dcbee6ec57d914c7567b03f))
+
 ## [2.15.0](https://github.com/limenet/laravel-baseline/compare/v2.14.0...v2.15.0) (2026-10-02)
 
 ### Features
