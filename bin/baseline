@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Limenet\LaravelBaseline\Cli\Application;
+
+// Composer 2.2+ tells a bin proxy where the autoloader is; the fallbacks cover
+// running bin/baseline straight from a checkout or a vendor/ path.
+$autoloaders = [
+    $GLOBALS['_composer_autoload_path'] ?? null,
+    __DIR__.'/../vendor/autoload.php',
+    __DIR__.'/../../../autoload.php',
+];
+
+foreach ($autoloaders as $autoloader) {
+    if (is_string($autoloader) && is_file($autoloader)) {
+        require $autoloader;
+
+        break;
+    }
+}
+
+if (!class_exists(Application::class)) {
+    fwrite(STDERR, "baseline: could not find Composer's autoloader. Run `composer install` first.\n");
+
+    exit(1);
+}
+
+exit((new Application)->run());

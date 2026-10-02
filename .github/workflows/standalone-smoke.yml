@@ -1,0 +1,104 @@
+name: standalone-smoke
+
+# The test suite always has laravel/framework installed, so it cannot notice a
+# Laravel helper leaking into the standalone runner. This installs the package
+# the way a WordPress theme would — from the distribution archive, without
+# Laravel — and runs vendor/bin/baseline for real.
+
+on:
+  push:
+    paths:
+      - "**.php"
+      - "bin/**"
+      - "composer.json"
+      - ".gitattributes"
+      - "policy/**"
+      - "resources/**"
+      - ".github/workflows/standalone-smoke.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.5, 8.3]
+
+    name: P${{ matrix.php }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Install the package into a WordPress theme without Laravel
+        run: |
+          # git archive honours export-ignore, so this is what Packagist ships.
+          mkdir -p "$RUNNER_TEMP/package" "$RUNNER_TEMP/theme"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/package"
+
+          cd "$RUNNER_TEMP/theme"
+          printf '/*\nTheme Name: Smoke\nVersion: 1.0.0\n*/\n' > style.css
+          printf '<?php\n' > functions.php
+          cat > composer.json <<JSON
+          {
+              "name": "smoke/theme",
+              "type": "project",
+              "repositories": [
+                  { "type": "path", "url": "$RUNNER_TEMP/package", "options": { "symlink": false } }
+              ],
+              "require": { "limenet/laravel-baseline": "*" }
+          }
+          JSON
+          composer install --no-interaction --no-progress
+
+          test ! -e vendor/laravel/framework
+          test ! -e vendor/illuminate/support
+
+      - name: Run the check
+        working-directory: ${{ runner.temp }}/theme
+        run: |
+          set +e
+          vendor/bin/baseline check -vv --no-interaction > out.txt 2>&1
+          code=$?
+          set -e
+          cat out.txt
+
+          test "$code" -eq 1
+          grep -q "Running baseline checks (wordpress)" out.txt
+          grep -q "Baseline check failed" out.txt
+          # `! grep` would not fail the step: errexit ignores negated commands.
+          if grep -qE "Fatal error|Call to undefined function|Class \"[^\"]+\" not found" out.txt; then exit 1; fi
+
+      - name: Run the fixes and the periodic command
+        working-directory: ${{ runner.temp }}/theme
+        run: |
+          vendor/bin/baseline check --fix --no-interaction > out.txt 2>&1 || true
+          cat out.txt
+          # `! grep` would not fail the step: errexit ignores negated commands.
+          if grep -qE "Fatal error|Call to undefined function|Class \"[^\"]+\" not found" out.txt; then exit 1; fi
+          grep -q "vendor/bin/baseline check --fix" composer.json
+          test -f .editorconfig
+
+          vendor/bin/baseline periodic --no-interaction
+
+      - name: Refuse a Laravel application
+        working-directory: ${{ runner.temp }}/theme
+        run: |
+          touch artisan
+          if vendor/bin/baseline check --no-interaction > out.txt 2>&1; then
+            cat out.txt
+            exit 1
+          fi
+          cat out.txt
+          grep -q "This is a Laravel project" out.txt

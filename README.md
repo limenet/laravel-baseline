@@ -10,12 +10,12 @@ Checks your Laravel installation against a highly opinionated baseline.
 
 This repository ships **two runners** from one policy:
 
-| | Composer | npm |
-| --- | --- | --- |
-| Package | `limenet/laravel-baseline` | `@limenet-ch/baseline` |
-| For | Laravel projects (DDEV, composer) | JS/TS-only projects (no PHP, no DDEV) |
-| Command | `php artisan limenet:laravel-baseline:check` | `npx baseline check` |
-| Checks | all of them | [the portable subset](#js-only-projects) |
+| | Composer (Laravel) | Composer (standalone) | npm |
+| --- | --- | --- | --- |
+| Package | `limenet/laravel-baseline` | `limenet/laravel-baseline` | `@limenet-ch/baseline` |
+| For | Laravel projects (DDEV, composer) | [other PHP projects](#non-laravel-php-projects), e.g. WordPress themes | JS/TS-only projects (no PHP, no DDEV) |
+| Command | `php artisan limenet:laravel-baseline:check` | `vendor/bin/baseline check` | `npx baseline check` |
+| Checks | all of them | the `php` / `wordpress` profiles | [the portable subset](#js-only-projects) |
 
 Both read `policy/`, so the version floors and required keys are defined once, and both are
 executed against the shared behavioural fixtures in `fixtures/`. They are released in lockstep:
@@ -69,6 +69,54 @@ The package also ships [Laravel Boost](https://laravel.com/docs/boost) resources
 conventions) and on-demand skills (e.g. `creating-a-release`). When a project that has
 `laravel/boost` installed runs `php artisan boost:install` or `php artisan boost:update --discover`,
 Boost discovers and publishes these to the consuming project's coding agents automatically.
+
+## Non-Laravel PHP projects
+
+The same composer package also checks PHP projects that are not Laravel apps, through
+`vendor/bin/baseline` instead of artisan. It runs the checks that make sense without Laravel —
+composer scripts, PHPStan, Pint, plain Rector sets, DDEV, CI, editor and Claude settings — and
+skips everything that needs artisan, `config/*.php` or a Laravel package.
+
+```bash
+composer require limenet/laravel-baseline
+```
+
+```bash
+ddev exec vendor/bin/baseline check              # report issues
+ddev exec vendor/bin/baseline check --fix        # apply safe fixes, then report what is left
+ddev exec vendor/bin/baseline periodic           # walk through expired periodic checks
+```
+
+Run it after every `composer update`, like the Laravel runner:
+
+```json
+"post-update-cmd": [
+    "@php vendor/bin/baseline check --fix"
+],
+```
+
+The runner picks a **profile** from the project:
+
+| Profile | Detected by |
+| --- | --- |
+| `wordpress` | a `style.css` with a `Theme Name:` header, a root `*.php` with a `Plugin Name:` header, or a composer `type` of `wordpress-theme` / `wordpress-plugin` / `wordpress-muplugin` |
+| `php` | anything else |
+
+A Laravel application (an `artisan` file, or `laravel/framework` in `require`) is refused — use the
+artisan command there, which runs the full Laravel profile. Set `"profile": "php"` or
+`"profile": "wordpress"` in `.baseline.json` to override the detection.
+
+Outside Laravel a test suite is optional: the Pest, `phpunit.xml` and pcov checks report a warning
+instead of failing until `pestphp/pest` is installed, and the CI test job is not required.
+
+State lives in `.baseline.json` at the project root, the same file and shape the npm runner uses:
+
+```json
+{
+    "excludes": ["hasTrivyConfig"],
+    "periodic": { "updatesDependencies": "2026-08-16T09:00:00+00:00" }
+}
+```
 
 ## JS-only projects
 
