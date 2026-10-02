@@ -29,14 +29,15 @@ class PhpVersionMatchesCiCheck extends AbstractCheck
 
         $ciPhpVersion = $ciData['variables']['PHP_VERSION'] ?? null;
 
-        if ($ciPhpVersion === null) {
+        // A tagged value (`!reference`) is not a version this check can compare.
+        if (!is_scalar($ciPhpVersion)) {
             $this->addComment('Missing PHP_VERSION variable in .gitlab-ci.yml: Add "PHP_VERSION" to the variables section');
 
             return CheckResult::FAIL;
         }
 
         // Ensure CI PHP version matches the composer constraint (both should be in format X.Y)
-        if ($composerPhpVersion !== $ciPhpVersion) {
+        if ($composerPhpVersion !== (string) $ciPhpVersion) {
             $this->addComment(sprintf(
                 'PHP version mismatch: composer.json requires ^%s but .gitlab-ci.yml uses %s',
                 $composerPhpVersion,

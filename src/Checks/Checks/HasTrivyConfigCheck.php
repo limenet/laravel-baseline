@@ -30,23 +30,12 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
             }
 
             $ciFile = $this->path('.gitlab-ci.yml');
+            $ciData = file_exists($ciFile) ? $this->getGitlabCiData() : null;
 
-            if (file_exists($ciFile)) {
-                $ciData = $this->getGitlabCiData() ?? [];
-                $changedCi = false;
-
-                foreach ($this->requiredCiJobs() as $jobName => $templates) {
-                    if (isset($ciData[$jobName])) {
-                        continue;
-                    }
-
-                    $ciData[$jobName] = ['extends' => [$templates[0]]];
-                    $changedCi = true;
-                }
-
-                if ($changedCi) {
-                    file_put_contents($ciFile, Yaml::dump($ciData, 4, 2));
-                }
+            // A file that could not be read is never rewritten: treating it as
+            // empty would replace every job in it with the one being added.
+            if ($ciData !== null) {
+                $this->appendMissingCiJobs($ciFile, $ciData);
             }
         }
 
@@ -137,6 +126,32 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
     protected function requiredCiJobs(): array
     {
         return $this->policy()->stringListMap('trivy.ciJob');
+    }
+
+    /**
+     * Appends each missing job as text instead of dumping the parsed file
+     * back: a dump would drop every comment, anchor and `!reference` tag.
+     *
+     * @param  array<string,mixed>  $ciData
+     */
+    private function appendMissingCiJobs(string $ciFile, array $ciData): void
+    {
+        $contents = (string) file_get_contents($ciFile);
+        $appended = '';
+
+        foreach ($this->requiredCiJobs() as $jobName => $templates) {
+            if (!array_key_exists($jobName, $ciData)) {
+                $appended .= "\n{$jobName}:\n  extends:\n    - {$templates[0]}\n";
+            }
+        }
+
+        if ($appended === '') {
+            return;
+        }
+
+        $separator = $contents === '' || str_ends_with($contents, "\n") ? '' : "\n";
+
+        file_put_contents($ciFile, $contents.$separator.$appended);
     }
 
     /**

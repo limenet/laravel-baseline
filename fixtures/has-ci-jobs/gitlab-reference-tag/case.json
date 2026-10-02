@@ -1,0 +1,7 @@
+{
+    "check": "hasCiJobs",
+    "description": "passes on a php project whose .gitlab-ci.yml uses GitLab's !reference tag",
+    "engines": ["php"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}
