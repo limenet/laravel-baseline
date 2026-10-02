@@ -1,0 +1,7 @@
+{
+    "check": "wordpressThemeVersionMatchesComposer",
+    "description": "passes when style.css and composer.json declare the same version",
+    "engines": ["php"],
+    "profiles": ["wordpress"],
+    "expect": "pass"
+}

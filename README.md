@@ -282,6 +282,7 @@ This package validates your Laravel installation against the following checks:
 ### Build & Release
 - 🔧 **`bumpsComposer()`** - Validates automatic composer dependency bumping *(adds `composer bump` to post-update-cmd)*
 - 🔧 **`usesReleaseIt()`** - Validates automated release management *(partial: creates/fixes .release-it.json and adds release npm script if packages installed)*
+- 🔧 **`wordpressThemeVersionMatchesComposer()`** - Validates the `Version:` header in `style.css` matches `composer.json`'s `version`, which `@release-it/bumper` keeps current *(wordpress profile, themes only; rewrites the header from composer.json, or seeds composer.json's `version` from the theme when it has none)*
 - **`hasNpmScripts()`** - Validates required npm build scripts
 - 🔧 **`biomeUsesLocalSchema()`** - Validates that `biome.json`, when the project has one, points `$schema` at `./node_modules/@biomejs/biome/configuration_schema.json` rather than a version-pinned remote URL, so the schema follows the installed Biome instead of needing a manual bump on every update. Passes when the project does not use Biome. *(rewrites or inserts the `$schema` line as a targeted text edit, leaving the rest of the file — comments included — byte-identical, since Biome formats `biome.json` itself)*
 

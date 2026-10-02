@@ -1,0 +1,13 @@
+{
+    "check": "wordpressThemeVersionMatchesComposer",
+    "description": "fails when the theme header lags composer.json, and rewrites the header on fix",
+    "engines": ["php"],
+    "profiles": ["wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "style.css": "/*\nTheme Name: Acme\nTemplate: astra\nVersion: 1.4.0\n*/\n"
+        }
+    }
+}
