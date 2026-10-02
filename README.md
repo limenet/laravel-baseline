@@ -118,6 +118,65 @@ State lives in `.baseline.json` at the project root, the same file and shape the
 }
 ```
 
+### What the standalone runner checks
+
+Every check below also runs in Laravel projects unless marked standalone-only.
+
+| Check | `php` | `wordpress` | Relationship to the Laravel runner |
+| --- | --- | --- | --- |
+| `allowsToolingInClaudeSettings` | ✓ | ✓ | requires the shared and `ddev composer` allow entries, not the artisan ones |
+| `biomeUsesLocalSchema` | ✓ | ✓ | identical |
+| `bumpsComposer` | ✓ | ✓ | identical |
+| `callsBaseline` | ✓ | ✓ | hooks `@php vendor/bin/baseline check --fix` into `post-update-cmd` instead of the artisan command |
+| `checkPhpunit` | ✓ | ✓ | warns until a test suite exists; requires only the cobertura and JUnit reports, not `APP_KEY` or the `./app` source |
+| `ddevHasPcovPackage` | ✓ | ✓ | warns until `pestphp/pest` is installed |
+| `ddevMutagenIgnoresNodeModules` | ✓ | ✓ | identical |
+| `ddevNodeVersionIsAuto` | ✓ | ✓ | identical |
+| `deniesEnvReadsInClaudeSettings` | ✓ | ✓ | identical |
+| `doesNotCallPeriodicBaselineOnUpdate` | ✓ | ✓ | flags `vendor/bin/baseline periodic` instead of the artisan command |
+| `doesNotExcludeUnknownChecks` | ✓ | ✓ | reads `.baseline.json`, against this profile’s checks |
+| `doesNotHaveCopilotOrJunieAgentFiles` | ✓ | ✓ | identical |
+| `doesNotUseBothBaselineRunners` | ✓ | ✓ | identical |
+| `doesNotUseGreaterThanOrEqualConstraints` | ✓ | ✓ | identical |
+| `doesNotUsePhpCsFixer` | ✓ | ✓ | identical |
+| `doesNotUsePhpInsights` | ✓ | ✓ | identical |
+| `hardensNpmSupplyChain` | ✓ | ✓ | identical |
+| `hasCiJobs` | ✓ | ✓ | same GitLab CI templates, without the `test` job |
+| `hasEditorconfig` | ✓ | ✓ | identical |
+| `hasNpmScripts` | ✓ | ✓ | identical |
+| `hasRectorConfigWithAttributesSets` | ✓ | ✓ | identical |
+| `hasRectorConfigWithImportNames` | ✓ | ✓ | identical |
+| `hasRectorConfigWithPestSet` | ✓ | ✓ | identical |
+| `hasRectorConfigWithPhpSets` | ✓ | ✓ | identical |
+| `hasRectorConfigWithPreparedSets` | ✓ | ✓ | identical |
+| `hasTrivyConfig` | ✓ | ✓ | identical |
+| `isCiLintComplete` | ✓ | ✓ | identical |
+| `isInstalledAsRegularDependency` | ✓ | ✓ | identical |
+| `nodeVersion` | ✓ | ✓ | identical |
+| `phpVersionMatchesCi` | ✓ | ✓ | identical |
+| `phpVersionMatchesDdev` | ✓ | ✓ | identical |
+| `phpstanCoversAllPhpFiles` | ✓ | ✓ | **standalone-only** |
+| `phpstanLevelAtLeastEight` | ✓ | ✓ | identical |
+| `rectorCoversAllPhpFiles` | ✓ | ✓ | **standalone-only** |
+| `releaseItBumpsWordpressThemeVersion` |  | ✓ | **standalone-only**, themes only |
+| `runsCiLintHookInClaudeSettings` | ✓ | ✓ | identical |
+| `updatesDdevAddons` | ✓ | ✓ | identical |
+| `updatesDependencies` | ✓ | ✓ | identical (periodic, every 30 days); recorded in `.baseline.json` |
+| `usesPest` | ✓ | ✓ | warns until `pestphp/pest` is installed; does not require `pest-plugin-laravel` |
+| `usesPestPhpstanPlugin` | ✓ | ✓ | identical |
+| `usesPestRectorPlugin` | ✓ | ✓ | identical |
+| `usesPhpstanExtensions` | ✓ | ✓ | identical |
+| `usesPhpstanWordpress` |  | ✓ | **standalone-only** |
+| `usesRector` | ✓ | ✓ | requires `rector/rector` only, not `driftingly/rector-laravel` |
+| `usesReleaseIt` | ✓ | ✓ | identical |
+| `wordpressThemeVersionMatchesComposer` |  | ✓ | **standalone-only**, themes only |
+
+Deliberately not run outside Laravel: everything artisan-, `config/*.php`-, schedule- or
+Laravel-package-shaped (Horizon, Pulse, Telescope, Spatie Health, Boost, IDE helpers, Larastan,
+`rector-laravel`), and `hasRectorConfigWithPaths` / `hasRectorConfigWithComposerBased`, whose
+values assume Laravel's layout — `rectorCoversAllPhpFiles` and `phpstanCoversAllPhpFiles` take their
+place.
+
 ## JS-only projects
 
 Projects with no PHP and no DDEV use the npm runner instead. It is a second implementation, not a

@@ -99,7 +99,9 @@ npm run release -- minor --ci
 
 `release-it` handles the version bump, git tag, commit, and (if configured) the remote release.
 The `@release-it/bumper` plugin writes the chosen version into the `version` field of
-`composer.json`, keeping it the single source of truth.
+`composer.json`, keeping it the single source of truth. In a WordPress theme an `after:bump` hook
+then rewrites the `Version:` header of `style.css` to match, so the theme WordPress sees carries the
+same version and the change lands in the release commit.
 
 ## Conventions
 
@@ -116,3 +118,5 @@ The relevant config the baseline enforces:
 
 - `package.json` → `scripts.release` = `"release-it"`
 - `.release-it.json` → `plugins['@release-it/bumper'].out` = `{ "file": "composer.json", "path": "version" }`
+- WordPress themes: `.release-it.json` → `hooks['after:bump']` includes a command rewriting the
+  `Version:` header of `style.css`
