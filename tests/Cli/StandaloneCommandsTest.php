@@ -106,3 +106,22 @@ it('records a confirmed periodic check in .baseline.json', function (): void {
     expect(json_decode((string) file_get_contents($project->path('.baseline.json')), true)['periodic'])
         ->toHaveKey('updatesDependencies');
 });
+
+it('installs the skills with install-skills', function (): void {
+    $project = makeProject(Profile::Php);
+
+    $tester = standaloneCommand('install-skills');
+
+    expect($tester->execute(['--cwd' => $project->path()], ['interactive' => false]))->toBe(Command::SUCCESS)
+        ->and($tester->getDisplay())->toContain('3 skill(s) installed, 0 left untouched.')
+        ->and(is_file($project->path('.claude/skills/updating-dependencies/SKILL.md')))->toBeTrue();
+});
+
+it('syncs the skills on check --fix', function (): void {
+    $project = makeProject(Profile::Php, ['composer.json' => json_encode(['name' => 'acme/lib'])]);
+
+    $tester = standaloneCommand('check');
+    $tester->execute(['--cwd' => $project->path(), '--fix' => true], ['interactive' => false]);
+
+    expect($tester->getDisplay())->toContain('🔧 Skill installed: .claude/skills/updating-dependencies/SKILL.md');
+});

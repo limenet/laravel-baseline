@@ -366,8 +366,13 @@ the runner's state file itself. The periodic command confirms interactively, whi
 answer, so without that step the check keeps prompting after the skill has completed. Copy the step
 from `updating-dependencies` in every variant of the skill that exists:
 
-- **PHP** (`resources/boost/skills/`) — `config/baseline.php`, `periodic.<checkName>`, value from
-  `ddev php -r 'echo date(DATE_ATOM), PHP_EOL;'`, leaving `excludes` untouched.
+- **PHP, Laravel** (`resources/boost/skills/`, delivered by Laravel Boost) — `config/baseline.php`,
+  `periodic.<checkName>`, value from `ddev php -r 'echo date(DATE_ATOM), PHP_EOL;'`, leaving
+  `excludes` untouched.
+- **PHP, standalone** (`resources/standalone/skills/`, delivered by `vendor/bin/baseline
+  install-skills` and `check --fix`) — `.baseline.json`, `periodic.<checkName>`, value from the same
+  `ddev php -r` command, leaving `excludes` and `profile` untouched. No artisan, no Laravel wording —
+  `tests/Skills/SkillInstallerTest.php` enforces it.
 - **npm** (`js/skills/`) — `.baseline.json`, `periodic.<checkName>`, value from
   `node -e "console.log(new Date().toISOString())"`.
 

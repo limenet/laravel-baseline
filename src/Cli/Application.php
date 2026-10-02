@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Cli;
 
 use Composer\InstalledVersions;
 use Limenet\LaravelBaseline\Cli\Command\CheckCommand;
+use Limenet\LaravelBaseline\Cli\Command\InstallSkillsCommand;
 use Limenet\LaravelBaseline\Cli\Command\PeriodicCommand;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
@@ -21,6 +22,7 @@ final class Application extends ConsoleApplication
         $this->addCommands([
             new CheckCommand,
             new PeriodicCommand,
+            new InstallSkillsCommand,
         ]);
     }
 
