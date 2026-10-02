@@ -415,9 +415,36 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
+     * A PHPStan NEON file, read as YAML after normalising the NEON syntax
+     * phpstan configs commonly use and YAML rejects: tab indentation, and
+     * unquoted values starting with `%` (`%currentWorkingDirectory%/src`) or
+     * `@` (service references). Other NEON-only syntax still fails to parse,
+     * which loadYamlConfig() reports as a finding rather than a crash.
+     *
      * @return array<string,mixed>|null
      */
-    protected function loadYamlConfig(string $relativePath): ?array
+    protected function loadNeonConfig(string $relativePath): ?array
+    {
+        return $this->loadYamlConfig($relativePath, static function (string $contents): string {
+            $contents = (string) preg_replace_callback(
+                '/^\t+/m',
+                static fn (array $m): string => str_repeat('    ', strlen($m[0])),
+                $contents,
+            );
+
+            return (string) preg_replace_callback(
+                '/^(\s*(?:-\s+|[\w.-]+:\s+))([%@][^\n#]*?)(\s*(?:#.*)?)$/m',
+                static fn (array $m): string => $m[1]."'".str_replace("'", "''", $m[2])."'".$m[3],
+                $contents,
+            );
+        });
+    }
+
+    /**
+     * @param  (callable(string): string)|null  $normalize  applied to the raw contents before parsing
+     * @return array<string,mixed>|null
+     */
+    protected function loadYamlConfig(string $relativePath, ?callable $normalize = null): ?array
     {
         $file = $this->path($relativePath);
         $path = ltrim($relativePath, '/');
@@ -429,7 +456,8 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         try {
-            $data = Yaml::parseFile($file);
+            $contents = (string) file_get_contents($file);
+            $data = Yaml::parse($normalize === null ? $contents : $normalize($contents));
         } catch (ParseException $e) {
             // A malformed file is a finding, not a crash: the fixable checks
             // re-read the file to verify their own write, so an exception here

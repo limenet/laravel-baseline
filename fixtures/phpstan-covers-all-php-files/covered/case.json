@@ -1,0 +1,7 @@
+{
+    "check": "phpstanCoversAllPhpFiles",
+    "description": "passes when parameters.paths covers every PHP file the project owns",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "pass"
+}

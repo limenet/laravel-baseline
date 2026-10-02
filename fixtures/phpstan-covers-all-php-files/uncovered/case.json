@@ -1,0 +1,7 @@
+{
+    "check": "phpstanCoversAllPhpFiles",
+    "description": "fails when PHPStan analyses app/ while functions.php goes unchecked",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "fail"
+}

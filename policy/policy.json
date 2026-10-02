@@ -168,5 +168,9 @@
     },
     "periodic": {
         "defaultIntervalDays": 30
+    },
+    "phpFileCoverage": {
+        "ignoredDirectories": ["vendor", "node_modules"],
+        "exempt": ["rector.php"]
     }
 }

@@ -116,8 +116,14 @@ YAML;
     expect($check->getComments())->toContain('PHPStan level must be a number or "max": Found "invalid" in phpstan.neon');
 });
 
-it('phpstanLevelAtLeastEight fails instead of crashing on a phpstan.neon that is not valid YAML', function (): void {
-    $this->withTempBasePath(['phpstan.neon' => "parameters:\n\tlevel: 8\n"]);
+it('phpstanLevelAtLeastEight reads NEON indented with tabs and %parameters%', function (): void {
+    $this->withTempBasePath(['phpstan.neon' => "includes:\n\t- %rootDir%/conf/bleedingEdge.neon\nparameters:\n\tlevel: 8\n\tpaths:\n\t\t- %currentWorkingDirectory%/src # app code\n"]);
+
+    expect(makeCheck(PhpstanLevelAtLeastEightCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
+it('phpstanLevelAtLeastEight fails instead of crashing on a phpstan.neon it cannot parse', function (): void {
+    $this->withTempBasePath(['phpstan.neon' => "parameters:\n    level: [8\n"]);
 
     [$check, $collector] = makeCheckWithCollector(PhpstanLevelAtLeastEightCheck::class);
 

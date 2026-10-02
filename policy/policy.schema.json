@@ -17,7 +17,8 @@
         "trivy",
         "baseline",
         "npmScripts",
-        "periodic"
+        "periodic",
+        "phpFileCoverage"
     ],
     "$defs": {
         "phpRunner": {
@@ -373,6 +374,24 @@
             "required": ["defaultIntervalDays"],
             "properties": {
                 "defaultIntervalDays": { "type": "integer", "minimum": 1 }
+            }
+        },
+        "phpFileCoverage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ignoredDirectories", "exempt"],
+            "description": "What phpstanCoversAllPhpFiles and rectorCoversAllPhpFiles (php and wordpress profiles) treat as the project's PHP files. Dot-directories and git-ignored files are never counted.",
+            "properties": {
+                "ignoredDirectories": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Directory names skipped at any depth, e.g. dependencies installed into the project."
+                },
+                "exempt": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Project-relative files that need not be analysed, e.g. the Rector config itself."
+                }
             }
         }
     }

@@ -194,6 +194,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
 - **`usesPhpstanWordpress()`** - Validates `szepeviktor/phpstan-wordpress` is installed, so PHPStan knows WordPress's functions, classes and hooks *(wordpress profile only)*
+- **`phpstanCoversAllPhpFiles()`** - Validates PHPStan's `parameters.paths` cover every PHP file the project owns (outside `vendor/`, `node_modules/`, dot-directories and git-ignored paths); files listed in `excludePaths` count as deliberately skipped. `includes` are not followed *(php and wordpress profiles)*
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
 - 🔧 **`phpstanParsesModelCastsMethod()`** - Validates `phpstan.neon` sets `parseModelCastsMethod: true`: `ModelCastsPropertyToCastsMethodRector` rewrites `protected $casts = [...]` into a `casts(): array` method, and without this parameter Larastan reads only the generated `@return array<string, string>` — not a constant array — so every cast is lost and datetime attributes report as strings *(inserts the parameter into the `parameters` block)*
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*

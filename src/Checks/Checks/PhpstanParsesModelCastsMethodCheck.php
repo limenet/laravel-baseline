@@ -26,7 +26,7 @@ class PhpstanParsesModelCastsMethodCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $phpstanConfig = $this->loadYamlConfig('phpstan.neon');
+        $phpstanConfig = $this->loadNeonConfig('phpstan.neon');
 
         if ($phpstanConfig === null) {
             return CheckResult::FAIL;

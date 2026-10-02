@@ -23,9 +23,9 @@ class PhpstanLevelAtLeastEightCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
-        // NEON is parsed as YAML; anything that is not valid YAML becomes a
-        // finding rather than an exception that aborts the whole run.
-        $phpstanConfig = $this->loadYamlConfig('phpstan.neon');
+        // Anything that still is not valid YAML becomes a finding rather than
+        // an exception that aborts the whole run.
+        $phpstanConfig = $this->loadNeonConfig('phpstan.neon');
 
         if ($phpstanConfig === null) {
             return CheckResult::FAIL;
