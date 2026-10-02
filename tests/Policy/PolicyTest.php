@@ -20,9 +20,11 @@ it('loads every key the checks depend on with the declared type', function (): v
     expect($policy->strings('editorconfig.requiredProperties'))->not->toBeEmpty();
     expect($policy->stringMap('agentFiles.forbidden'))->not->toBeEmpty();
     expect($policy->strings('claude.allow.shared'))->not->toBeEmpty();
-    expect($policy->strings('claude.allow.php'))->not->toBeEmpty();
+    expect($policy->strings('claude.allow.composer'))->not->toBeEmpty();
+    expect($policy->strings('claude.allow.laravel'))->not->toBeEmpty();
+    expect($policy->strings('claude.ask.laravel'))->not->toBeEmpty();
     expect($policy->strings('claude.deny.shared'))->not->toBeEmpty();
-    expect($policy->string('claude.ciLintHookCommand.php'))->toBeString();
+    expect($policy->string('claude.ciLintHookCommand.composer'))->toBeString();
     expect($policy->string('claude.ciLintHookCommand.js'))->toBeString();
     expect($policy->string('trivy.configFile'))->toBeString();
     expect($policy->string('trivy.ignoreFile'))->toBeString();
@@ -30,7 +32,10 @@ it('loads every key the checks depend on with the declared type', function (): v
     expect($policy->strings('trivy.forbiddenKeys'))->not->toBeEmpty();
     expect($policy->stringListMap('trivy.ciJob'))->not->toBeEmpty();
     expect($policy->template($policy->string('trivy.template')))->toContain('ignorefile:');
+    expect($policy->stringListMap('ci.requiredJobs.laravel'))->not->toBeEmpty();
     expect($policy->stringListMap('ci.requiredJobs.php'))->not->toBeEmpty();
+    expect($policy->stringListMap('ci.requiredJobs.wordpress'))->not->toBeEmpty();
+    expect($policy->strings('ciLint.required.composer'))->not->toBeEmpty();
     expect($policy->stringListMap('ci.requiredJobs.js'))->not->toBeEmpty();
     expect($policy->int('periodic.defaultIntervalDays'))->toBeInt();
 });

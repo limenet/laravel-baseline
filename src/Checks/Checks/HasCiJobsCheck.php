@@ -14,6 +14,6 @@ class HasCiJobsCheck extends AbstractCiJobCheck
 
     protected function requiredCiJobs(): array
     {
-        return $this->policy()->stringListMap('ci.requiredJobs.php');
+        return $this->policy()->stringListMap('ci.requiredJobs.laravel');
     }
 }

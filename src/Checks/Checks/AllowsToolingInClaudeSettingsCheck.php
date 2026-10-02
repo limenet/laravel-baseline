@@ -52,7 +52,8 @@ class AllowsToolingInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
     private function requiredAllowEntries(): array
     {
         return [
-            ...$this->policy()->strings('claude.allow.php'),
+            ...$this->policy()->strings('claude.allow.composer'),
+            ...$this->policy()->strings('claude.allow.laravel'),
             ...$this->policy()->strings('claude.allow.shared'),
         ];
     }

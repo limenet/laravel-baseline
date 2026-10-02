@@ -199,8 +199,23 @@ Ask whether the check means anything in a project with no PHP, no composer and n
 - **Yes, identically** — add the TS class under `js/src/checks/`, register it in
   `js/src/checks/registry.ts`, and add a fixture with `"engines": ["php", "js"]`.
 - **Yes, but with different data** — put the differing values in `policy/policy.json` under a
-  `php` / `js` split (see `ci.requiredJobs`, `ciLint.required`, `claude.allow`), have *both* checks
-  read their half, and write one fixture per engine.
+  split (see `ci.requiredJobs`, `ciLint.required`, `claude.allow`), have *both* checks read their
+  half, and write one fixture per engine.
+
+Policy splits are keyed by **who the value applies to**, coarsest first, so a value shared by several
+profiles is written once:
+
+| Key | Applies to |
+|---|---|
+| `shared` | every project, both runners |
+| `composer` | every PHP profile (`laravel`, `php`, `wordpress`) |
+| `laravel` / `php` / `wordpress` | that one PHP profile |
+| `js` | the npm runner |
+
+A check reads the union of the keys that cover its profile (e.g. `claude.allow.composer` +
+`claude.allow.laravel` + `claude.allow.shared`). Only introduce a per-profile key where the values
+actually differ; the schema is closed, so every new key also goes into `policy.schema.json`, which
+`tests/Policy/PolicySchemaTest.php` validates the shipped file against.
 
 **Any constant a check compares against belongs in `policy/`, not in the class.** That is the only
 thing keeping the two runners from disagreeing about what the standard actually is. Logic stays in

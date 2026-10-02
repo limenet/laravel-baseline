@@ -9,7 +9,7 @@ class RunsCiLintHookInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $command = $this->policy()->string('claude.ciLintHookCommand.php');
+        $command = $this->policy()->string('claude.ciLintHookCommand.composer');
 
         $settings = $this->readClaudeSettings() ?? [];
 

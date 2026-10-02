@@ -9,7 +9,7 @@ class IsCiLintCompleteCheck extends AbstractCheck
 {
     public function check(): CheckResult
     {
-        foreach ($this->policy()->strings('ciLint.required.php') as $required) {
+        foreach ($this->policy()->strings('ciLint.required.composer') as $required) {
             if (!$this->checkComposerScript('ci-lint', $required)) {
                 return CheckResult::FAIL;
             }

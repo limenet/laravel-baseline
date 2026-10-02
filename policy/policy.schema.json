@@ -127,17 +127,22 @@
                 "allow": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["shared", "php"],
+                    "required": ["shared", "composer", "laravel"],
                     "properties": {
                         "shared": {
                             "type": "array",
                             "items": { "type": "string" },
                             "description": "permissions.allow entries that apply to every project type."
                         },
-                        "php": {
+                        "composer": {
                             "type": "array",
                             "items": { "type": "string" },
-                            "description": "permissions.allow entries that only make sense in a Laravel/DDEV project."
+                            "description": "permissions.allow entries for every composer project under DDEV (laravel, php and wordpress profiles)."
+                        },
+                        "laravel": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.allow entries that only make sense in a Laravel project (artisan)."
                         }
                     }
                 },
@@ -156,21 +161,21 @@
                 "ask": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php"],
+                    "required": ["laravel"],
                     "properties": {
-                        "php": {
+                        "laravel": {
                             "type": "array",
                             "items": { "type": "string" },
-                            "description": "permissions.ask entries for the artisan commands that destroy database contents. Laravel/DDEV only. These prompt rather than deny, so the developer keeps an approval path."
+                            "description": "permissions.ask entries for the artisan commands that destroy database contents. Laravel only. These prompt rather than deny, so the developer keeps an approval path."
                         }
                     }
                 },
                 "ciLintHookCommand": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php", "js"],
+                    "required": ["composer", "js"],
                     "properties": {
-                        "php": { "type": "string" },
+                        "composer": { "type": "string" },
                         "js": { "type": "string" }
                     }
                 }
@@ -194,10 +199,18 @@
                 "requiredJobs": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php", "js"],
-                    "description": "GitLab CI job name => the shared template it must extend, or a list of templates any one of which is accepted. The js set omits the php job.",
+                    "required": ["laravel", "php", "wordpress", "js"],
+                    "description": "GitLab CI job name => the shared template it must extend, or a list of templates any one of which is accepted, per profile. The js set omits the php job; php and wordpress omit the test job.",
                     "properties": {
+                        "laravel": {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
+                        },
                         "php": {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
+                        },
+                        "wordpress": {
                             "type": "object",
                             "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
                         },
@@ -217,10 +230,10 @@
                 "required": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php", "js"],
-                    "description": "Substrings the project's ci-lint script must contain — a composer script for php, an npm script for js.",
+                    "required": ["composer", "js"],
+                    "description": "Substrings the project's ci-lint script must contain — a composer script for every composer profile, an npm script for js.",
                     "properties": {
-                        "php": { "type": "array", "items": { "type": "string" } },
+                        "composer": { "type": "array", "items": { "type": "string" } },
                         "js": { "type": "array", "items": { "type": "string" } }
                     }
                 },

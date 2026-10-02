@@ -18,8 +18,10 @@ whether a fixture is per-engine, and the autofix choice changes the base class t
 ### 1. Which runner(s)?
 
 - **Both** — the standard lives in every project. Ask whether the *values* are identical or differ
-  per ecosystem; if they differ, they go into `policy/policy.json` under a `php` / `js` split (see
-  `ci.requiredJobs`, `ciLint.required`, `claude.allow`) and the fixtures are written per engine.
+  per ecosystem; if they differ, they go into `policy/policy.json` under a split keyed by who the
+  value applies to — `shared`, `composer`, `laravel` / `php` / `wordpress`, `js` (see
+  `ci.requiredJobs`, `ciLint.required`, `claude.allow`, and CLAUDE.md §4b) — and the fixtures are
+  written per engine.
 - **PHP only** — anything composer-, artisan-, Rector-, PHPStan-, Spatie-Health- or DDEV-shaped.
 - **JS only** — anything that has no meaning in a Laravel project, or whose PHP counterpart would
   assert the opposite (`usesReleaseIt` is the precedent).

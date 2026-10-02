@@ -10,7 +10,7 @@ use Limenet\LaravelBaseline\Policy\Policy;
  */
 function requiredAskEntries(): array
 {
-    return Policy::fromDirectory()->strings('claude.ask.php');
+    return Policy::fromDirectory()->strings('claude.ask.laravel');
 }
 
 it('asksBeforeDestructiveDbCommandsInClaudeSettings implements FixableInterface', function (): void {
