@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.15.0](https://github.com/limenet/laravel-baseline/compare/v2.14.0...v2.15.0) (2026-10-02)
+
+### Features
+
+* **policy:** add biomeIgnoresCiArtifacts check ([e68cea2](https://github.com/limenet/laravel-baseline/commit/e68cea24a095ae166518e5538fe956913d85d0fa))
+
 ## [2.14.0](https://github.com/limenet/laravel-baseline/compare/v2.13.0...v2.14.0) (2026-10-02)
 
 ### Features
