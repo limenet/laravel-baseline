@@ -151,3 +151,11 @@ YML;
 
     $result->assertExitCode(Command::FAILURE);
 })->group('command');
+
+it('keeps the check registry alphabetically sorted', function (): void {
+    $names = array_map(fn (string $class): string => strtolower(class_basename($class)), CheckRegistry::all());
+    $sorted = $names;
+    sort($sorted);
+
+    expect($names)->toBe($sorted);
+})->group('command');
