@@ -64,6 +64,7 @@ use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanParsesModelCastsMethodCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
+use Limenet\LaravelBaseline\Checks\Checks\RectorCoversAllPhpFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsBoostUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsCiLintHookInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UpdatesDdevAddonsCheck;
@@ -184,6 +185,7 @@ class CheckRegistry
         UsesPhpstanWordpressCheck::class,
         UsesPredisCheck::class,
         RunsBoostUpdateCheck::class,
+        RectorCoversAllPhpFilesCheck::class,
         RunsCiLintHookInClaudeSettingsCheck::class,
         UpdatesDdevAddonsCheck::class,
         UpdatesDependenciesCheck::class,

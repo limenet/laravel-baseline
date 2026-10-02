@@ -1,0 +1,7 @@
+{
+    "check": "rectorCoversAllPhpFiles",
+    "description": "passes when withPaths() and withRootFiles() cover every PHP file the project owns",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "pass"
+}

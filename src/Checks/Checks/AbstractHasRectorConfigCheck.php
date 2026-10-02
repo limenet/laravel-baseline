@@ -3,6 +3,7 @@
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
+use Limenet\LaravelBaseline\Concerns\AppendsToRectorChain;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\PhpFile\PhpFileWriter;
 use Limenet\LaravelBaseline\Rector\AbstractRectorVisitor;
@@ -13,6 +14,8 @@ use PhpParser\ParserFactory;
 
 abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
 {
+    use AppendsToRectorChain;
+
     public function fix(bool $dry = false): CheckResult
     {
         $rectorFile = $this->path('rector.php');
@@ -179,47 +182,6 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
         $writer->save(multilineArrays: true);
 
         return true;
-    }
-
-    /**
-     * @param  list<string>  $imports
-     */
-    protected function appendToRectorChain(string $rectorFile, string $snippet, array $imports = []): void
-    {
-        $snippetCode = '<?php $dummy'.$snippet.';';
-        $snippetAst = (new ParserFactory)->createForNewestSupportedVersion()->parse($snippetCode) ?? [];
-
-        if ($snippetAst === [] || !$snippetAst[0] instanceof Node\Stmt\Expression) {
-            return;
-        }
-
-        $methodCall = $snippetAst[0]->expr;
-
-        if (!$methodCall instanceof Node\Expr\MethodCall) {
-            return;
-        }
-
-        $writer = PhpFileWriter::open($rectorFile);
-        $finder = new NodeFinder;
-        $return = $finder->findFirst($writer->stmts, fn ($n): bool => $n instanceof Node\Stmt\Return_);
-
-        if ($return instanceof Node\Stmt\Return_) {
-            if ($return->expr instanceof Node\Expr\MethodCall || $return->expr instanceof Node\Expr\StaticCall) {
-                $methodCall->var = $return->expr;
-                $return->expr = $methodCall;
-            } else {
-                $exprStmt = $finder->findFirst($writer->stmts, fn ($n): bool => $n instanceof Node\Stmt\Expression
-                    && $n->expr instanceof Node\Expr\MethodCall);
-
-                if ($exprStmt instanceof Node\Stmt\Expression) {
-                    $methodCall->var = $exprStmt->expr;
-                    $exprStmt->expr = $methodCall;
-                }
-            }
-        }
-
-        $writer->addMissingUseStatements($imports);
-        $writer->save();
     }
 
     /**
