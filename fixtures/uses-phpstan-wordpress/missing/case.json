@@ -1,0 +1,7 @@
+{
+    "check": "usesPhpstanWordpress",
+    "description": "fails when a WordPress project analyses with PHPStan but without the WordPress stubs",
+    "engines": ["php"],
+    "profiles": ["wordpress"],
+    "expect": "fail"
+}

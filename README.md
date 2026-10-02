@@ -193,6 +193,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`usesRector()`** - Validates Rector automated code modernization is installed, with `driftingly/rector-laravel` constrained to at least `^2.6.1` — the release where `LaravelSetProvider` is gone and its rules arrive through `LaravelSetList::COMPOSER_BASED` instead *(partial: fixes ci-lint script if packages installed)*
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
+- **`usesPhpstanWordpress()`** - Validates `szepeviktor/phpstan-wordpress` is installed, so PHPStan knows WordPress's functions, classes and hooks *(wordpress profile only)*
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
 - 🔧 **`phpstanParsesModelCastsMethod()`** - Validates `phpstan.neon` sets `parseModelCastsMethod: true`: `ModelCastsPropertyToCastsMethodRector` rewrites `protected $casts = [...]` into a `casts(): array` method, and without this parameter Larastan reads only the generated `@return array<string, string>` — not a constant array — so every cast is lost and datetime attributes report as strings *(inserts the parameter into the `parameters` block)*
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*

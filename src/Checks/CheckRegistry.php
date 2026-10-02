@@ -81,6 +81,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesPestCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestPhpstanPluginCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestRectorPluginCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanWordpressCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReadableEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
@@ -178,6 +179,7 @@ class CheckRegistry
         UsesPestPhpstanPluginCheck::class,
         UsesPestRectorPluginCheck::class,
         UsesPhpstanExtensionsCheck::class,
+        UsesPhpstanWordpressCheck::class,
         UsesPredisCheck::class,
         RunsBoostUpdateCheck::class,
         RunsCiLintHookInClaudeSettingsCheck::class,
