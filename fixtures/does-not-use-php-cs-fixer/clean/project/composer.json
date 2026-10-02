@@ -1,0 +1,9 @@
+{
+    "name": "acme/theme",
+    "require-dev": {
+        "laravel/pint": "^1.0"
+    },
+    "scripts": {
+        "ci-lint": ["pint --parallel", "phpstan analyse"]
+    }
+}

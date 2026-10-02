@@ -637,7 +637,8 @@ abstract class AbstractCheck implements CheckInterface
             return;
         }
 
-        $scripts = $composerJson['scripts'][$scriptName] ?? [];
+        // Composer accepts a single command as a plain string.
+        $scripts = (array) ($composerJson['scripts'][$scriptName] ?? []);
 
         foreach ($scripts as $script) {
             if (str_contains($script, $value)) {
@@ -657,7 +658,7 @@ abstract class AbstractCheck implements CheckInterface
             }
         }
 
-        $composerJson['scripts'][$scriptName][] = $value;
+        $composerJson['scripts'][$scriptName] = [...$scripts, $value];
         $this->writeComposerJson($composerJson);
     }
 
@@ -672,7 +673,7 @@ abstract class AbstractCheck implements CheckInterface
             return;
         }
 
-        $scripts = $composerJson['scripts'][$scriptName] ?? [];
+        $scripts = (array) ($composerJson['scripts'][$scriptName] ?? []);
         $filtered = array_values(array_filter($scripts, fn ($script): bool => !str_contains($script, $match)));
 
         if ($filtered === $scripts) {

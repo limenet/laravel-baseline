@@ -249,6 +249,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesPredis()`** - Validates Predis Redis client is installed
 - **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used
 - 🔧 **`doesNotUseSail()`** - Validates Sail is NOT used *(partial: deletes docker-compose.yml; run `composer remove laravel/sail` manually)*
+- 🔧 **`doesNotUsePhpCsFixer()`** - Validates PHP CS Fixer is NOT used directly — Pint is the formatter *(removes the `friendsofphp/php-cs-fixer` composer.json entry, `php-cs-fixer` ci-lint entries, and `.php-cs-fixer.php` / `.php-cs-fixer.dist.php` / `.php-cs-fixer.cache`; port custom rules to `pint.json` first, and run `composer update` afterward)*
 - 🔧 **`doesNotUsePhpInsights()`** - Validates PHP Insights is NOT used *(removes the `nunomaduro/phpinsights` composer.json entry, leftover ci-lint script entries, and config/insights.php; run `composer update` afterward to sync composer.lock)*
 - **`doesNotUseSpatiePasskeysWithFortify()`** - Fails if both `spatie/laravel-passkeys` and `laravel/fortify` are installed, as they overlap in authentication responsibility
 - **`doesNotUseBothBaselineRunners()`** - Fails when `package.json` also declares `@limenet-ch/baseline`: the npm runner is the fallback for projects this package cannot reach, and in a Laravel project this one wins (reports the `npm uninstall` to run; never uninstalls for you)

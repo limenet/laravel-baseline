@@ -1,0 +1,7 @@
+{
+    "check": "doesNotUsePhpCsFixer",
+    "description": "passes when Pint formats and PHP CS Fixer is nowhere to be found",
+    "engines": ["php"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}

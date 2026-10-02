@@ -26,6 +26,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseBothBaselineRunnersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotUsePhpCsFixerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUsePhpInsightsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseRectorSetProvidersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
@@ -125,6 +126,7 @@ class CheckRegistry
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,
+        DoesNotUsePhpCsFixerCheck::class,
         DoesNotUsePhpInsightsCheck::class,
         DoesNotUseRectorSetProvidersCheck::class,
         DoesNotUseSailCheck::class,
