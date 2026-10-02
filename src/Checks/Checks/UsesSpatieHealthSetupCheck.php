@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
+use Limenet\LaravelBaseline\Concerns\InteractsWithLaravelSchedule;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Health\HealthConfigVisitor;
 use PhpParser\NodeTraverser;
@@ -11,6 +12,8 @@ use PhpParser\ParserFactory;
 
 class UsesSpatieHealthSetupCheck extends AbstractCheck
 {
+    use InteractsWithLaravelSchedule;
+
     public function check(): CheckResult
     {
         if (!$this->checkComposerPackages(['spatie/laravel-health', 'spatie/cpu-load-health-check'])) {

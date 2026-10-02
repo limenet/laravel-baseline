@@ -2,10 +2,13 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
+use Limenet\LaravelBaseline\Concerns\InteractsWithLaravelSchedule;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class UsesSpatieHealthQueueCheckCacheStoreCheck extends AbstractUsesSpatieHealthCheckCacheStoreCheck
 {
+    use InteractsWithLaravelSchedule;
+
     public function check(): CheckResult
     {
         if (!$this->checkComposerPackages('spatie/laravel-health')) {

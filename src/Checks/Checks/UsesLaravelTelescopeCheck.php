@@ -3,10 +3,13 @@
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
+use Limenet\LaravelBaseline\Concerns\InteractsWithLaravelSchedule;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class UsesLaravelTelescopeCheck extends AbstractFixableCheck
 {
+    use InteractsWithLaravelSchedule;
+
     public function fix(bool $dry = false): CheckResult
     {
         if (!$this->checkComposerPackages('laravel/telescope')) {

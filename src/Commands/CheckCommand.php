@@ -9,6 +9,7 @@ use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Checks\PeriodicCheckInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Support\CheckName;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\intro;
@@ -57,7 +58,7 @@ class CheckCommand extends Command
             $this->line(
                 sprintf(
                     '⚪ %s (excluded)',
-                    str($name)->ucsplit()->implode(' '),
+                    CheckName::display($name),
                 ),
             );
 
@@ -88,7 +89,7 @@ class CheckCommand extends Command
         }
 
         $checkName = $check::name();
-        $displayName = str($checkName)->ucsplit()->implode(' ');
+        $displayName = CheckName::display($checkName);
 
         $hasOutput = $result->isError() || $this->getOutput()->isVerbose();
         $hasComments = $result->isError() || $this->getOutput()->isVeryVerbose();

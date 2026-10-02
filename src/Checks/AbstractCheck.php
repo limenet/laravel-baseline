@@ -5,11 +5,11 @@ namespace Limenet\LaravelBaseline\Checks;
 use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Policy\Policy;
+use Limenet\LaravelBaseline\Support\CheckName;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -38,10 +38,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     final public static function name(): string
     {
-        return str(class_basename(static::class))
-            ->beforeLast('Check')
-            ->lcfirst()
-            ->toString();
+        return CheckName::fromClass(static::class);
     }
 
     /**
@@ -86,8 +83,8 @@ abstract class AbstractCheck implements CheckInterface
 
         $this->addComment('Composer script check: '.$scriptName.' for '.$match);
 
-        foreach ($composerJson['scripts'][$scriptName] ?? [] as $script) {
-            if (str($script)->contains($match)) {
+        foreach ((array) ($composerJson['scripts'][$scriptName] ?? []) as $script) {
+            if (is_string($script) && str_contains($script, $match)) {
                 return true;
             }
         }
@@ -782,45 +779,6 @@ abstract class AbstractCheck implements CheckInterface
         file_put_contents($file, $contents.$prefix.$entry."\n");
 
         return CheckResult::FAIL;
-    }
-
-    // === Schedule Helpers ===
-
-    protected function hasScheduleEntry(string $command): bool
-    {
-        $this->addComment('Schedule check: '.$command);
-
-        foreach (Schedule::events() as $event) {
-            if (str_contains($event->command ?? '', $command)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if a package is installed and has required schedule entries
-     *
-     * @param  string|list<string>  $scheduleCommands
-     */
-    protected function checkPackageWithSchedule(
-        string $package,
-        string|array $scheduleCommands,
-    ): CheckResult {
-        if (!$this->checkComposerPackages($package)) {
-            return CheckResult::WARN;
-        }
-
-        $commands = is_string($scheduleCommands) ? [$scheduleCommands] : $scheduleCommands;
-
-        foreach ($commands as $command) {
-            if (!$this->hasScheduleEntry($command)) {
-                return CheckResult::FAIL;
-            }
-        }
-
-        return CheckResult::PASS;
     }
 
     /**

@@ -9,6 +9,7 @@ use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Checks\PeriodicCheckInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\State\PeriodicStateManager;
+use Limenet\LaravelBaseline\Support\CheckName;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
@@ -36,7 +37,7 @@ class PeriodicCheckCommand extends Command
 
         foreach ($expired as $check) {
             $this->newLine();
-            $this->line(sprintf('<info>%s</info>', str($check::name())->ucsplit()->implode(' ')));
+            $this->line(sprintf('<info>%s</info>', CheckName::display($check::name())));
             $this->line($check->promptDescription());
             $this->newLine();
 

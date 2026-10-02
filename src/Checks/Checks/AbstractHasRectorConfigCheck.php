@@ -37,7 +37,7 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
 
         // Check if the method is already called (wrong args) — can't safely rewrite
         $snippet = $this->fixCodeSnippet();
-        $methodName = ltrim((string) str($snippet)->before('('), '->');
+        $methodName = ltrim(strstr($snippet, '(', true) ?: $snippet, '->');
 
         if (str_contains((string) (file_get_contents($rectorFile) ?: ''), $methodName.'(')) {
             return CheckResult::FAIL;
