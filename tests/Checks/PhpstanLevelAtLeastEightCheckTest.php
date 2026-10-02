@@ -115,3 +115,12 @@ YAML;
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($check->getComments())->toContain('PHPStan level must be a number or "max": Found "invalid" in phpstan.neon');
 });
+
+it('phpstanLevelAtLeastEight fails instead of crashing on a phpstan.neon that is not valid YAML', function (): void {
+    $this->withTempBasePath(['phpstan.neon' => "parameters:\n\tlevel: 8\n"]);
+
+    [$check, $collector] = makeCheckWithCollector(PhpstanLevelAtLeastEightCheck::class);
+
+    expect($check->check())->toBe(CheckResult::FAIL)
+        ->and(implode("\n", $collector->all()))->toContain('phpstan.neon could not be parsed');
+});

@@ -2,6 +2,7 @@
     "check": "hardensNpmSupplyChain",
     "description": "fails when engines.npm allows a version below the floor, and bumps it on fix",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",

@@ -45,6 +45,18 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
+     * Laravel only unless a check opts in: a check written for a Laravel app
+     * that silently ran in a WordPress theme would report against the wrong
+     * standard, whereas one missing from a profile is found and opted in.
+     *
+     * @return list<Profile>
+     */
+    public static function profiles(): array
+    {
+        return [Profile::Laravel];
+    }
+
+    /**
      * The policy values shared with the npm runner (see policy/policy.json).
      */
     protected function policy(): Policy

@@ -2,5 +2,6 @@
     "check": "hardensNpmSupplyChain",
     "description": "passes when engines.npm, engine-strict and min-release-age are all in place",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "pass"
 }

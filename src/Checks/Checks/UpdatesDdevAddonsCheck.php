@@ -5,11 +5,17 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Carbon\Carbon;
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 use Symfony\Component\Yaml\Yaml;
 
 class UpdatesDdevAddonsCheck extends AbstractCheck
 {
     private const MAX_AGE_MONTHS = 3;
+
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
 
     public function check(): CheckResult
     {

@@ -4,9 +4,15 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class RunsCiLintHookInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $command = $this->policy()->string('claude.ciLintHookCommand.composer');

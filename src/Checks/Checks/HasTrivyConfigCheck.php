@@ -5,10 +5,16 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractCiJobCheck;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 use Symfony\Component\Yaml\Yaml;
 
 class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function check(): CheckResult
     {
         return $this->fix(dry: true);

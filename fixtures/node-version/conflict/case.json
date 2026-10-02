@@ -2,6 +2,7 @@
     "check": "nodeVersion",
     "description": "fails on a genuine disagreement and refuses to auto-resolve it",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "fail",

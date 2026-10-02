@@ -2,6 +2,7 @@
     "check": "hasEditorconfig",
     "description": "fails when a required property is absent, and replaces the file on fix",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",

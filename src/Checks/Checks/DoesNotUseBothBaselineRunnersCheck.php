@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 /**
  * A project runs one baseline runner, and in a Laravel project that is this one:
@@ -17,6 +18,11 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
  */
 class DoesNotUseBothBaselineRunnersCheck extends AbstractCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function check(): CheckResult
     {
         $packageJson = $this->getPackageJson();

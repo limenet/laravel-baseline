@@ -11,9 +11,10 @@ cannot be inferred from the request, and getting either wrong means rewriting th
 
 ## Ask first — always, before writing any code
 
-Ask both questions in a single `AskUserQuestion` call. Do not guess, and do not start with an
+Ask all three questions in a single `AskUserQuestion` call. Do not guess, and do not start with an
 implementation "to be adjusted later": the runner choice changes where the policy values live and
-whether a fixture is per-engine, and the autofix choice changes the base class the check extends.
+whether a fixture is per-engine, the profile choice changes which projects ever run the check, and
+the autofix choice changes the base class the check extends.
 
 ### 1. Which runner(s)?
 
@@ -29,7 +30,24 @@ whether a fixture is per-engine, and the autofix choice changes the base class t
 Recommend an answer with a reason rather than presenting a bare choice — most checks have an
 obvious home, and the question exists for the ones that do not.
 
-### 2. Autofix?
+### 2. Which PHP profiles? (skip for JS-only checks)
+
+The PHP runner checks three kinds of project: `laravel` (artisan), and — through the standalone
+`vendor/bin/baseline` — `php` (any composer project) and `wordpress` (a theme or plugin).
+
+- **Laravel only** — the default: `AbstractCheck::profiles()` returns `[Profile::Laravel]`. Anything
+  touching artisan, `config/*.php`, the schedule, Laravel packages or rector-laravel.
+- **Every PHP profile** — override `profiles()` to return `Profile::cases()`. Tooling that means the
+  same in any composer project (composer scripts, PHPStan, plain Rector sets, DDEV, editor/CI files).
+- **A subset** (e.g. `[Profile::WordPress]`) — standards that only exist in that kind of project.
+
+A check that runs outside Laravel must not use Laravel helpers (`base_path()`, `str()`, `config()`,
+facades …) — use `$this->path()` and plain PHP. `tests/StandaloneFrameworkFreeTest.php` enforces
+this. When the *values* differ between profiles, branch on `$this->profile()` and keep the values in
+`policy/` under per-profile keys. Fixtures declare the profiles they run under with an optional
+`"profiles"` list (default `["laravel"]`).
+
+### 3. Autofix?
 
 - **Yes** — extend `AbstractFixableCheck` (PHP) / `FixableCheck` (TS) and implement `fix()`;
   `check()` is the dry run, so detection and repair can never drift apart. The README entry must be
@@ -50,7 +68,7 @@ against belongs in `policy/`, not in the class**. Follow it rather than restatin
 
 Two things that are easy to miss:
 
-- `tests/CheckCommandTest.php` hard-codes the registered check count in **two** places.
+- `tests/CheckCommandTest.php` hard-codes the total registered check count.
 - Adding a check on one side only is fine, but the fixture must declare its `engines` accordingly,
   and a fixture directory name must be the kebab-case of the check name.
 

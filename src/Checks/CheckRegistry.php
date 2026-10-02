@@ -95,6 +95,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckHorizonQueue
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckCacheStoreCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckHeartbeatCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthSetupCheck;
+use Limenet\LaravelBaseline\Project\Profile;
 use Limenet\LaravelBaseline\Project\Project;
 
 class CheckRegistry
@@ -203,7 +204,20 @@ class CheckRegistry
     }
 
     /**
-     * Create instances of all checks with the given comment collector.
+     * The checks that apply to a profile.
+     *
+     * @return list<class-string<CheckInterface>>
+     */
+    public static function for(Profile $profile): array
+    {
+        return array_values(array_filter(
+            self::$checks,
+            static fn (string $class): bool => in_array($profile, $class::profiles(), true),
+        ));
+    }
+
+    /**
+     * Create instances of the checks that apply to the project's profile.
      *
      * @return list<CheckInterface>
      */
@@ -211,7 +225,7 @@ class CheckRegistry
     {
         return array_map(
             fn (string $class) => new $class($collector, $project),
-            self::$checks,
+            self::for($project->profile()),
         );
     }
 }

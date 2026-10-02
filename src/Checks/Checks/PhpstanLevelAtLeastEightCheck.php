@@ -4,10 +4,15 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
-use Symfony\Component\Yaml\Yaml;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class PhpstanLevelAtLeastEightCheck extends AbstractCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function check(): CheckResult
     {
         $phpstanConfigFile = $this->path('phpstan.neon');
@@ -18,7 +23,13 @@ class PhpstanLevelAtLeastEightCheck extends AbstractCheck
             return CheckResult::FAIL;
         }
 
-        $phpstanConfig = Yaml::parseFile($phpstanConfigFile);
+        // NEON is parsed as YAML; anything that is not valid YAML becomes a
+        // finding rather than an exception that aborts the whole run.
+        $phpstanConfig = $this->loadYamlConfig('phpstan.neon');
+
+        if ($phpstanConfig === null) {
+            return CheckResult::FAIL;
+        }
 
         $level = $phpstanConfig['parameters']['level'] ?? null;
 

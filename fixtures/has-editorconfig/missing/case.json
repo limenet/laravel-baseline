@@ -2,6 +2,7 @@
     "check": "hasEditorconfig",
     "description": "fails without an .editorconfig, and writes the canonical body on fix",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",
