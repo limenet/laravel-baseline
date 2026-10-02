@@ -10,12 +10,12 @@ Checks your Laravel installation against a highly opinionated baseline.
 
 This repository ships **two runners** from one policy:
 
-| | Composer | npm |
-| --- | --- | --- |
-| Package | `limenet/laravel-baseline` | `@limenet-ch/baseline` |
-| For | Laravel projects (DDEV, composer) | JS/TS-only projects (no PHP, no DDEV) |
-| Command | `php artisan limenet:laravel-baseline:check` | `npx baseline check` |
-| Checks | all of them | [the portable subset](#js-only-projects) |
+| | Composer (Laravel) | Composer (standalone) | npm |
+| --- | --- | --- | --- |
+| Package | `limenet/laravel-baseline` | `limenet/laravel-baseline` | `@limenet-ch/baseline` |
+| For | Laravel projects (DDEV, composer) | [other PHP projects](#non-laravel-php-projects), e.g. WordPress themes | JS/TS-only projects (no PHP, no DDEV) |
+| Command | `php artisan limenet:laravel-baseline:check` | `vendor/bin/baseline check` | `npx baseline check` |
+| Checks | all of them | the `php` / `wordpress` profiles | [the portable subset](#js-only-projects) |
 
 Both read `policy/`, so the version floors and required keys are defined once, and both are
 executed against the shared behavioural fixtures in `fixtures/`. They are released in lockstep:
@@ -69,6 +69,113 @@ The package also ships [Laravel Boost](https://laravel.com/docs/boost) resources
 conventions) and on-demand skills (e.g. `creating-a-release`). When a project that has
 `laravel/boost` installed runs `php artisan boost:install` or `php artisan boost:update --discover`,
 Boost discovers and publishes these to the consuming project's coding agents automatically.
+
+## Non-Laravel PHP projects
+
+The same composer package also checks PHP projects that are not Laravel apps, through
+`vendor/bin/baseline` instead of artisan. It runs the checks that make sense without Laravel —
+composer scripts, PHPStan, Pint, plain Rector sets, DDEV, CI, editor and Claude settings — and
+skips everything that needs artisan, `config/*.php` or a Laravel package.
+
+```bash
+composer require --dev limenet/laravel-baseline
+```
+
+```bash
+ddev exec vendor/bin/baseline check              # report issues
+ddev exec vendor/bin/baseline check --fix        # apply safe fixes, then report what is left
+ddev exec vendor/bin/baseline periodic           # walk through expired periodic checks
+```
+
+Run it after every `composer update`, like the Laravel runner:
+
+```json
+"post-update-cmd": [
+    "@php vendor/bin/baseline check --fix"
+],
+```
+
+The runner picks a **profile** from the project:
+
+| Profile | Detected by |
+| --- | --- |
+| `wordpress` | a `style.css` with a `Theme Name:` header, a root `*.php` with a `Plugin Name:` header, or a composer `type` of `wordpress-theme` / `wordpress-plugin` / `wordpress-muplugin` |
+| `php` | anything else |
+
+A Laravel application (an `artisan` file, or `laravel/framework` in `require`) is refused — use the
+artisan command there, which runs the full Laravel profile. Set `"profile": "php"` or
+`"profile": "wordpress"` in `.baseline.json` to override the detection.
+
+Outside Laravel a test suite is optional: the Pest, `phpunit.xml` and pcov checks report a warning
+instead of failing until `pestphp/pest` is installed, and the CI test job is not required.
+
+State lives in `.baseline.json` at the project root, the same file and shape the npm runner uses:
+
+```json
+{
+    "excludes": ["hasTrivyConfig"],
+    "periodic": { "updatesDependencies": "2026-08-16T09:00:00+00:00" }
+}
+```
+
+### What the standalone runner checks
+
+Every check below also runs in Laravel projects unless marked standalone-only.
+
+| Check | `php` | `wordpress` | Relationship to the Laravel runner |
+| --- | --- | --- | --- |
+| `allowsToolingInClaudeSettings` | ✓ | ✓ | requires the shared and `ddev composer` allow entries, not the artisan ones |
+| `biomeUsesLocalSchema` | ✓ | ✓ | identical |
+| `bumpsComposer` | ✓ | ✓ | identical |
+| `callsBaseline` | ✓ | ✓ | hooks `@php vendor/bin/baseline check --fix` into `post-update-cmd` instead of the artisan command |
+| `checkPhpunit` | ✓ | ✓ | warns until a test suite exists; requires only the cobertura and JUnit reports, not `APP_KEY` or the `./app` source |
+| `ddevHasPcovPackage` | ✓ | ✓ | warns until `pestphp/pest` is installed |
+| `ddevMutagenIgnoresNodeModules` | ✓ | ✓ | identical |
+| `ddevNodeVersionIsAuto` | ✓ | ✓ | identical |
+| `deniesEnvReadsInClaudeSettings` | ✓ | ✓ | identical |
+| `doesNotCallPeriodicBaselineOnUpdate` | ✓ | ✓ | flags `vendor/bin/baseline periodic` instead of the artisan command |
+| `doesNotExcludeUnknownChecks` | ✓ | ✓ | reads `.baseline.json`, against this profile’s checks |
+| `doesNotHaveCopilotOrJunieAgentFiles` | ✓ | ✓ | identical |
+| `doesNotUseBothBaselineRunners` | ✓ | ✓ | identical |
+| `doesNotUseGreaterThanOrEqualConstraints` | ✓ | ✓ | identical |
+| `doesNotUsePhpCsFixer` | ✓ | ✓ | identical |
+| `doesNotUsePhpInsights` | ✓ | ✓ | identical |
+| `hardensNpmSupplyChain` | ✓ | ✓ | identical |
+| `hasCiJobs` | ✓ | ✓ | same GitLab CI templates, without the `test` job |
+| `hasEditorconfig` | ✓ | ✓ | identical |
+| `hasNpmScripts` | ✓ | ✓ | identical |
+| `hasRectorConfigWithAttributesSets` | ✓ | ✓ | identical |
+| `hasRectorConfigWithImportNames` | ✓ | ✓ | identical |
+| `hasRectorConfigWithPestSet` | ✓ | ✓ | identical |
+| `hasRectorConfigWithPhpSets` | ✓ | ✓ | identical |
+| `hasRectorConfigWithPreparedSets` | ✓ | ✓ | identical |
+| `hasTrivyConfig` | ✓ | ✓ | identical |
+| `isCiLintComplete` | ✓ | ✓ | identical |
+| `isInstalledAsDevDependency` | ✓ | ✓ | **standalone-only**: the package belongs in `require-dev`; the Laravel runner's `isInstalledAsRegularDependency` requires `require` instead, because a Laravel app loads it at runtime |
+| `nodeVersion` | ✓ | ✓ | identical |
+| `phpVersionMatchesCi` | ✓ | ✓ | identical |
+| `phpVersionMatchesDdev` | ✓ | ✓ | identical |
+| `phpstanCoversAllPhpFiles` | ✓ | ✓ | **standalone-only** |
+| `phpstanLevelAtLeastEight` | ✓ | ✓ | identical |
+| `rectorCoversAllPhpFiles` | ✓ | ✓ | **standalone-only** |
+| `releaseItBumpsWordpressThemeVersion` |  | ✓ | **standalone-only**, themes only |
+| `runsCiLintHookInClaudeSettings` | ✓ | ✓ | identical |
+| `updatesDdevAddons` | ✓ | ✓ | identical |
+| `updatesDependencies` | ✓ | ✓ | identical (periodic, every 30 days); recorded in `.baseline.json` |
+| `usesPest` | ✓ | ✓ | warns until `pestphp/pest` is installed; does not require `pest-plugin-laravel` |
+| `usesPestPhpstanPlugin` | ✓ | ✓ | identical |
+| `usesPestRectorPlugin` | ✓ | ✓ | identical |
+| `usesPhpstanExtensions` | ✓ | ✓ | identical |
+| `usesPhpstanWordpress` |  | ✓ | **standalone-only** |
+| `usesRector` | ✓ | ✓ | requires `rector/rector` only, not `driftingly/rector-laravel` |
+| `usesReleaseIt` | ✓ | ✓ | identical |
+| `wordpressThemeVersionMatchesComposer` |  | ✓ | **standalone-only**, themes only |
+
+Deliberately not run outside Laravel: everything artisan-, `config/*.php`-, schedule- or
+Laravel-package-shaped (Horizon, Pulse, Telescope, Spatie Health, Boost, IDE helpers, Larastan,
+`rector-laravel`), and `hasRectorConfigWithPaths` / `hasRectorConfigWithComposerBased`, whose
+values assume Laravel's layout — `rectorCoversAllPhpFiles` and `phpstanCoversAllPhpFiles` take their
+place.
 
 ## JS-only projects
 
@@ -145,6 +252,8 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`usesRector()`** - Validates Rector automated code modernization is installed, with `driftingly/rector-laravel` constrained to at least `^2.6.1` — the release where `LaravelSetProvider` is gone and its rules arrive through `LaravelSetList::COMPOSER_BASED` instead *(partial: fixes ci-lint script if packages installed)*
 - **`usesLarastan()`** - Validates Larastan static analysis tool is configured
 - **`usesPhpstanExtensions()`** - Validates PHPStan extensions are installed
+- **`usesPhpstanWordpress()`** - Validates `szepeviktor/phpstan-wordpress` is installed, so PHPStan knows WordPress's functions, classes and hooks *(wordpress profile only)*
+- **`phpstanCoversAllPhpFiles()`** - Validates PHPStan's `parameters.paths` cover every PHP file the project owns (outside `vendor/`, `node_modules/`, dot-directories and git-ignored paths); files listed in `excludePaths` count as deliberately skipped. `includes` are not followed *(php and wordpress profiles)*
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
 - 🔧 **`phpstanParsesModelCastsMethod()`** - Validates `phpstan.neon` sets `parseModelCastsMethod: true`: `ModelCastsPropertyToCastsMethodRector` rewrites `protected $casts = [...]` into a `casts(): array` method, and without this parameter Larastan reads only the generated `@return array<string, string>` — not a constant array — so every cast is lost and datetime attributes report as strings *(inserts the parameter into the `parameters` block)*
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*
@@ -156,6 +265,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`hasRectorConfigWithAttributesSets()`** - Validates Rector `withAttributesSets()` is called *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithRules()`** - Validates Rector `withRules([MinutesToSecondsInCacheRector, UseForwardsCallsTraitRector])` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithSets()`** - Validates Rector `withSets([LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS, LaravelSetList::LARAVEL_*])` is configured with all required sets *(appends call to rector.php)*
+- 🔧 **`rectorCoversAllPhpFiles()`** - Validates rector.php's `withPaths()` (plus `withRootFiles()`) cover every PHP file the project owns (outside `vendor/`, `node_modules/`, dot-directories and git-ignored paths); paths in `withSkip()` count as deliberately skipped *(php and wordpress profiles; adds `->withRootFiles()` when only root files are uncovered — which directories to process is left to the developer)*
 - 🔧 **`hasRectorConfigWithPaths()`** - Validates Rector `withPaths([app, database, routes, tests])` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithPestSet()`** - Validates Rector `withSets([PestSetList::CODING_STYLE])` is configured when Pest 5+ and Rector are both present *(appends call to rector.php; warns if not applicable)*
 - 🔧 **`hasRectorConfigWithSkip()`** - Validates Rector `withSkip()` contains required skipped rules (always: 6 Laravel rules plus `StringToClassConstantRector`, which maps the Laravel 5.2-era string events context-free and so rewrites any matching literal — `view('auth.login')` becomes `Illuminate\Auth\Events\Login::class`; Laravel 13+: `TablePropertyToTableAttributeRector`; `AddGenericBuilderToScopesRector`, new in rector-laravel 2.6 and shipped in `LARAVEL_TYPE_DECLARATIONS`, which downgrades an already-correct `Builder<$this>` to `Builder<static>`; `MigrateToSimplifiedAttributeRector`, which rewrites working `getFooAttribute()`/`setFooAttribute()` accessors into a single `Attribute` method; when server.php exists: `ServerVariableToRequestFacadeRector`) *(appends an imported `withSkip()` call, or merges the missing classes into one that already exists)*
@@ -201,6 +311,7 @@ This package validates your Laravel installation against the following checks:
 - **`usesPredis()`** - Validates Predis Redis client is installed
 - **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used
 - 🔧 **`doesNotUseSail()`** - Validates Sail is NOT used *(partial: deletes docker-compose.yml; run `composer remove laravel/sail` manually)*
+- 🔧 **`doesNotUsePhpCsFixer()`** - Validates PHP CS Fixer is NOT used directly — Pint is the formatter *(removes the `friendsofphp/php-cs-fixer` composer.json entry, `php-cs-fixer` ci-lint entries and `.php-cs-fixer.cache`; removes `.php-cs-fixer.php` / `.php-cs-fixer.dist.php` only once a `pint.json` exists, so hand-tuned rules are never lost; run `composer update` afterward)*
 - 🔧 **`doesNotUsePhpInsights()`** - Validates PHP Insights is NOT used *(removes the `nunomaduro/phpinsights` composer.json entry, leftover ci-lint script entries, and config/insights.php; run `composer update` afterward to sync composer.lock)*
 - **`doesNotUseSpatiePasskeysWithFortify()`** - Fails if both `spatie/laravel-passkeys` and `laravel/fortify` are installed, as they overlap in authentication responsibility
 - **`doesNotUseBothBaselineRunners()`** - Fails when `package.json` also declares `@limenet-ch/baseline`: the npm runner is the fallback for projects this package cannot reach, and in a Laravel project this one wins (reports the `npm uninstall` to run; never uninstalls for you)
@@ -229,7 +340,9 @@ This package validates your Laravel installation against the following checks:
 
 ### Build & Release
 - 🔧 **`bumpsComposer()`** - Validates automatic composer dependency bumping *(adds `composer bump` to post-update-cmd)*
+- 🔧 **`releaseItBumpsWordpressThemeVersion()`** - Validates `.release-it.json` has an `after:bump` hook that rewrites the `Version:` header of `style.css`, so a release bumps the theme along with composer.json *(wordpress profile, themes only; adds a `node -e` one-liner from `policy/policy.json` to the hooks)*
 - 🔧 **`usesReleaseIt()`** - Validates automated release management *(partial: creates/fixes .release-it.json and adds release npm script if packages installed)*
+- 🔧 **`wordpressThemeVersionMatchesComposer()`** - Validates the `Version:` header in `style.css` matches `composer.json`'s `version`, which `@release-it/bumper` keeps current *(wordpress profile, themes only; rewrites the header from composer.json, or seeds composer.json's `version` from the theme when it has none)*
 - **`hasNpmScripts()`** - Validates required npm build scripts
 - 🔧 **`biomeUsesLocalSchema()`** - Validates that `biome.json`, when the project has one, points `$schema` at `./node_modules/@biomejs/biome/configuration_schema.json` rather than a version-pinned remote URL, so the schema follows the installed Biome instead of needing a manual bump on every update. Passes when the project does not use Biome. *(rewrites or inserts the `$schema` line as a targeted text edit, leaving the rest of the file — comments included — byte-identical, since Biome formats `biome.json` itself)*
 
@@ -244,7 +357,8 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`doesNotExcludeUnknownChecks()`** - Fails when `config/baseline.php` excludes a name no registered check answers to: excludes are matched against the registry, so an entry left behind by a check this package renamed or removed silences nothing and only hides that the exclusion is no longer in force *(drops the dead entries, leaving the remaining excludes and the periodic state intact)*
 - **`doesNotCallPeriodicBaselineOnUpdate()`** - Fails if `php artisan limenet:laravel-baseline:periodic` is in the `post-update-cmd` scripts (it shouldn't be — periodic checks fail CI automatically when expired)
 - 🔧 **`doesNotHaveGuidelinesScript()`** - Fails if the removed `php artisan limenet:laravel-baseline:guidelines` command is still in `post-update-cmd` (removed in v2.1.0) *(removes the entry from composer.json)*
-- 🔧 **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`) *(moves from require-dev to require in composer.json)*
+- 🔧 **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`), since a Laravel app loads it at runtime *(moves from require-dev to require in composer.json)*
+- 🔧 **`isInstalledAsDevDependency()`** - Validates `limenet/laravel-baseline` is in `require-dev` (not `require`): outside Laravel it is only a development tool, so a `--no-dev` deploy leaves it out *(php and wordpress profiles; moves from require to require-dev in composer.json)*
 - 🔧 **`usesLaravelLang()`** - Validates `laravel-lang/lang` dev dependency is installed with `lang:update` and pint in post-update scripts *(partial: adds post-update scripts if package in require-dev)*
 
 ## Testing

@@ -15,7 +15,7 @@ class AsksBeforeDestructiveDbCommandsInClaudeSettingsCheck extends AbstractClaud
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $required = $this->policy()->strings('claude.ask.php');
+        $required = $this->policy()->strings('claude.ask.laravel');
 
         $settings = $this->readClaudeSettings() ?? [];
 

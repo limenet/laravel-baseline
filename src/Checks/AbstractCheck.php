@@ -4,12 +4,14 @@ namespace Limenet\LaravelBaseline\Checks;
 
 use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
-use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Policy\Policy;
+use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Project\Project;
+use Limenet\LaravelBaseline\Support\CheckName;
+use Limenet\LaravelBaseline\Support\JsonFile;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -27,8 +29,10 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected const MIN_RECTOR_LARAVEL = '2.6.1';
 
-    public function __construct(CommentCollector $commentCollector)
-    {
+    public function __construct(
+        CommentCollector $commentCollector,
+        protected readonly Project $project,
+    ) {
         $this->commentCollector = $commentCollector;
     }
 
@@ -38,10 +42,19 @@ abstract class AbstractCheck implements CheckInterface
      */
     final public static function name(): string
     {
-        return str(class_basename(static::class))
-            ->beforeLast('Check')
-            ->lcfirst()
-            ->toString();
+        return CheckName::fromClass(static::class);
+    }
+
+    /**
+     * Laravel only unless a check opts in: a check written for a Laravel app
+     * that silently ran in a WordPress theme would report against the wrong
+     * standard, whereas one missing from a profile is found and opted in.
+     *
+     * @return list<Profile>
+     */
+    public static function profiles(): array
+    {
+        return [Profile::Laravel];
     }
 
     /**
@@ -49,12 +62,20 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function policy(): Policy
     {
-        return app(Policy::class);
+        return $this->project->policy();
     }
 
-    protected function getComposer(): Composer
+    /**
+     * An absolute path inside the checked project ($this->path() semantics).
+     */
+    protected function path(string $relative = ''): string
     {
-        return app(Composer::class)->setWorkingPath(base_path());
+        return $this->project->path($relative);
+    }
+
+    protected function profile(): Profile
+    {
+        return $this->project->profile();
     }
 
     /**
@@ -62,13 +83,12 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function checkComposerPackages(string|array $packages): bool
     {
-        $composer = $this->getComposer();
         $packages = is_string($packages) ? [$packages] : $packages;
 
         $this->addComment('Composer check: '.implode(', ', $packages));
 
         foreach ($packages as $package) {
-            if (!$composer->hasPackage($package)) {
+            if (!$this->project->hasComposerPackage($package)) {
                 return false;
             }
         }
@@ -86,8 +106,8 @@ abstract class AbstractCheck implements CheckInterface
 
         $this->addComment('Composer script check: '.$scriptName.' for '.$match);
 
-        foreach ($composerJson['scripts'][$scriptName] ?? [] as $script) {
-            if (str($script)->contains($match)) {
+        foreach ((array) ($composerJson['scripts'][$scriptName] ?? []) as $script) {
+            if (is_string($script) && str_contains($script, $match)) {
                 return true;
             }
         }
@@ -110,7 +130,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getComposerJson(): ?array
     {
-        $composerFile = base_path('composer.json');
+        $composerFile = $this->path('composer.json');
 
         if (!file_exists($composerFile)) {
             $this->addComment('Composer configuration missing: composer.json not found in project root');
@@ -263,7 +283,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getPackageJson(): ?array
     {
-        $packageFile = base_path('package.json');
+        $packageFile = $this->path('package.json');
 
         if (!file_exists($packageFile)) {
             $this->addComment('Package.json missing: Create package.json in project root');
@@ -299,7 +319,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getNvmrcNodeVersion(): ?string
     {
-        $nvmrcFile = base_path('.nvmrc');
+        $nvmrcFile = $this->path('.nvmrc');
 
         if (!file_exists($nvmrcFile)) {
             return null;
@@ -333,7 +353,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getNpmrc(): array
     {
-        $npmrcFile = base_path('.npmrc');
+        $npmrcFile = $this->path('.npmrc');
 
         if (!file_exists($npmrcFile)) {
             return [];
@@ -361,9 +381,36 @@ abstract class AbstractCheck implements CheckInterface
 
     // === Config File Helpers ===
 
+    /**
+     * The PHPStan config PHPStan itself would load, project-relative:
+     * phpstan.neon wins over the .dist variants, as in PHPStan. Null if none.
+     */
+    protected function phpstanConfigFile(): ?string
+    {
+        foreach (['phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'] as $file) {
+            if (file_exists($this->path($file))) {
+                return $file;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The PHPUnit config PHPUnit itself would load, project-relative:
+     * phpunit.xml wins over phpunit.xml.dist. Falls back to phpunit.xml when
+     * neither exists, so messages and fixes name the conventional file.
+     */
+    protected function phpunitConfigFile(): string
+    {
+        return !file_exists($this->path('phpunit.xml')) && file_exists($this->path('phpunit.xml.dist'))
+            ? 'phpunit.xml.dist'
+            : 'phpunit.xml';
+    }
+
     protected function getPhpunitXml(): \SimpleXMLElement|false|null
     {
-        $xmlFile = base_path('/phpunit.xml');
+        $xmlFile = $this->path($this->phpunitConfigFile());
 
         if (!file_exists($xmlFile)) {
             return null;
@@ -396,11 +443,38 @@ abstract class AbstractCheck implements CheckInterface
     }
 
     /**
+     * A PHPStan NEON file, read as YAML after normalising the NEON syntax
+     * phpstan configs commonly use and YAML rejects: tab indentation, and
+     * unquoted values starting with `%` (`%currentWorkingDirectory%/src`) or
+     * `@` (service references). Other NEON-only syntax still fails to parse,
+     * which loadYamlConfig() reports as a finding rather than a crash.
+     *
      * @return array<string,mixed>|null
      */
-    protected function loadYamlConfig(string $relativePath): ?array
+    protected function loadNeonConfig(string $relativePath): ?array
     {
-        $file = base_path($relativePath);
+        return $this->loadYamlConfig($relativePath, static function (string $contents): string {
+            $contents = (string) preg_replace_callback(
+                '/^\t+/m',
+                static fn (array $m): string => str_repeat('    ', strlen($m[0])),
+                $contents,
+            );
+
+            return (string) preg_replace_callback(
+                '/^(\s*(?:-\s+|[\w.-]+:\s+))([%@][^\n#]*?)(\s*(?:#.*)?)$/m',
+                static fn (array $m): string => $m[1]."'".str_replace("'", "''", $m[2])."'".$m[3],
+                $contents,
+            );
+        });
+    }
+
+    /**
+     * @param  (callable(string): string)|null  $normalize  applied to the raw contents before parsing
+     * @return array<string,mixed>|null
+     */
+    protected function loadYamlConfig(string $relativePath, ?callable $normalize = null): ?array
+    {
+        $file = $this->path($relativePath);
         $path = ltrim($relativePath, '/');
 
         if (!file_exists($file)) {
@@ -410,7 +484,8 @@ abstract class AbstractCheck implements CheckInterface
         }
 
         try {
-            $data = Yaml::parseFile($file);
+            $contents = (string) file_get_contents($file);
+            $data = Yaml::parse($normalize === null ? $contents : $normalize($contents));
         } catch (ParseException $e) {
             // A malformed file is a finding, not a crash: the fixable checks
             // re-read the file to verify their own write, so an exception here
@@ -519,7 +594,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getReleaseItConfig(): ?array
     {
-        $releaseItFile = base_path('.release-it.json');
+        $releaseItFile = $this->path('.release-it.json');
 
         if (!file_exists($releaseItFile)) {
             $this->addComment('Release-it configuration missing: Create .release-it.json in project root');
@@ -539,7 +614,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function parsePhpConfigFile(string $relativePath): ?array
     {
-        $file = base_path($relativePath);
+        $file = $this->path($relativePath);
         $path = ltrim($relativePath, '/');
 
         if (!file_exists($file)) {
@@ -586,10 +661,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function writeComposerJson(array $data): void
     {
-        file_put_contents(
-            base_path('composer.json'),
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
-        );
+        JsonFile::write($this->path('composer.json'), $data);
     }
 
     /**
@@ -597,10 +669,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function writePackageJson(array $data): void
     {
-        file_put_contents(
-            base_path('package.json'),
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
-        );
+        JsonFile::write($this->path('package.json'), $data);
     }
 
     /**
@@ -618,7 +687,8 @@ abstract class AbstractCheck implements CheckInterface
             return;
         }
 
-        $scripts = $composerJson['scripts'][$scriptName] ?? [];
+        // Composer accepts a single command as a plain string.
+        $scripts = (array) ($composerJson['scripts'][$scriptName] ?? []);
 
         foreach ($scripts as $script) {
             if (str_contains($script, $value)) {
@@ -638,7 +708,7 @@ abstract class AbstractCheck implements CheckInterface
             }
         }
 
-        $composerJson['scripts'][$scriptName][] = $value;
+        $composerJson['scripts'][$scriptName] = [...$scripts, $value];
         $this->writeComposerJson($composerJson);
     }
 
@@ -653,7 +723,7 @@ abstract class AbstractCheck implements CheckInterface
             return;
         }
 
-        $scripts = $composerJson['scripts'][$scriptName] ?? [];
+        $scripts = (array) ($composerJson['scripts'][$scriptName] ?? []);
         $filtered = array_values(array_filter($scripts, fn ($script): bool => !str_contains($script, $match)));
 
         if ($filtered === $scripts) {
@@ -695,7 +765,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function setPhpunitEnvVar(string $name, string $value): void
     {
-        $xmlFile = base_path('phpunit.xml');
+        $xmlFile = $this->path($this->phpunitConfigFile());
 
         if (!file_exists($xmlFile)) {
             return;
@@ -749,7 +819,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function ensureGitignoreEntry(string $entry, string $reason, bool $dry): ?CheckResult
     {
-        $file = base_path('.gitignore');
+        $file = $this->path('.gitignore');
 
         if (!file_exists($file)) {
             $this->addComment("Missing .gitignore in project root: create it and add '{$entry}'");
@@ -782,45 +852,6 @@ abstract class AbstractCheck implements CheckInterface
         file_put_contents($file, $contents.$prefix.$entry."\n");
 
         return CheckResult::FAIL;
-    }
-
-    // === Schedule Helpers ===
-
-    protected function hasScheduleEntry(string $command): bool
-    {
-        $this->addComment('Schedule check: '.$command);
-
-        foreach (Schedule::events() as $event) {
-            if (str_contains($event->command ?? '', $command)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if a package is installed and has required schedule entries
-     *
-     * @param  string|list<string>  $scheduleCommands
-     */
-    protected function checkPackageWithSchedule(
-        string $package,
-        string|array $scheduleCommands,
-    ): CheckResult {
-        if (!$this->checkComposerPackages($package)) {
-            return CheckResult::WARN;
-        }
-
-        $commands = is_string($scheduleCommands) ? [$scheduleCommands] : $scheduleCommands;
-
-        foreach ($commands as $command) {
-            if (!$this->hasScheduleEntry($command)) {
-                return CheckResult::FAIL;
-            }
-        }
-
-        return CheckResult::PASS;
     }
 
     /**

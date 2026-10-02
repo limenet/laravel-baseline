@@ -2,5 +2,6 @@
     "check": "doesNotExcludeUnknownChecks",
     "description": "passes when every exclude names a check the runner registers",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "pass"
 }

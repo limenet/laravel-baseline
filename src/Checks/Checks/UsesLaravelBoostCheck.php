@@ -21,7 +21,7 @@ class UsesLaravelBoostCheck extends AbstractFixableCheck
             $this->addToComposerScript('post-update-cmd', '@php artisan boost:update');
         }
 
-        $boostJsonFile = base_path('boost.json');
+        $boostJsonFile = $this->path('boost.json');
 
         if (!file_exists($boostJsonFile)) {
             $this->addComment('Laravel Boost configuration missing: Create boost.json in project root');

@@ -1,0 +1,6 @@
+{
+    "check": "callsBaseline",
+    "description": "passes when post-update-cmd runs the artisan check with --fix",
+    "engines": ["php"],
+    "expect": "pass"
+}

@@ -1,0 +1,7 @@
+{
+    "check": "allowsToolingInClaudeSettings",
+    "description": "passes in a non-Laravel php project declaring the shared and composer entries but no artisan ones",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "pass"
+}

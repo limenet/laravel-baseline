@@ -4,12 +4,26 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class CheckPhpunitCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
-        $xmlFile = base_path('phpunit.xml');
+        $configFile = $this->phpunitConfigFile();
+        $xmlFile = $this->path($configFile);
+        $isLaravel = $this->profile() === Profile::Laravel;
+
+        if (!$isLaravel && !file_exists($xmlFile) && !$this->project->hasComposerPackage('pestphp/pest')) {
+            $this->addComment('No test suite (phpunit.xml or pestphp/pest) found; tests are optional outside Laravel');
+
+            return CheckResult::WARN;
+        }
 
         if (!file_exists($xmlFile)) {
             $this->addComment('PHPUnit configuration missing: Create phpunit.xml in project root');
@@ -20,7 +34,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
         $xmlContent = file_get_contents($xmlFile);
 
         if ($xmlContent === false || trim($xmlContent) === '') {
-            $this->addComment('PHPUnit configuration invalid: Check phpunit.xml for XML syntax errors');
+            $this->addComment('PHPUnit configuration invalid: Check '.$configFile.' for XML syntax errors');
 
             return CheckResult::FAIL;
         }
@@ -30,7 +44,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
         $dom->formatOutput = true;
 
         if (!@$dom->loadXML($xmlContent)) {
-            $this->addComment('PHPUnit configuration invalid: Check phpunit.xml for XML syntax errors');
+            $this->addComment('PHPUnit configuration invalid: Check '.$configFile.' for XML syntax errors');
 
             return CheckResult::FAIL;
         }
@@ -48,7 +62,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
         $cobertura = $xpath->query('//coverage/report/cobertura[@outputFile="cobertura.xml"]');
 
         if ($cobertura === false || $cobertura->length === 0) {
-            $this->addComment('Cobertura coverage report missing or misconfigured in phpunit.xml: Add <cobertura outputFile="cobertura.xml"/> under <coverage><report>');
+            $this->addComment('Cobertura coverage report missing or misconfigured in '.$configFile.': Add <cobertura outputFile="cobertura.xml"/> under <coverage><report>');
 
             if ($dry) {
                 return CheckResult::FAIL;
@@ -62,7 +76,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
         $junit = $xpath->query('//logging/junit[@outputFile="report.xml"]');
 
         if ($junit === false || $junit->length === 0) {
-            $this->addComment('JUnit report missing or misconfigured in phpunit.xml: Add <junit outputFile="report.xml"/> under <logging>');
+            $this->addComment('JUnit report missing or misconfigured in '.$configFile.': Add <junit outputFile="report.xml"/> under <logging>');
 
             if ($dry) {
                 return CheckResult::FAIL;
@@ -72,6 +86,19 @@ class CheckPhpunitCheck extends AbstractFixableCheck
             $dirty = true;
         }
 
+        // APP_KEY and the ./app source directory are Laravel's layout.
+        if (!$isLaravel) {
+            if ($dry) {
+                return CheckResult::PASS;
+            }
+
+            if ($dirty) {
+                $dom->save($xmlFile);
+            }
+
+            return $this->fix(dry: true);
+        }
+
         // APP_KEY
         $appKey = $xpath->query('//php/env[@name="APP_KEY"]');
         $appKeyValid = $appKey !== false && $appKey->length > 0
@@ -79,7 +106,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
             && str_starts_with($appKey->item(0)->getAttribute('value'), 'base64:');
 
         if (!$appKeyValid) {
-            $this->addComment('APP_KEY missing in phpunit.xml: Add <env name="APP_KEY" value="base64:..."/> to <php> section (generate with "ddev artisan key:generate")');
+            $this->addComment('APP_KEY missing in '.$configFile.': Add <env name="APP_KEY" value="base64:..."/> to <php> section (generate with "ddev artisan key:generate")');
 
             if ($dry) {
                 return CheckResult::FAIL;
@@ -111,7 +138,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
             && $sourceDir->item(0)->textContent === './app';
 
         if (!$sourceDirValid) {
-            $this->addComment('Coverage source configuration missing or incorrect in phpunit.xml: Add <source><include><directory suffix=".php">./app</directory></include></source>');
+            $this->addComment('Coverage source configuration missing or incorrect in '.$configFile.': Add <source><include><directory suffix=".php">./app</directory></include></source>');
 
             if ($dry) {
                 return CheckResult::FAIL;

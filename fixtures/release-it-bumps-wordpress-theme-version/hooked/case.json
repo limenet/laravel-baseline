@@ -1,0 +1,7 @@
+{
+    "check": "releaseItBumpsWordpressThemeVersion",
+    "description": "passes when an after:bump hook rewrites the style.css header",
+    "engines": ["php"],
+    "profiles": ["wordpress"],
+    "expect": "pass"
+}

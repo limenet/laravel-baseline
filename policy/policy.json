@@ -44,9 +44,14 @@
                 "Skill(code-review)",
                 "Skill(code-review:*)"
             ],
-            "php": [
+            "composer": [
                 "Bash(ddev composer run ci-lint:*)",
                 "Bash(ddev composer test:*)",
+                "Bash(ddev composer show:*)",
+                "Bash(ddev composer outdated:*)",
+                "Bash(ddev composer why:*)"
+            ],
+            "laravel": [
                 "Bash(ddev artisan test:*)",
                 "Bash(ddev artisan make:*)",
                 "Bash(ddev artisan route:list:*)",
@@ -57,17 +62,14 @@
                 "Bash(ddev artisan cache:clear:*)",
                 "Bash(ddev artisan config:clear:*)",
                 "Bash(ddev artisan route:clear:*)",
-                "Bash(ddev artisan view:clear:*)",
-                "Bash(ddev composer show:*)",
-                "Bash(ddev composer outdated:*)",
-                "Bash(ddev composer why:*)"
+                "Bash(ddev artisan view:clear:*)"
             ]
         },
         "deny": {
             "shared": ["Read(./.env)"]
         },
         "ask": {
-            "php": [
+            "laravel": [
                 "Bash(ddev artisan migrate:fresh:*)",
                 "Bash(php artisan migrate:fresh:*)",
                 "Bash(ddev artisan migrate:refresh:*)",
@@ -81,7 +83,7 @@
             ]
         },
         "ciLintHookCommand": {
-            "php": "ddev composer run ci-lint",
+            "composer": "ddev composer run ci-lint",
             "js": "npm run ci-lint"
         }
     },
@@ -91,11 +93,21 @@
             "value": "latest"
         },
         "requiredJobs": {
-            "php": {
+            "laravel": {
                 "build": ".build",
                 "php": ".lint_php",
                 "js": ".lint_js",
                 "test": [".test", ".test_db"]
+            },
+            "php": {
+                "build": ".build",
+                "php": ".lint_php",
+                "js": ".lint_js"
+            },
+            "wordpress": {
+                "build": ".build",
+                "php": ".lint_php",
+                "js": ".lint_js"
             },
             "js": {
                 "build": ".build",
@@ -106,7 +118,7 @@
     },
     "ciLint": {
         "required": {
-            "php": ["pint --parallel", "phpstan"],
+            "composer": ["pint --parallel", "phpstan"],
             "js": []
         },
         "linters": {
@@ -135,12 +147,33 @@
     },
     "baseline": {
         "composerPackage": "limenet/laravel-baseline",
-        "npmPackage": "@limenet-ch/baseline"
+        "npmPackage": "@limenet-ch/baseline",
+        "runner": {
+            "laravel": {
+                "postUpdateScript": "@php artisan limenet:laravel-baseline:check --fix",
+                "checkMatch": "limenet:laravel-baseline:check",
+                "periodicMatch": "limenet:laravel-baseline:periodic",
+                "periodicCommand": "ddev artisan limenet:laravel-baseline:periodic"
+            },
+            "standalone": {
+                "postUpdateScript": "@php vendor/bin/baseline check --fix",
+                "checkMatch": "vendor/bin/baseline check",
+                "periodicMatch": "vendor/bin/baseline periodic",
+                "periodicCommand": "ddev exec vendor/bin/baseline periodic"
+            }
+        }
     },
     "npmScripts": {
         "required": ["ci-lint", "production"]
     },
     "periodic": {
         "defaultIntervalDays": 30
+    },
+    "wordpress": {
+        "themeVersionHook": "node -e 'const fs = require(\"fs\"); fs.writeFileSync(\"style.css\", fs.readFileSync(\"style.css\", \"utf8\").replace(/^([ \\t\\/*#@]*Version:[ \\t]*)[^\\r\\n]*?([ \\t]*(?:\\*\\/|\\?>)[^\\r\\n]*)?(\\r?)$/mi, \"$1${version}$2$3\"))'"
+    },
+    "phpFileCoverage": {
+        "ignoredDirectories": ["vendor", "node_modules"],
+        "exempt": ["rector.php"]
     }
 }

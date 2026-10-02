@@ -2,6 +2,7 @@
     "check": "doesNotHaveCopilotOrJunieAgentFiles",
     "description": "fails when the forbidden agent paths exist, and deletes all of them on fix",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",

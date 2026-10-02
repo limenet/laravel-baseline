@@ -5,10 +5,16 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractCiJobCheck;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 use Symfony\Component\Yaml\Yaml;
 
 class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function check(): CheckResult
     {
         return $this->fix(dry: true);
@@ -23,7 +29,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
                 return $ciResult;
             }
 
-            $ciFile = base_path('.gitlab-ci.yml');
+            $ciFile = $this->path('.gitlab-ci.yml');
 
             if (file_exists($ciFile)) {
                 $ciData = $this->getGitlabCiData() ?? [];
@@ -68,7 +74,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
         }
 
         $configFile = $this->policy()->string('trivy.configFile');
-        $trivyFile = base_path($configFile);
+        $trivyFile = $this->path($configFile);
 
         if (!file_exists($trivyFile)) {
             if ($dry) {
@@ -229,7 +235,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 
     private function ensureFileExists(string $relative, string $defaultContent, bool $dry, string $missingComment): ?CheckResult
     {
-        $file = base_path($relative);
+        $file = $this->path($relative);
 
         if (file_exists($file)) {
             return null;

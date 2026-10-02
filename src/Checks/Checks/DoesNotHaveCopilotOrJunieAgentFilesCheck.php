@@ -2,20 +2,26 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
-use Illuminate\Support\Facades\File;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Support\Filesystem;
 
 class DoesNotHaveCopilotOrJunieAgentFilesCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $present = [];
 
         foreach ($this->policy()->stringMap('agentFiles.forbidden') as $path => $reason) {
-            $absolute = base_path($path);
+            $absolute = $this->path($path);
 
-            if (file_exists($absolute) || File::isDirectory($absolute)) {
+            if (file_exists($absolute) || is_dir($absolute)) {
                 $present[$path] = $absolute;
                 $this->addComment("Remove {$path} — {$reason}");
             }
@@ -30,8 +36,8 @@ class DoesNotHaveCopilotOrJunieAgentFilesCheck extends AbstractFixableCheck
         }
 
         foreach ($present as $absolute) {
-            if (File::isDirectory($absolute)) {
-                File::deleteDirectory($absolute);
+            if (is_dir($absolute) && !is_link($absolute)) {
+                Filesystem::deleteDirectory($absolute);
 
                 continue;
             }

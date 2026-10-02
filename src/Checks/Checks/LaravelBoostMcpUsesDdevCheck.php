@@ -18,7 +18,7 @@ class LaravelBoostMcpUsesDdevCheck extends AbstractFixableCheck
             return CheckResult::WARN;
         }
 
-        $mcpFile = base_path('.mcp.json');
+        $mcpFile = $this->path('.mcp.json');
 
         $mcp = file_exists($mcpFile)
             ? json_decode(file_get_contents($mcpFile) ?: throw new \RuntimeException, true, flags: JSON_THROW_ON_ERROR)

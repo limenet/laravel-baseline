@@ -6,9 +6,15 @@ use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class NodeVersionCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $packageJson = $this->getPackageJson();
@@ -92,7 +98,7 @@ class NodeVersionCheck extends AbstractFixableCheck
         }
 
         if ($nvmrc === null || $nvmrcTooLow) {
-            file_put_contents(base_path('.nvmrc'), $major."\n");
+            file_put_contents($this->path('.nvmrc'), $major."\n");
         }
 
         return $this->fix(dry: true);

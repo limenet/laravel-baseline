@@ -4,10 +4,13 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Backup\BackupConfigValidator;
 use Limenet\LaravelBaseline\Checks\AbstractCheck;
+use Limenet\LaravelBaseline\Concerns\InteractsWithLaravelSchedule;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 
 class UsesSpatieBackupCheck extends AbstractCheck
 {
+    use InteractsWithLaravelSchedule;
+
     public function check(): CheckResult
     {
         $scheduleResult = $this->checkPackageWithSchedule(
@@ -30,7 +33,7 @@ class UsesSpatieBackupCheck extends AbstractCheck
         // Validate the backup configuration file
         $validator = new BackupConfigValidator;
         $errors = $validator->validate(
-            base_path('config/backup.php'),
+            $this->path('config/backup.php'),
             checkVerifyBackup: $this->composerPackageSatisfies('spatie/laravel-backup', '^10'),
         );
 

@@ -4,14 +4,20 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class DoesNotUsePhpInsightsCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $packageClean = !$this->checkComposerPackages('nunomaduro/phpinsights');
         $scriptClean = !$this->checkComposerScript('ci-lint', 'insights');
-        $configFile = base_path('config/insights.php');
+        $configFile = $this->path('config/insights.php');
         $configClean = !file_exists($configFile);
 
         if ($packageClean && $scriptClean && $configClean) {

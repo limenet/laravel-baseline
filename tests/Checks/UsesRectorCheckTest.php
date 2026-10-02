@@ -2,6 +2,7 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 it('usesRector fails unless both rector packages installed and ci-lint script configured', function (): void {
     // FAIL when packages not installed
@@ -49,4 +50,24 @@ it('usesRector accepts a driftingly/rector-laravel constraint at the floor', fun
     $this->withTempBasePath(['composer.json' => json_encode($composer)]);
 
     expect(makeCheck(UsesRectorCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
+it('usesRector does not require rector-laravel outside Laravel', function (Profile $profile): void {
+    $project = makeProject($profile, ['composer.json' => json_encode([
+        'require-dev' => ['rector/rector' => '^2.0'],
+        'scripts' => ['ci-lint' => ['./vendor/bin/rector']],
+    ])]);
+
+    expect(makeCheck(UsesRectorCheck::class, $project)->check())->toBe(CheckResult::PASS);
+})->with([Profile::Php, Profile::WordPress]);
+
+it('usesRector adds rector to ci-lint outside Laravel', function (): void {
+    $project = makeProject(Profile::Php, ['composer.json' => json_encode([
+        'require-dev' => ['rector/rector' => '^2.0'],
+        'scripts' => ['ci-lint' => ['phpstan']],
+    ])]);
+
+    expect(makeCheck(UsesRectorCheck::class, $project)->fix())->toBe(CheckResult::PASS)
+        ->and(json_decode((string) file_get_contents($project->path('composer.json')), true)['scripts']['ci-lint'])
+        ->toBe(['phpstan', '@php vendor/bin/rector --dry-run']);
 });

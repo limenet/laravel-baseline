@@ -1,0 +1,13 @@
+{
+    "check": "rectorCoversAllPhpFiles",
+    "description": "fails when the root files are not processed, and adds withRootFiles() on fix",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "rector.php": "<?php\n\nuse Rector\\Config\\RectorConfig;\n\nreturn RectorConfig::configure()\n    ->withPaths([__DIR__.'/app'])\n    ->withPhpSets()->withRootFiles();\n"
+        }
+    }
+}

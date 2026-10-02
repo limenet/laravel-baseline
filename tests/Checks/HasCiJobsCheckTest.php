@@ -2,6 +2,7 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\HasCiJobsCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 it('hasCiJobs parses gitlab-ci.yml for required jobs', function (): void {
     bindFakeComposer([]);
@@ -127,4 +128,16 @@ it('hasCiJobs fails when .gitlab-ci.yml is empty', function (): void {
     [$check, $collector] = makeCheckWithCollector(HasCiJobsCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($collector->all())->toContain('.gitlab-ci.yml is empty or invalid');
+});
+
+it('hasCiJobs does not require a test job outside Laravel', function (Profile $profile): void {
+    $project = makeProject($profile, ['.gitlab-ci.yml' => "build:\n  extends: [.build]\nphp:\n  extends: [.lint_php]\njs:\n  extends: [.lint_js]\n"]);
+
+    expect(makeCheck(HasCiJobsCheck::class, $project)->check())->toBe(CheckResult::PASS);
+})->with([Profile::Php, Profile::WordPress]);
+
+it('hasCiJobs still requires the test job in Laravel', function (): void {
+    $this->withTempBasePath(['.gitlab-ci.yml' => "build:\n  extends: [.build]\nphp:\n  extends: [.lint_php]\njs:\n  extends: [.lint_js]\n"]);
+
+    expect(makeCheck(HasCiJobsCheck::class)->check())->toBe(CheckResult::FAIL);
 });

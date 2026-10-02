@@ -7,6 +7,11 @@ use Illuminate\Support\Composer as IlluminateComposer;
 use Limenet\LaravelBaseline\Checks\CheckInterface;
 use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Commands\CheckCommand;
+use Limenet\LaravelBaseline\Project\FilesystemProject;
+use Limenet\LaravelBaseline\Project\LaravelProject;
+use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Project\Project;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -31,9 +36,9 @@ function makeCommand(): CheckCommand
  * @param  class-string<T>  $checkClass
  * @return T
  */
-function makeCheck(string $checkClass): CheckInterface
+function makeCheck(string $checkClass, ?Project $project = null): CheckInterface
 {
-    return new $checkClass(new CommentCollector);
+    return new $checkClass(new CommentCollector, $project ?? new LaravelProject);
 }
 
 /**
@@ -45,11 +50,33 @@ function makeCheck(string $checkClass): CheckInterface
  * @param  class-string<T>  $checkClass
  * @return array{0: T, 1: CommentCollector}
  */
-function makeCheckWithCollector(string $checkClass): array
+function makeCheckWithCollector(string $checkClass, ?Project $project = null): array
 {
     $collector = new CommentCollector;
 
-    return [new $checkClass($collector), $collector];
+    return [new $checkClass($collector, $project ?? new LaravelProject), $collector];
+}
+
+/**
+ * Helper: a standalone (non-Laravel) project rooted in a fresh temp directory.
+ *
+ * @param  array<string,string>  $files  relative path => content
+ */
+function makeProject(Profile $profile, array $files = []): FilesystemProject
+{
+    $root = (new TemporaryDirectory)->deleteWhenDestroyed(false)->create()->path();
+
+    foreach ($files as $path => $content) {
+        $full = $root.DIRECTORY_SEPARATOR.$path;
+
+        if (!is_dir(dirname($full))) {
+            mkdir(dirname($full), 0777, true);
+        }
+
+        file_put_contents($full, $content);
+    }
+
+    return new FilesystemProject($root, $profile);
 }
 
 /**

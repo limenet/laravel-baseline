@@ -1,0 +1,7 @@
+{
+    "check": "usesPhpstanWordpress",
+    "description": "passes when the WordPress stubs for PHPStan are installed",
+    "engines": ["php"],
+    "profiles": ["wordpress"],
+    "expect": "pass"
+}

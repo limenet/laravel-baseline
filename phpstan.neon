@@ -6,6 +6,7 @@ parameters:
     paths:
         - src
         - config
+        - bin/baseline
 
     tmpDir: build/phpstan
     checkOctaneCompatibility: true

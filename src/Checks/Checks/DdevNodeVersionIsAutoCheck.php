@@ -4,9 +4,15 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class DdevNodeVersionIsAutoCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $ddevConfig = $this->getDdevConfig();
@@ -25,7 +31,7 @@ class DdevNodeVersionIsAutoCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $this->setYamlScalarKey(base_path('.ddev/config.yaml'), 'nodejs_version', 'auto');
+        $this->setYamlScalarKey($this->path('.ddev/config.yaml'), 'nodejs_version', 'auto');
 
         return $this->fix(dry: true);
     }

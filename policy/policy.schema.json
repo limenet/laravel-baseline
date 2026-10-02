@@ -17,9 +17,34 @@
         "trivy",
         "baseline",
         "npmScripts",
-        "periodic"
+        "periodic",
+        "wordpress",
+        "phpFileCoverage"
     ],
     "$defs": {
+        "phpRunner": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["postUpdateScript", "checkMatch", "periodicMatch", "periodicCommand"],
+            "properties": {
+                "postUpdateScript": {
+                    "type": "string",
+                    "description": "The post-update-cmd entry callsBaseline writes."
+                },
+                "checkMatch": {
+                    "type": "string",
+                    "description": "Substring identifying an existing check entry in post-update-cmd, with or without --fix."
+                },
+                "periodicMatch": {
+                    "type": "string",
+                    "description": "Substring identifying the periodic command, which must not run on every composer update."
+                },
+                "periodicCommand": {
+                    "type": "string",
+                    "description": "What an expired periodic check tells the developer to run."
+                }
+            }
+        },
         "ciJobTemplates": {
             "description": "A single shared template the job must extend, or a list of templates any one of which is accepted.",
             "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }]
@@ -127,17 +152,22 @@
                 "allow": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["shared", "php"],
+                    "required": ["shared", "composer", "laravel"],
                     "properties": {
                         "shared": {
                             "type": "array",
                             "items": { "type": "string" },
                             "description": "permissions.allow entries that apply to every project type."
                         },
-                        "php": {
+                        "composer": {
                             "type": "array",
                             "items": { "type": "string" },
-                            "description": "permissions.allow entries that only make sense in a Laravel/DDEV project."
+                            "description": "permissions.allow entries for every composer project under DDEV (laravel, php and wordpress profiles)."
+                        },
+                        "laravel": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "permissions.allow entries that only make sense in a Laravel project (artisan)."
                         }
                     }
                 },
@@ -156,21 +186,21 @@
                 "ask": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php"],
+                    "required": ["laravel"],
                     "properties": {
-                        "php": {
+                        "laravel": {
                             "type": "array",
                             "items": { "type": "string" },
-                            "description": "permissions.ask entries for the artisan commands that destroy database contents. Laravel/DDEV only. These prompt rather than deny, so the developer keeps an approval path."
+                            "description": "permissions.ask entries for the artisan commands that destroy database contents. Laravel only. These prompt rather than deny, so the developer keeps an approval path."
                         }
                     }
                 },
                 "ciLintHookCommand": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php", "js"],
+                    "required": ["composer", "js"],
                     "properties": {
-                        "php": { "type": "string" },
+                        "composer": { "type": "string" },
                         "js": { "type": "string" }
                     }
                 }
@@ -194,10 +224,18 @@
                 "requiredJobs": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php", "js"],
-                    "description": "GitLab CI job name => the shared template it must extend, or a list of templates any one of which is accepted. The js set omits the php job.",
+                    "required": ["laravel", "php", "wordpress", "js"],
+                    "description": "GitLab CI job name => the shared template it must extend, or a list of templates any one of which is accepted, per profile. The js set omits the php job; php and wordpress omit the test job.",
                     "properties": {
+                        "laravel": {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
+                        },
                         "php": {
+                            "type": "object",
+                            "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
+                        },
+                        "wordpress": {
                             "type": "object",
                             "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" }
                         },
@@ -217,10 +255,10 @@
                 "required": {
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["php", "js"],
-                    "description": "Substrings the project's ci-lint script must contain — a composer script for php, an npm script for js.",
+                    "required": ["composer", "js"],
+                    "description": "Substrings the project's ci-lint script must contain — a composer script for every composer profile, an npm script for js.",
                     "properties": {
-                        "php": { "type": "array", "items": { "type": "string" } },
+                        "composer": { "type": "array", "items": { "type": "string" } },
                         "js": { "type": "array", "items": { "type": "string" } }
                     }
                 },
@@ -302,11 +340,21 @@
         "baseline": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["composerPackage", "npmPackage"],
-            "description": "The two runners' own package names, so each can recognise the other's presence in a project.",
+            "required": ["composerPackage", "npmPackage", "runner"],
+            "description": "The two runners' own package names, so each can recognise the other's presence in a project, and how a composer project invokes the PHP runner.",
             "properties": {
                 "composerPackage": { "type": "string" },
-                "npmPackage": { "type": "string" }
+                "npmPackage": { "type": "string" },
+                "runner": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["laravel", "standalone"],
+                    "description": "Per PHP runner: laravel is the artisan command, standalone is vendor/bin/baseline (the php and wordpress profiles).",
+                    "properties": {
+                        "laravel": { "$ref": "#/$defs/phpRunner" },
+                        "standalone": { "$ref": "#/$defs/phpRunner" }
+                    }
+                }
             }
         },
         "npmScripts": {
@@ -327,6 +375,35 @@
             "required": ["defaultIntervalDays"],
             "properties": {
                 "defaultIntervalDays": { "type": "integer", "minimum": 1 }
+            }
+        },
+        "wordpress": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["themeVersionHook"],
+            "properties": {
+                "themeVersionHook": {
+                    "type": "string",
+                    "description": "The release-it after:bump hook releaseItBumpsWordpressThemeVersion adds: rewrites the Version: header of style.css to the version release-it just bumped to. release-it interpolates ${version} before the shell runs, so the script sits in single quotes to keep the shell off $1."
+                }
+            }
+        },
+        "phpFileCoverage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ignoredDirectories", "exempt"],
+            "description": "What phpstanCoversAllPhpFiles and rectorCoversAllPhpFiles (php and wordpress profiles) treat as the project's PHP files. Dot-directories and git-ignored files are never counted.",
+            "properties": {
+                "ignoredDirectories": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Directory names skipped at any depth, e.g. dependencies installed into the project."
+                },
+                "exempt": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Project-relative files that need not be analysed, e.g. the Rector config itself."
+                }
             }
         }
     }

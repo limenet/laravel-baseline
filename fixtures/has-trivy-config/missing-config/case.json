@@ -5,6 +5,7 @@
         "php",
         "js"
     ],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",

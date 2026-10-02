@@ -1,0 +1,9 @@
+{
+    "name": "acme/theme",
+    "scripts": {
+        "post-update-cmd": [
+            "@composer bump",
+            "@php vendor/bin/baseline check --fix"
+        ]
+    }
+}

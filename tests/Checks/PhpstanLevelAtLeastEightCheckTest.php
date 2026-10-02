@@ -2,6 +2,7 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 it('phpstanLevelAtLeastEight fails when phpstan.neon is missing', function (): void {
     bindFakeComposer([]);
@@ -115,3 +116,24 @@ YAML;
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($check->getComments())->toContain('PHPStan level must be a number or "max": Found "invalid" in phpstan.neon');
 });
+
+it('phpstanLevelAtLeastEight reads NEON indented with tabs and %parameters%', function (): void {
+    $this->withTempBasePath(['phpstan.neon' => "includes:\n\t- %rootDir%/conf/bleedingEdge.neon\nparameters:\n\tlevel: 8\n\tpaths:\n\t\t- %currentWorkingDirectory%/src # app code\n"]);
+
+    expect(makeCheck(PhpstanLevelAtLeastEightCheck::class)->check())->toBe(CheckResult::PASS);
+});
+
+it('phpstanLevelAtLeastEight fails instead of crashing on a phpstan.neon it cannot parse', function (): void {
+    $this->withTempBasePath(['phpstan.neon' => "parameters:\n    level: [8\n"]);
+
+    [$check, $collector] = makeCheckWithCollector(PhpstanLevelAtLeastEightCheck::class);
+
+    expect($check->check())->toBe(CheckResult::FAIL)
+        ->and(implode("\n", $collector->all()))->toContain('phpstan.neon could not be parsed');
+});
+
+it('phpstanLevelAtLeastEight reads the .dist configs PHPStan itself loads', function (string $file): void {
+    $project = makeProject(Profile::Php, [$file => "parameters:\n    level: 9\n"]);
+
+    expect(makeCheck(PhpstanLevelAtLeastEightCheck::class, $project)->check())->toBe(CheckResult::PASS);
+})->with(['phpstan.neon.dist', 'phpstan.dist.neon']);

@@ -2,6 +2,7 @@
     "check": "nodeVersion",
     "description": "fails when both declarations sit below the floor, and bumps both on fix",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",

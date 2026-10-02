@@ -5,7 +5,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Enums\CheckResult;
-use Limenet\LaravelBaseline\PhpFile\PhpFileWriter;
+use Limenet\LaravelBaseline\Project\Profile;
 
 /**
  * An exclude naming a check this package no longer registers silences nothing:
@@ -14,19 +14,25 @@ use Limenet\LaravelBaseline\PhpFile\PhpFileWriter;
  */
 class DoesNotExcludeUnknownChecksCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
-        $path = config_path('baseline.php');
-        $config = $this->readConfig($path);
-        $excludes = $config['excludes'] ?? [];
+        // Read the file rather than the excludes a run honours: the fix rewrites
+        // it, and Laravel's cached config would report state it no longer holds.
+        $state = $this->project->state();
+        $excludes = $state->storedExcludes();
 
-        if (!is_array($excludes) || $excludes === []) {
+        if ($excludes === []) {
             return CheckResult::PASS;
         }
 
         $known = array_map(
             fn (string $class): string => $class::name(),
-            CheckRegistry::all(),
+            CheckRegistry::for($this->profile()),
         );
 
         $live = [];
@@ -48,8 +54,9 @@ class DoesNotExcludeUnknownChecksCheck extends AbstractFixableCheck
 
         foreach ($dead as $name) {
             $this->addComment(sprintf(
-                'Remove "%s" from the excludes in config/baseline.php: no check by that name is registered, so the entry excludes nothing',
+                'Remove "%s" from the excludes in %s: no check by that name is registered, so the entry excludes nothing',
                 $name,
+                $state->location(),
             ));
         }
 
@@ -57,27 +64,8 @@ class DoesNotExcludeUnknownChecksCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $config['excludes'] = $live;
-        PhpFileWriter::writeConfig($path, $config);
+        $state->setExcludes($live);
 
         return $this->fix(dry: true);
-    }
-
-    /**
-     * Read config/baseline.php from disk rather than through config(), the same
-     * way PeriodicStateManager does: the fix rewrites that file, and a cached
-     * config would report state the file no longer holds.
-     *
-     * @return array<string,mixed>
-     */
-    private function readConfig(string $path): array
-    {
-        if (!file_exists($path)) {
-            return [];
-        }
-
-        $config = require $path;
-
-        return is_array($config) ? $config : [];
     }
 }

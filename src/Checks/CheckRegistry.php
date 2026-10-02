@@ -26,6 +26,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseBothBaselineRunnersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotUsePhpCsFixerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUsePhpInsightsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseRectorSetProvidersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseSailCheck;
@@ -53,15 +54,19 @@ use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSkipCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasTrivyConfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsCiLintCompleteCheck;
+use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsDevDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\LaravelBoostMcpUsesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\ModelShouldBeStrictCheck;
 use Limenet\LaravelBaseline\Checks\Checks\NodeVersionCheck;
+use Limenet\LaravelBaseline\Checks\Checks\PhpstanCoversAllPhpFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanParsesModelCastsMethodCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesDdevCheck;
+use Limenet\LaravelBaseline\Checks\Checks\RectorCoversAllPhpFilesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\ReleaseItBumpsWordpressThemeVersionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsBoostUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsCiLintHookInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UpdatesDdevAddonsCheck;
@@ -80,6 +85,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesPestCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestPhpstanPluginCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPestRectorPluginCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanExtensionsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UsesPhpstanWordpressCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesPredisCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesReadableEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesRectorCheck;
@@ -95,6 +101,9 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckHorizonQueue
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckCacheStoreCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckHeartbeatCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthSetupCheck;
+use Limenet\LaravelBaseline\Checks\Checks\WordpressThemeVersionMatchesComposerCheck;
+use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Project\Project;
 
 class CheckRegistry
 {
@@ -106,6 +115,12 @@ class CheckRegistry
         BumpsComposerCheck::class,
         CacheAllowsPulseSerializableClassesCheck::class,
         CallsBaselineCheck::class,
+        CallsSentryHookCheck::class,
+        CheckPhpunitCheck::class,
+        DdevHasPcovPackageCheck::class,
+        DdevHasRedisAddonCheck::class,
+        DdevMutagenIgnoresNodeModulesCheck::class,
+        DdevNodeVersionIsAutoCheck::class,
         DeniesEnvReadsInClaudeSettingsCheck::class,
         DoesNotCallPeriodicBaselineOnUpdateCheck::class,
         DoesNotDuplicateRectorSetRulesCheck::class,
@@ -113,21 +128,16 @@ class CheckRegistry
         DoesNotHaveCopilotOrJunieAgentFilesCheck::class,
         DoesNotHaveGuidelinesScriptCheck::class,
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
-        CallsSentryHookCheck::class,
-        CheckPhpunitCheck::class,
-        DdevHasPcovPackageCheck::class,
-        DdevHasRedisAddonCheck::class,
-        DdevMutagenIgnoresNodeModulesCheck::class,
-        DdevNodeVersionIsAutoCheck::class,
+        DoesNotPinOldMailTemplateCheck::class,
         DoesNotUseBothBaselineRunnersCheck::class,
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,
+        DoesNotUsePhpCsFixerCheck::class,
         DoesNotUsePhpInsightsCheck::class,
         DoesNotUseRectorSetProvidersCheck::class,
         DoesNotUseSailCheck::class,
         DoesNotUseSpatiePasskeysWithFortifyCheck::class,
-        DoesNotPinOldMailTemplateCheck::class,
         FollowsModernLaravelIdiomsCheck::class,
         FormRequestFailOnUnknownFieldsCheck::class,
         GitignoresLspFilesCheck::class,
@@ -136,6 +146,8 @@ class CheckRegistry
         HasClaudeSettingsWithLaravelSkillsCheck::class,
         HasDailyLoggingCheck::class,
         HasEditorconfigCheck::class,
+        HasEncryptedEnvFileCheck::class,
+        HasNpmScriptsCheck::class,
         HasRectorConfigWithAttributesSetsCheck::class,
         HasRectorConfigWithComposerBasedCheck::class,
         HasRectorConfigWithConfiguredRulesCheck::class,
@@ -147,19 +159,25 @@ class CheckRegistry
         HasRectorConfigWithRulesCheck::class,
         HasRectorConfigWithSetsCheck::class,
         HasRectorConfigWithSkipCheck::class,
-        HasEncryptedEnvFileCheck::class,
-        HasNpmScriptsCheck::class,
         HasTrivyConfigCheck::class,
         IsCiLintCompleteCheck::class,
+        IsInstalledAsDevDependencyCheck::class,
         IsInstalledAsRegularDependencyCheck::class,
         IsLaravelVersionMaintainedCheck::class,
         LaravelBoostMcpUsesDdevCheck::class,
         ModelShouldBeStrictCheck::class,
         NodeVersionCheck::class,
+        PhpstanCoversAllPhpFilesCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
         PhpstanParsesModelCastsMethodCheck::class,
         PhpVersionMatchesCiCheck::class,
         PhpVersionMatchesDdevCheck::class,
+        RectorCoversAllPhpFilesCheck::class,
+        ReleaseItBumpsWordpressThemeVersionCheck::class,
+        RunsBoostUpdateCheck::class,
+        RunsCiLintHookInClaudeSettingsCheck::class,
+        UpdatesDdevAddonsCheck::class,
+        UpdatesDependenciesCheck::class,
         UsesIdeHelpersCheck::class,
         UsesLarastanCheck::class,
         UsesLaravelAdminerCheck::class,
@@ -174,25 +192,23 @@ class CheckRegistry
         UsesPestPhpstanPluginCheck::class,
         UsesPestRectorPluginCheck::class,
         UsesPhpstanExtensionsCheck::class,
+        UsesPhpstanWordpressCheck::class,
         UsesPredisCheck::class,
-        RunsBoostUpdateCheck::class,
-        RunsCiLintHookInClaudeSettingsCheck::class,
-        UpdatesDdevAddonsCheck::class,
-        UpdatesDependenciesCheck::class,
-        UsesRectorCheck::class,
         UsesReadableEncryptedEnvFileCheck::class,
+        UsesRectorCheck::class,
         UsesReleaseItCheck::class,
         UsesSpatieBackupCheck::class,
+        UsesSpatieHealthCacheCheckCacheStoreCheck::class,
         UsesSpatieHealthHasCoreChecksCheck::class,
         UsesSpatieHealthHasLaravelVersionCheckCheck::class,
         UsesSpatieHealthHasPhpVersionCheckCheck::class,
         UsesSpatieHealthHasReleaseAgeCheckCheck::class,
-        UsesSpatieHealthCacheCheckCacheStoreCheck::class,
         UsesSpatieHealthQueueCheckCacheStoreCheck::class,
         UsesSpatieHealthQueueCheckHorizonQueuesCheck::class,
         UsesSpatieHealthScheduleCheckCacheStoreCheck::class,
         UsesSpatieHealthScheduleCheckHeartbeatCheck::class,
         UsesSpatieHealthSetupCheck::class,
+        WordpressThemeVersionMatchesComposerCheck::class,
     ];
 
     /** @return list<class-string<CheckInterface>> */
@@ -202,15 +218,28 @@ class CheckRegistry
     }
 
     /**
-     * Create instances of all checks with the given comment collector.
+     * The checks that apply to a profile.
+     *
+     * @return list<class-string<CheckInterface>>
+     */
+    public static function for(Profile $profile): array
+    {
+        return array_values(array_filter(
+            self::$checks,
+            static fn (string $class): bool => in_array($profile, $class::profiles(), true),
+        ));
+    }
+
+    /**
+     * Create instances of the checks that apply to the project's profile.
      *
      * @return list<CheckInterface>
      */
-    public static function createAll(CommentCollector $collector): array
+    public static function createAll(CommentCollector $collector, Project $project): array
     {
         return array_map(
-            fn (string $class) => new $class($collector),
-            self::$checks,
+            fn (string $class) => new $class($collector, $project),
+            self::for($project->profile()),
         );
     }
 }

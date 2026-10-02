@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 /**
  * Biome's `$schema` must resolve out of node_modules rather than name a released
@@ -28,10 +29,15 @@ class BiomeUsesLocalSchemaCheck extends AbstractFixableCheck
      */
     private const SCHEMA_PATTERN = '/"\$schema"\s*:\s*"((?:[^"\\\\]|\\\\.)*)"/';
 
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $configFile = $this->policy()->string('biome.configFile');
-        $file = base_path($configFile);
+        $file = $this->path($configFile);
 
         if (!file_exists($file)) {
             return CheckResult::PASS;

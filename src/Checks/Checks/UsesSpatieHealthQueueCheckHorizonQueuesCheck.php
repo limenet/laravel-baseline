@@ -49,7 +49,7 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
     /** @return list<string>|null null if horizon.php cannot be parsed */
     private function getHorizonQueues(): ?array
     {
-        $file = base_path('config/horizon.php');
+        $file = $this->path('config/horizon.php');
 
         if (!file_exists($file)) {
             return null;
@@ -121,7 +121,7 @@ class UsesSpatieHealthQueueCheckHorizonQueuesCheck extends AbstractCheck
     /** @return list<string>|null null if QueueCheck not found or has no onQueue call */
     private function getQueueCheckOnQueueQueues(): ?array
     {
-        $file = base_path('app/Providers/AppServiceProvider.php');
+        $file = $this->path('app/Providers/AppServiceProvider.php');
 
         if (!file_exists($file)) {
             return null;

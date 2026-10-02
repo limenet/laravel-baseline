@@ -1,0 +1,8 @@
+{
+    "name": "acme/app",
+    "scripts": {
+        "post-update-cmd": [
+            "@php artisan limenet:laravel-baseline:check --fix"
+        ]
+    }
+}

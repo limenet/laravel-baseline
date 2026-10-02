@@ -5,6 +5,8 @@ use Limenet\LaravelBaseline\Checks\CheckInterface;
 use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Commands\CheckCommand;
+use Limenet\LaravelBaseline\Project\LaravelProject;
+use Limenet\LaravelBaseline\Project\Profile;
 
 it('registers all check classes that implement CheckInterface', function (): void {
     $registeredChecks = CheckRegistry::all();
@@ -41,14 +43,14 @@ it('has correct command description', function (): void {
 })->group('command');
 
 it('has expected number of checks registered', function (): void {
-    expect(CheckRegistry::all())->toHaveCount(93);
+    expect(CheckRegistry::all())->toHaveCount(100);
 })->group('command');
 
 it('createAll returns check instances with shared comment collector', function (): void {
     $collector = new CommentCollector;
-    $checks = CheckRegistry::createAll($collector);
+    $checks = CheckRegistry::createAll($collector, new LaravelProject);
 
-    expect($checks)->toHaveCount(93);
+    expect($checks)->toHaveCount(count(CheckRegistry::for(Profile::Laravel)));
     expect($checks[0])->toBeInstanceOf(CheckInterface::class);
 })->group('command');
 
@@ -148,4 +150,12 @@ YML;
     $result = $this->artisan('limenet:laravel-baseline:check', ['-vv' => true]);
 
     $result->assertExitCode(Command::FAILURE);
+})->group('command');
+
+it('keeps the check registry alphabetically sorted', function (): void {
+    $names = array_map(fn (string $class): string => strtolower(class_basename($class)), CheckRegistry::all());
+    $sorted = $names;
+    sort($sorted);
+
+    expect($names)->toBe($sorted);
 })->group('command');

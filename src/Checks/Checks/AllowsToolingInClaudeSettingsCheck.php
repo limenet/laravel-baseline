@@ -4,9 +4,15 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class AllowsToolingInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $required = $this->requiredAllowEntries();
@@ -52,7 +58,8 @@ class AllowsToolingInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
     private function requiredAllowEntries(): array
     {
         return [
-            ...$this->policy()->strings('claude.allow.php'),
+            ...$this->policy()->strings('claude.allow.composer'),
+            ...($this->profile() === Profile::Laravel ? $this->policy()->strings('claude.allow.laravel') : []),
             ...$this->policy()->strings('claude.allow.shared'),
         ];
     }

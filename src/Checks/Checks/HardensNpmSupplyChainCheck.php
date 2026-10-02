@@ -6,9 +6,15 @@ use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class HardensNpmSupplyChainCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $packageJson = $this->getPackageJson();
@@ -114,7 +120,7 @@ class HardensNpmSupplyChainCheck extends AbstractFixableCheck
      */
     private function upsertNpmrc(array $entries): void
     {
-        $npmrcFile = base_path('.npmrc');
+        $npmrcFile = $this->path('.npmrc');
         $content = file_exists($npmrcFile) ? (file_get_contents($npmrcFile) ?: '') : '';
         $lines = $content === '' ? [] : explode("\n", rtrim($content, "\n"));
 

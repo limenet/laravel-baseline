@@ -4,10 +4,16 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 use Symfony\Component\Finder\Finder;
 
 class DeniesEnvReadsInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $required = $this->requiredDenyEntries();
@@ -51,7 +57,7 @@ class DeniesEnvReadsInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
         $entries = $this->policy()->strings('claude.deny.shared');
 
         $finder = (new Finder)
-            ->in(base_path())
+            ->in($this->path())
             ->ignoreDotFiles(false)
             ->name('.env.*.encrypted')
             ->depth('== 0');

@@ -5,6 +5,10 @@ use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Policy\Policy;
+use Limenet\LaravelBaseline\Project\LaravelProject;
+use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Project\Project;
+use Limenet\LaravelBaseline\Tests\TestCase;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -22,7 +26,20 @@ function conformanceFixtureRoot(): string
 }
 
 /**
- * @return array<string, array{0: string}>
+ * The PHP profiles a case runs under. `profiles` is optional and PHP-only:
+ * absent means the Laravel runner, which is all a fixture meant before the
+ * standalone runner existed.
+ *
+ * @param  array<string,mixed>  $case
+ * @return list<Profile>
+ */
+function conformanceProfiles(array $case): array
+{
+    return array_map(Profile::from(...), $case['profiles'] ?? [Profile::Laravel->value]);
+}
+
+/**
+ * @return array<string, array{0: string, 1: Profile}>
  */
 function conformanceCases(string $engine, bool $onlyFixable = false): array
 {
@@ -40,7 +57,9 @@ function conformanceCases(string $engine, bool $onlyFixable = false): array
             continue;
         }
 
-        $cases[$case['check'].' — '.$case['description']] = [dirname($file)];
+        foreach (conformanceProfiles($case) as $profile) {
+            $cases[$case['check'].' — '.$case['description'].' ['.$profile->value.']'] = [dirname($file), $profile];
+        }
     }
 
     return $cases;
@@ -81,6 +100,23 @@ function conformanceCheckClass(string $name): string
 }
 
 /**
+ * Materialises the fixture project for a profile: the Laravel runner reads it
+ * through base_path(), the standalone runner through a FilesystemProject.
+ */
+function conformanceProject(TestCase $test, string $dir, Profile $profile): Project
+{
+    $files = conformanceProjectFiles($dir.'/project');
+
+    if ($profile === Profile::Laravel) {
+        $test->withTempBasePath($files);
+
+        return new LaravelProject;
+    }
+
+    return makeProject($profile, $files);
+}
+
+/**
  * @return array<string,mixed>
  */
 function conformanceCase(string $dir): array
@@ -88,22 +124,19 @@ function conformanceCase(string $dir): array
     return json_decode((string) file_get_contents($dir.'/case.json'), true, flags: JSON_THROW_ON_ERROR);
 }
 
-it('reaches the shared fixture verdict', function (string $dir): void {
+it('reaches the shared fixture verdict', function (string $dir, Profile $profile): void {
     $case = conformanceCase($dir);
 
-    $this->withTempBasePath(conformanceProjectFiles($dir.'/project'));
-
-    $check = makeCheck(conformanceCheckClass($case['check']));
+    $check = makeCheck(conformanceCheckClass($case['check']), conformanceProject($this, $dir, $profile));
 
     expect($check->check())->toBe(CheckResult::from($case['expect']));
 })->with(fn (): array => conformanceCases('php'));
 
-it('leaves the shared fixture file state behind after a fix', function (string $dir): void {
+it('leaves the shared fixture file state behind after a fix', function (string $dir, Profile $profile): void {
     $case = conformanceCase($dir);
+    $project = conformanceProject($this, $dir, $profile);
 
-    $this->withTempBasePath(conformanceProjectFiles($dir.'/project'));
-
-    $check = makeCheck(conformanceCheckClass($case['check']));
+    $check = makeCheck(conformanceCheckClass($case['check']), $project);
 
     expect($check)->toBeInstanceOf(FixableInterface::class);
     expect($check->fix())->toBe(CheckResult::from($case['fix']['expect']));
@@ -115,11 +148,11 @@ it('leaves the shared fixture file state behind after a fix', function (string $
             $expected = Policy::fromDirectory()->template(substr((string) $expected, strlen('@template:')));
         }
 
-        expect(file_get_contents(base_path($path)))->toBe($expected);
+        expect(file_get_contents($project->path($path)))->toBe($expected);
     }
 
     foreach ($case['fix']['json'] ?? [] as $path => $assertions) {
-        $data = json_decode((string) file_get_contents(base_path($path)), true, flags: JSON_THROW_ON_ERROR);
+        $data = json_decode((string) file_get_contents($project->path($path)), true, flags: JSON_THROW_ON_ERROR);
 
         foreach ($assertions as $key => $expected) {
             expect(data_get($data, $key))->toBe($expected);
@@ -127,7 +160,7 @@ it('leaves the shared fixture file state behind after a fix', function (string $
     }
 
     foreach ($case['fix']['absent'] ?? [] as $path) {
-        expect(file_exists(base_path($path)))->toBeFalse();
+        expect(file_exists($project->path($path)))->toBeFalse();
     }
 })->with(fn (): array => conformanceCases('php', onlyFixable: true));
 
@@ -148,7 +181,14 @@ it('names a registered check and a real project directory in every fixture', fun
         // the npm runner alone (e.g. ciSetsNodeVersion, which has no PHP
         // counterpart). The vitest suite makes the mirror-image assertion.
         if (in_array('php', $case['engines'], true)) {
-            conformanceCheckClass($case['check']);
+            $class = conformanceCheckClass($case['check']);
+
+            // A case may only claim profiles its check actually runs in.
+            foreach (conformanceProfiles($case) as $profile) {
+                expect($class::profiles())->toContain($profile);
+            }
+        } else {
+            expect($case)->not->toHaveKey('profiles');
         }
 
         // The directory name must be the kebab-case of the check it exercises,

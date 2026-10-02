@@ -4,12 +4,18 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class HasEditorconfigCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
-        $editorconfigFile = base_path('.editorconfig');
+        $editorconfigFile = $this->path('.editorconfig');
 
         if (!file_exists($editorconfigFile)) {
             $this->addComment('Editorconfig missing: Create .editorconfig in project root');

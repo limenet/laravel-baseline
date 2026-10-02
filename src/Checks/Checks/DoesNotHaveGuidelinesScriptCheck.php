@@ -15,8 +15,8 @@ class DoesNotHaveGuidelinesScriptCheck extends AbstractFixableCheck
             return CheckResult::PASS;
         }
 
-        $scripts = $composerJson['scripts']['post-update-cmd'] ?? [];
-        $filtered = array_values(array_filter($scripts, fn (string $s): bool => !str_contains($s, 'limenet:laravel-baseline:guidelines')));
+        $scripts = (array) ($composerJson['scripts']['post-update-cmd'] ?? []);
+        $filtered = array_values(array_filter($scripts, fn (mixed $s): bool => !is_string($s) || !str_contains($s, 'limenet:laravel-baseline:guidelines')));
 
         if (count($filtered) === count($scripts)) {
             return CheckResult::PASS;

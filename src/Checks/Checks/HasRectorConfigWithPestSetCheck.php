@@ -3,11 +3,17 @@
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 use Limenet\LaravelBaseline\Rector\AbstractRectorVisitor;
 use Limenet\LaravelBaseline\Rector\RectorVisitorArrayClassConstant;
 
 class HasRectorConfigWithPestSetCheck extends AbstractHasRectorConfigCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         if (!$this->composerPackageSatisfies('pestphp/pest', '>=5.0') || !$this->checkComposerPackages('rector/rector')) {

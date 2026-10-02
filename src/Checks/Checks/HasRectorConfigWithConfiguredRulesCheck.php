@@ -10,7 +10,7 @@ class HasRectorConfigWithConfiguredRulesCheck extends AbstractHasRectorConfigChe
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $rectorFile = base_path('rector.php');
+        $rectorFile = $this->path('rector.php');
 
         if (!file_exists($rectorFile)) {
             if ($dry) {

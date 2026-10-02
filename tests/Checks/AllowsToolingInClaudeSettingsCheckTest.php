@@ -3,10 +3,14 @@
 use Limenet\LaravelBaseline\Checks\Checks\AllowsToolingInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 $requiredAllow = [
     'Bash(ddev composer run ci-lint:*)',
     'Bash(ddev composer test:*)',
+    'Bash(ddev composer show:*)',
+    'Bash(ddev composer outdated:*)',
+    'Bash(ddev composer why:*)',
     'Bash(ddev artisan test:*)',
     'Bash(ddev artisan make:*)',
     'Bash(ddev artisan route:list:*)',
@@ -18,9 +22,6 @@ $requiredAllow = [
     'Bash(ddev artisan config:clear:*)',
     'Bash(ddev artisan route:clear:*)',
     'Bash(ddev artisan view:clear:*)',
-    'Bash(ddev composer show:*)',
-    'Bash(ddev composer outdated:*)',
-    'Bash(ddev composer why:*)',
     'Bash(npm info:*)',
     'Bash(npm view:*)',
     'Bash(npm ls:*)',
@@ -103,3 +104,15 @@ it('allowsToolingInClaudeSettings fix is idempotent', function (): void {
     expect($check->fix())->toBe(CheckResult::PASS);
     expect($check->fix())->toBe(CheckResult::PASS);
 });
+
+it('allowsToolingInClaudeSettings writes no artisan entries outside Laravel', function (Profile $profile): void {
+    $project = makeProject($profile);
+
+    expect(makeCheck(AllowsToolingInClaudeSettingsCheck::class, $project)->fix())->toBe(CheckResult::PASS);
+
+    $allow = json_decode((string) file_get_contents($project->path('.claude/settings.json')), true)['permissions']['allow'];
+
+    expect($allow)->toContain('Bash(ddev composer run ci-lint:*)')
+        ->toContain('Bash(npm info:*)')
+        ->not->toContain('Bash(ddev artisan test:*)');
+})->with([Profile::Php, Profile::WordPress]);

@@ -1,0 +1,17 @@
+{
+    "check": "doesNotUsePhpCsFixer",
+    "description": "fails while PHP CS Fixer is required, run and configured, and removes all of it on fix once pint.json exists",
+    "engines": ["php"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "json": {
+            "composer.json": {
+                "require-dev": { "phpstan/phpstan": "^2.0" },
+                "scripts.ci-lint": ["./vendor/bin/phpstan analyse"]
+            }
+        },
+        "absent": [".php-cs-fixer.php", ".php-cs-fixer.cache"]
+    }
+}

@@ -2,6 +2,7 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\DdevHasPcovPackageCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 use Symfony\Component\Yaml\Yaml;
 
 it('ddevHasPcovPackage passes when all requirements are met', function (): void {
@@ -291,4 +292,26 @@ INI;
 
     $raw = file_get_contents(base_path('.ddev/config.yaml'));
     expect($raw)->toBe($ddevConfig);
+});
+
+it('ddevHasPcovPackage warns outside Laravel without a test suite', function (Profile $profile): void {
+    $project = makeProject($profile, [
+        'composer.json' => json_encode(['require-dev' => []]),
+        '.ddev/config.yaml' => "type: php\n",
+    ]);
+
+    expect(makeCheck(DdevHasPcovPackageCheck::class, $project)->check())->toBe(CheckResult::WARN);
+})->with([Profile::Php, Profile::WordPress]);
+
+it('ddevHasPcovPackage applies outside Laravel once Pest is installed', function (): void {
+    $project = makeProject(Profile::Php, [
+        'composer.json' => json_encode(['require-dev' => ['pestphp/pest' => '^4.0']]),
+        '.ddev/config.yaml' => "type: php\n",
+    ]);
+
+    $check = makeCheck(DdevHasPcovPackageCheck::class, $project);
+
+    expect($check->check())->toBe(CheckResult::FAIL)
+        ->and($check->fix())->toBe(CheckResult::PASS)
+        ->and(file_get_contents($project->path('.ddev/php/90-custom.ini')))->toContain('opcache.jit=disable');
 });

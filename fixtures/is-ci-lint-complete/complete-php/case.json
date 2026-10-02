@@ -4,5 +4,6 @@
     "engines": [
         "php"
     ],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "pass"
 }

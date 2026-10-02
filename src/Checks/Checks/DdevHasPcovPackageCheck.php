@@ -4,11 +4,25 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class DdevHasPcovPackageCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
+        // pcov only serves coverage, which only a test suite produces; outside
+        // Laravel that suite is optional.
+        if ($this->profile() !== Profile::Laravel && !$this->project->hasComposerPackage('pestphp/pest')) {
+            $this->addComment('No test suite (pestphp/pest) installed, so there is no coverage for pcov to collect');
+
+            return CheckResult::WARN;
+        }
+
         $ddevConfig = $this->getDdevConfig();
 
         if ($ddevConfig === null) {
@@ -39,7 +53,7 @@ class DdevHasPcovPackageCheck extends AbstractFixableCheck
             }
         }
 
-        $customIniFile = base_path('.ddev/php/90-custom.ini');
+        $customIniFile = $this->path('.ddev/php/90-custom.ini');
         $iniContent = file_exists($customIniFile) ? (file_get_contents($customIniFile) ?: '') : '';
 
         if (!str_starts_with(trim($iniContent), '[PHP]')) {
@@ -61,7 +75,7 @@ class DdevHasPcovPackageCheck extends AbstractFixableCheck
         }
 
         // Apply fixes
-        $ddevConfigFile = base_path('.ddev/config.yaml');
+        $ddevConfigFile = $this->path('.ddev/config.yaml');
         $packages = is_array($extraPackages) ? $extraPackages : [];
 
         if (file_exists($ddevConfigFile) && !in_array($pcovPackage, $packages, true)) {

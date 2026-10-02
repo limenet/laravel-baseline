@@ -1,0 +1,13 @@
+{
+    "git": {
+        "commitMessage": "chore: release v${version}"
+    },
+    "plugins": {
+        "@release-it/bumper": {
+            "out": {
+                "file": "composer.json",
+                "path": "version"
+            }
+        }
+    }
+}

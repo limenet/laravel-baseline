@@ -21,7 +21,7 @@ class DoesNotPinOldMailTemplateCheck extends AbstractCheck
     public function check(): CheckResult
     {
         foreach (self::PINNED_VIEWS as $view) {
-            if (file_exists(base_path($view))) {
+            if (file_exists($this->path($view))) {
                 $this->addComment("Published mail view pins the old template: Delete {$view} (re-publish via `ddev artisan vendor:publish --tag=laravel-mail --force` only if you maintain customizations) to adopt the modernized mail template");
 
                 return CheckResult::FAIL;

@@ -6,7 +6,11 @@
 
 This repository ships **two runners** from one policy:
 
-- `limenet/laravel-baseline` (Composer, `src/`) — every check, for Laravel projects.
+- `limenet/laravel-baseline` (Composer, `src/`) — the PHP runner, entered two ways:
+  - `php artisan limenet:laravel-baseline:check` — every check, for Laravel projects (the `laravel`
+    profile);
+  - `vendor/bin/baseline check` — the standalone CLI for other composer projects, which detects the
+    `php` or `wordpress` profile and refuses Laravel apps.
 - `@limenet-ch/baseline` (npm, `js/`) — the portable subset, for JS/TS projects with no PHP and no
   DDEV.
 
@@ -15,6 +19,14 @@ baseline's own guideline (`resources/boost/guidelines/core.blade.php`) puts `npm
 artisan runs inside DDEV, so shelling out across that boundary is not an option. What is shared is
 the *policy* (`policy/`) and the *behavioural contract* (`fixtures/`), both read by both runners.
 Drift is caught by the fixtures, not prevented by a common implementation.
+
+Inside the PHP runner, every check declares the **profiles** it applies to (`profiles()`, default
+`[Profile::Laravel]`) and reaches the project only through a `Project`: `LaravelProject` resolves
+everything through the application at call time, `FilesystemProject` needs nothing but a root
+directory. Anything the standalone CLI can load must stay free of Laravel — no `base_path()`, `str()`,
+`config()`, facades or `Illuminate\*` — because a WordPress theme has none of it installed;
+`tests/StandaloneFrameworkFreeTest.php` walks everything reachable and enforces that, and the
+`standalone-smoke` workflow installs the package into a theme without Laravel and runs it.
 
 The codebase uses a **one class per check** architecture:
 
@@ -30,18 +42,38 @@ src/
 │   └── Checks/                      # Individual check classes
 │       ├── BumpsComposerCheck.php
 │       └── ...
-├── Commands/
-│   ├── LaravelBaselineCommand.php   # CI-safe check runner
+├── Commands/                        # artisan: thin wrappers around Runner/
+│   ├── CheckCommand.php             # CI-safe check runner
 │   └── PeriodicCheckCommand.php     # Interactive periodic check runner
+├── Cli/                             # vendor/bin/baseline (standalone, symfony/console)
+│   ├── Application.php
+│   └── Command/                     # check, periodic, install-skills
+├── Runner/
+│   ├── CheckRunner.php              # One run over a Project, shared by artisan and the CLI
+│   └── PeriodicRunner.php
+├── Project/
+│   ├── Profile.php                  # laravel | php | wordpress
+│   ├── Project.php                  # path(), hasComposerPackage(), policy(), state()
+│   ├── LaravelProject.php           # base_path()/app() at call time
+│   ├── FilesystemProject.php        # a root directory; .baseline.json state
+│   └── ProfileDetector.php          # Standalone profile detection, Laravel refusal
 ├── Policy/
 │   └── Policy.php                  # Typed reader for policy/policy.json
-└── State/
-    └── PeriodicStateManager.php    # Reads/writes config/baseline.php for periodic state
+├── Skills/
+│   └── SkillInstaller.php          # Copies resources/standalone/skills into .claude/skills
+├── State/
+│   ├── StateStore.php              # excludes + periodic last-run times
+│   ├── PhpConfigStateStore.php     # config/baseline.php (Laravel)
+│   └── JsonStateStore.php          # .baseline.json (standalone, same shape as npm)
+└── Support/                        # Framework-free helpers (CheckName, PhpSourceFiles, WordPressHeader, …)
+
+bin/baseline                        # The standalone CLI entry point
 
 resources/
-└── boost/                          # Laravel Boost resources shipped to consumers
-    ├── guidelines/core.blade.php   # Always-on AI guideline (dev loop, conventions)
-    └── skills/<name>/SKILL.md      # On-demand AI skills (e.g. creating-a-release)
+├── boost/                          # Laravel Boost resources shipped to Laravel consumers
+│   ├── guidelines/core.blade.php   # Always-on AI guideline (dev loop, conventions)
+│   └── skills/<name>/SKILL.md      # On-demand AI skills (e.g. creating-a-release)
+└── standalone/skills/<name>/SKILL.md  # Non-Laravel variants, copied by `vendor/bin/baseline install-skills`
 
 policy/                             # SHARED — read at runtime by both runners
 ├── policy.json                     # Floors, required keys, allow/deny lists
@@ -50,7 +82,7 @@ policy/                             # SHARED — read at runtime by both runners
 
 fixtures/                           # SHARED — executed by both test suites
 └── <check-name>/<case>/
-    ├── case.json                   # engines, expected verdict, expected fix outcome
+    ├── case.json                   # engines, PHP profiles (default laravel), verdict, fix outcome
     └── project/                    # materialised into a temp project root
 
 js/                                 # The npm runner (@limenet-ch/baseline)
@@ -150,9 +182,13 @@ tests/Checks/
 ```
 
 **Test helpers available** (from `tests/Helpers.php`):
-- `makeCheck(CheckClass::class)` - Create a check instance
-- `makeCheckWithCollector(CheckClass::class)` - Returns `[$check, $collector]` tuple for comment verification
-- `bindFakeComposer(['package' => true/false])` - Mock composer package checks
+- `makeCheck(CheckClass::class, ?Project $project = null)` - Create a check instance (a `LaravelProject` by default)
+- `makeCheckWithCollector(CheckClass::class, ?Project $project = null)` - Returns `[$check, $collector]` tuple for comment verification
+- `bindFakeComposer(['package' => true/false])` - Mock composer package checks (Laravel project only)
+- `makeProject(Profile::Php|Profile::WordPress, ['path' => 'contents'])` - A standalone `FilesystemProject` in a fresh temp directory; its packages come from the composer.json you write, not from `bindFakeComposer`
+
+A check that applies outside Laravel needs tests for those profiles too — pass `makeProject(...)` as
+the second argument, and give its fixtures a `"profiles"` list.
 
 **Absence test:** Check fails when package/configuration is missing
 ```php
@@ -191,6 +227,15 @@ it('myNew provides helpful comment when script is missing', function (): void {
 
 Add check documentation to [README.md](README.md) under the appropriate category. The entry must use the exact `name()` of the check (e.g., `**\`usesPest()\`**`). The test in `tests/ReadmeChecksTest.php` enforces that every registered check is documented and will fail if the README is missing any. Forgetting this step will break the test suite.
 
+### 4a. Decide which PHP profiles the check applies to
+
+A new check is Laravel-only by default. Override `profiles()` to return `Profile::cases()` when it
+means the same in any composer project, or a subset (e.g. `[Profile::WordPress]`) when it only
+exists there — see the `adding-a-check` skill. A check that runs outside Laravel must stay
+framework-free (`$this->path()`, plain PHP), needs `makeProject(...)` tests for its profiles, and
+gets a row in the README's "What the standalone runner checks" table, which
+`tests/ReadmeProfilesTest.php` keeps in step with the registry.
+
 ### 4b. Decide whether the check belongs in the npm runner too
 
 Ask whether the check means anything in a project with no PHP, no composer and no DDEV.
@@ -199,8 +244,23 @@ Ask whether the check means anything in a project with no PHP, no composer and n
 - **Yes, identically** — add the TS class under `js/src/checks/`, register it in
   `js/src/checks/registry.ts`, and add a fixture with `"engines": ["php", "js"]`.
 - **Yes, but with different data** — put the differing values in `policy/policy.json` under a
-  `php` / `js` split (see `ci.requiredJobs`, `ciLint.required`, `claude.allow`), have *both* checks
-  read their half, and write one fixture per engine.
+  split (see `ci.requiredJobs`, `ciLint.required`, `claude.allow`), have *both* checks read their
+  half, and write one fixture per engine.
+
+Policy splits are keyed by **who the value applies to**, coarsest first, so a value shared by several
+profiles is written once:
+
+| Key | Applies to |
+|---|---|
+| `shared` | every project, both runners |
+| `composer` | every PHP profile (`laravel`, `php`, `wordpress`) |
+| `laravel` / `php` / `wordpress` | that one PHP profile |
+| `js` | the npm runner |
+
+A check reads the union of the keys that cover its profile (e.g. `claude.allow.composer` +
+`claude.allow.laravel` + `claude.allow.shared`). Only introduce a per-profile key where the values
+actually differ; the schema is closed, so every new key also goes into `policy.schema.json`, which
+`tests/Policy/PolicySchemaTest.php` validates the shipped file against.
 
 **Any constant a check compares against belongs in `policy/`, not in the class.** That is the only
 thing keeping the two runners from disagreeing about what the standard actually is. Logic stays in
@@ -234,6 +294,13 @@ npm run ci-lint && npm run build && npm test
 
 ## Available Helper Methods in AbstractCheck
 
+### Project
+- `path(string $relative = ''): string` - An absolute path in the checked project. **Use this, never `base_path()`** — the standalone runner has no application
+- `profile(): Profile` - The profile being checked; branch on it when a check's *values* differ per profile (and keep those values in `policy/`)
+- `policy(): Policy` - The shared policy
+- `$this->project->hasComposerPackage(string $package): bool` - composer.json declares the package; unlike `checkComposerPackages()` it adds no comment
+- `$this->project->state()` - The `StateStore` (`config/baseline.php` or `.baseline.json`)
+
 ### Composer Checks
 - `checkComposerPackages(string|array $packages): bool` - Check if composer packages are installed
 - `checkComposerScript(string $scriptName, string $match): bool` - Check if a composer script contains a string
@@ -259,8 +326,10 @@ they are not safe to call from an applicability guard whose comments a passing c
 - `getGitlabCiData(): array` - Parse .gitlab-ci.yml
 - `getDdevConfig(): ?array` - Parse .ddev/config.yaml
 - `getReleaseItConfig(): ?array` - Parse .release-it.json
+- `loadYamlConfig(string $relativePath): ?array` - Parse a YAML file; a parse error becomes a comment and `null`, not a crash
+- `loadNeonConfig(string $relativePath): ?array` - Parse a PHPStan NEON file as YAML after normalising tab indentation and `%param%` / `@service` values; `includes` are not followed
 
-### Schedule Checks
+### Schedule Checks (trait `InteractsWithLaravelSchedule`, Laravel-only checks)
 - `hasScheduleEntry(string $command): bool` - Check if a command is scheduled
 - `checkPackageWithSchedule(string $package, string|array $scheduleCommands): CheckResult` - Package + schedule validation
 
@@ -274,8 +343,8 @@ Checks that read or write `rector.php` come in two families, and a change to wha
 mandates usually needs both:
 
 - **`AbstractHasRectorConfigCheck`** — assert a call is present and append it when it is not.
-  `fixCodeSnippet()`/`fixImports()` describe what to write; `appendToRectorChain()` splices it onto
-  the end of the chain. When the call already exists but is incomplete, `mergeIntoArrayArgument()`
+  `fixCodeSnippet()`/`fixImports()` describe what to write; `appendToRectorChain()` (trait
+  `AppendsToRectorChain`, usable by any check) splices it onto the end of the chain. When the call already exists but is incomplete, `mergeIntoArrayArgument()`
   adds the missing class constants to its array argument rather than giving up with a FAIL — see
   `HasRectorConfigWithSkipCheck`. It writes a `use` statement for every entry that ends up
   referenced by a bare short name without one, which also repairs the unimported `withSkip()` an
@@ -351,8 +420,13 @@ the runner's state file itself. The periodic command confirms interactively, whi
 answer, so without that step the check keeps prompting after the skill has completed. Copy the step
 from `updating-dependencies` in every variant of the skill that exists:
 
-- **PHP** (`resources/boost/skills/`) — `config/baseline.php`, `periodic.<checkName>`, value from
-  `ddev php -r 'echo date(DATE_ATOM), PHP_EOL;'`, leaving `excludes` untouched.
+- **PHP, Laravel** (`resources/boost/skills/`, delivered by Laravel Boost) — `config/baseline.php`,
+  `periodic.<checkName>`, value from `ddev php -r 'echo date(DATE_ATOM), PHP_EOL;'`, leaving
+  `excludes` untouched.
+- **PHP, standalone** (`resources/standalone/skills/`, delivered by `vendor/bin/baseline
+  install-skills` and `check --fix`) — `.baseline.json`, `periodic.<checkName>`, value from the same
+  `ddev php -r` command, leaving `excludes` and `profile` untouched. No artisan, no Laravel wording —
+  `tests/Skills/SkillInstallerTest.php` enforces it.
 - **npm** (`js/skills/`) — `.baseline.json`, `periodic.<checkName>`, value from
   `node -e "console.log(new Date().toISOString())"`.
 
@@ -361,9 +435,12 @@ say to skip the step otherwise — the date records a completed run, not an atte
 
 ### How periodic state is stored
 
-Timestamps are persisted in `config/baseline.php` under a `periodic` key by `PeriodicStateManager`. The file is rewritten via `PhpFileWriter::writeConfig` (nikic/php-parser) each time a check is confirmed. `PeriodicStateManager` reads directly via `require` (bypassing Laravel's config cache) so state is always fresh.
+Each project's `StateStore` holds the excludes and the periodic timestamps:
 
-The npm runner keeps the same two keys in `.baseline.json` at the project root, since a JS project has no `config/` directory to write a PHP file into.
+- **Laravel** (`PhpConfigStateStore`) — `config/baseline.php`, `periodic` key. The file is rewritten via `PhpFileWriter::writeConfig` (nikic/php-parser) each time a check is confirmed, and read directly via `require` (bypassing Laravel's config cache) so state is always fresh. The excludes a *run* honours still come from `config('baseline.excludes')`.
+- **Standalone** (`JsonStateStore`) — `.baseline.json` at the project root, the same file and shape the npm runner uses (plus an optional `profile` override); writes keep every key they do not own.
+
+`PeriodicStateManager` is a static wrapper over the Laravel store, kept for older callers.
 
 ### Running periodic checks
 
@@ -373,6 +450,10 @@ php artisan limenet:laravel-baseline:periodic
 
 # CI: fails for any expired periodic check (non-interactive)
 php artisan limenet:laravel-baseline:check
+
+# Standalone (non-Laravel) projects
+vendor/bin/baseline periodic
+vendor/bin/baseline check
 ```
 
 ## Commit Conventions

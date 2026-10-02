@@ -4,14 +4,20 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 use Symfony\Component\Yaml\Yaml;
 
 class DdevMutagenIgnoresNodeModulesCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
-        $mutagenFile = base_path('.ddev/mutagen/mutagen.yml');
-        $ddevGitignore = base_path('.ddev/.gitignore');
+        $mutagenFile = $this->path('.ddev/mutagen/mutagen.yml');
+        $ddevGitignore = $this->path('.ddev/.gitignore');
 
         // Check / fix .ddev/.gitignore
         if (file_exists($ddevGitignore)) {

@@ -1,0 +1,7 @@
+{
+    "check": "hasCiJobs",
+    "description": "passes on a non-Laravel php project declaring every required CI job, without a test job",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "pass"
+}

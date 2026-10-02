@@ -5,7 +5,6 @@ namespace Limenet\LaravelBaseline\Checks;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Limenet\LaravelBaseline\Enums\CheckResult;
-use Limenet\LaravelBaseline\State\PeriodicStateManager;
 
 abstract class AbstractPeriodicCheck extends AbstractCheck implements PeriodicCheckInterface
 {
@@ -21,10 +20,13 @@ abstract class AbstractPeriodicCheck extends AbstractCheck implements PeriodicCh
 
     final public function check(): CheckResult
     {
-        $lastRun = PeriodicStateManager::getLastRun(static::name());
+        $lastRun = $this->project->state()->lastRun(static::name());
 
         if ($lastRun === null || Carbon::instance($lastRun)->add($this->interval())->isPast()) {
-            $this->addComment('Run `ddev artisan limenet:laravel-baseline:periodic` to complete this periodic check');
+            $this->addComment(sprintf(
+                'Run `%s` to complete this periodic check',
+                $this->policy()->string('baseline.runner.'.$this->profile()->runner().'.periodicCommand'),
+            ));
 
             return CheckResult::FAIL;
         }

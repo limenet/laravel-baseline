@@ -1,0 +1,8 @@
+{
+    "name": "acme/theme",
+    "scripts": {
+        "post-update-cmd": [
+            "@composer bump"
+        ]
+    }
+}

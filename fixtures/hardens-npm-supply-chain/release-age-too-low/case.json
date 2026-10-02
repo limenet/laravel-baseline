@@ -2,6 +2,7 @@
     "check": "hardensNpmSupplyChain",
     "description": "fails when the cooldown is shorter than the policy minimum, and raises it on fix",
     "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",
