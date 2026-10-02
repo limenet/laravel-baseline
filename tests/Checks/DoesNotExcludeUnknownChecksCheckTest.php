@@ -2,6 +2,7 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotExcludeUnknownChecksCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 /**
  * Pest shares one global function namespace across the suite, hence the prefix.
@@ -81,4 +82,25 @@ it('doesNotExcludeUnknownChecks keeps periodic state when it rewrites the config
 
     expect($config['excludes'])->toBe([]);
     expect($config['periodic'])->toBe(['updatesDependencies' => '2026-01-01T00:00:00+00:00']);
+});
+
+it('doesNotExcludeUnknownChecks treats a Laravel-only check as unknown in .baseline.json', function (): void {
+    $project = makeProject(Profile::WordPress, [
+        '.baseline.json' => json_encode(['excludes' => ['hasEditorconfig', 'usesLaravelHorizon']]),
+    ]);
+
+    $check = makeCheck(DoesNotExcludeUnknownChecksCheck::class, $project);
+
+    expect($check->check())->toBe(CheckResult::FAIL)
+        ->and($check->fix())->toBe(CheckResult::PASS)
+        ->and(json_decode((string) file_get_contents($project->path('.baseline.json')), true)['excludes'])->toBe(['hasEditorconfig']);
+});
+
+it('doesNotExcludeUnknownChecks names .baseline.json in its comment', function (): void {
+    $project = makeProject(Profile::Php, ['.baseline.json' => json_encode(['excludes' => ['gone']])]);
+
+    [$check, $collector] = makeCheckWithCollector(DoesNotExcludeUnknownChecksCheck::class, $project);
+
+    expect($check->check())->toBe(CheckResult::FAIL)
+        ->and(implode("\n", $collector->all()))->toContain('from the excludes in .baseline.json');
 });

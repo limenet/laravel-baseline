@@ -1,7 +1,8 @@
 {
     "check": "doesNotExcludeUnknownChecks",
     "description": "fails on an exclude naming no registered check, and drops it on fix",
-    "engines": ["js"],
+    "engines": ["php", "js"],
+    "profiles": ["php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",

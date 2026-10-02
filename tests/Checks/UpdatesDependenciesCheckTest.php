@@ -2,6 +2,7 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\UpdatesDependenciesCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 it('updatesDependencies is always applicable', function (): void {
     expect(makeCheck(UpdatesDependenciesCheck::class)->isApplicable())->toBeTrue();
@@ -37,4 +38,19 @@ it('updatesDependencies provides helpful comment when expired', function (): voi
     [$check, $collector] = makeCheckWithCollector(UpdatesDependenciesCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($collector->all())->toContain('Run `ddev artisan limenet:laravel-baseline:periodic` to complete this periodic check');
+});
+
+it('updatesDependencies points a standalone project at vendor/bin/baseline periodic', function (): void {
+    [$check, $collector] = makeCheckWithCollector(UpdatesDependenciesCheck::class, makeProject(Profile::WordPress));
+
+    expect($check->check())->toBe(CheckResult::FAIL)
+        ->and($collector->all())->toContain('Run `ddev exec vendor/bin/baseline periodic` to complete this periodic check');
+});
+
+it('updatesDependencies reads the last run from .baseline.json', function (): void {
+    $project = makeProject(Profile::Php, [
+        '.baseline.json' => json_encode(['periodic' => ['updatesDependencies' => (new DateTimeImmutable)->format(DATE_ATOM)]]),
+    ]);
+
+    expect(makeCheck(UpdatesDependenciesCheck::class, $project)->check())->toBe(CheckResult::PASS);
 });

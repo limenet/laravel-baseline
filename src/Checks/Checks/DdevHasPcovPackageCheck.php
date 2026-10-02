@@ -4,11 +4,25 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class DdevHasPcovPackageCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
+        // pcov only serves coverage, which only a test suite produces; outside
+        // Laravel that suite is optional.
+        if ($this->profile() !== Profile::Laravel && !$this->project->hasComposerPackage('pestphp/pest')) {
+            $this->addComment('No test suite (pestphp/pest) installed, so there is no coverage for pcov to collect');
+
+            return CheckResult::WARN;
+        }
+
         $ddevConfig = $this->getDdevConfig();
 
         if ($ddevConfig === null) {

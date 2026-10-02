@@ -1,0 +1,15 @@
+{
+    "check": "callsBaseline",
+    "description": "fails when post-update-cmd never runs vendor/bin/baseline, and appends it on fix",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "json": {
+            "composer.json": {
+                "scripts.post-update-cmd": ["@composer bump", "@php vendor/bin/baseline check --fix"]
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+build:
+  extends:
+    - .build
+php:
+  extends:
+    - .lint_php
+js:
+  extends:
+    - .lint_js

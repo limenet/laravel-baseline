@@ -147,7 +147,21 @@
     },
     "baseline": {
         "composerPackage": "limenet/laravel-baseline",
-        "npmPackage": "@limenet-ch/baseline"
+        "npmPackage": "@limenet-ch/baseline",
+        "runner": {
+            "laravel": {
+                "postUpdateScript": "@php artisan limenet:laravel-baseline:check --fix",
+                "checkMatch": "limenet:laravel-baseline:check",
+                "periodicMatch": "limenet:laravel-baseline:periodic",
+                "periodicCommand": "ddev artisan limenet:laravel-baseline:periodic"
+            },
+            "standalone": {
+                "postUpdateScript": "@php vendor/bin/baseline check --fix",
+                "checkMatch": "vendor/bin/baseline check",
+                "periodicMatch": "vendor/bin/baseline periodic",
+                "periodicCommand": "ddev exec vendor/bin/baseline periodic"
+            }
+        }
     },
     "npmScripts": {
         "required": ["ci-lint", "production"]

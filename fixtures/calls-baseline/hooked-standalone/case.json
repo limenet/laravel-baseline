@@ -1,0 +1,7 @@
+{
+    "check": "callsBaseline",
+    "description": "passes when post-update-cmd runs vendor/bin/baseline check --fix",
+    "engines": ["php"],
+    "profiles": ["php", "wordpress"],
+    "expect": "pass"
+}

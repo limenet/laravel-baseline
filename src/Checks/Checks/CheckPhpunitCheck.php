@@ -4,12 +4,25 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class CheckPhpunitCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         $xmlFile = $this->path('phpunit.xml');
+        $isLaravel = $this->profile() === Profile::Laravel;
+
+        if (!$isLaravel && !file_exists($xmlFile) && !$this->project->hasComposerPackage('pestphp/pest')) {
+            $this->addComment('No test suite (phpunit.xml or pestphp/pest) found; tests are optional outside Laravel');
+
+            return CheckResult::WARN;
+        }
 
         if (!file_exists($xmlFile)) {
             $this->addComment('PHPUnit configuration missing: Create phpunit.xml in project root');
@@ -70,6 +83,19 @@ class CheckPhpunitCheck extends AbstractFixableCheck
 
             $this->ensureXmlPath($dom, $xpath, $root, 'logging/junit', ['outputFile' => 'report.xml']);
             $dirty = true;
+        }
+
+        // APP_KEY and the ./app source directory are Laravel's layout.
+        if (!$isLaravel) {
+            if ($dry) {
+                return CheckResult::PASS;
+            }
+
+            if ($dirty) {
+                $dom->save($xmlFile);
+            }
+
+            return $this->fix(dry: true);
         }
 
         // APP_KEY

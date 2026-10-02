@@ -20,6 +20,29 @@
         "periodic"
     ],
     "$defs": {
+        "phpRunner": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["postUpdateScript", "checkMatch", "periodicMatch", "periodicCommand"],
+            "properties": {
+                "postUpdateScript": {
+                    "type": "string",
+                    "description": "The post-update-cmd entry callsBaseline writes."
+                },
+                "checkMatch": {
+                    "type": "string",
+                    "description": "Substring identifying an existing check entry in post-update-cmd, with or without --fix."
+                },
+                "periodicMatch": {
+                    "type": "string",
+                    "description": "Substring identifying the periodic command, which must not run on every composer update."
+                },
+                "periodicCommand": {
+                    "type": "string",
+                    "description": "What an expired periodic check tells the developer to run."
+                }
+            }
+        },
         "ciJobTemplates": {
             "description": "A single shared template the job must extend, or a list of templates any one of which is accepted.",
             "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }]
@@ -315,11 +338,21 @@
         "baseline": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["composerPackage", "npmPackage"],
-            "description": "The two runners' own package names, so each can recognise the other's presence in a project.",
+            "required": ["composerPackage", "npmPackage", "runner"],
+            "description": "The two runners' own package names, so each can recognise the other's presence in a project, and how a composer project invokes the PHP runner.",
             "properties": {
                 "composerPackage": { "type": "string" },
-                "npmPackage": { "type": "string" }
+                "npmPackage": { "type": "string" },
+                "runner": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["laravel", "standalone"],
+                    "description": "Per PHP runner: laravel is the artisan command, standalone is vendor/bin/baseline (the php and wordpress profiles).",
+                    "properties": {
+                        "laravel": { "$ref": "#/$defs/phpRunner" },
+                        "standalone": { "$ref": "#/$defs/phpRunner" }
+                    }
+                }
             }
         },
         "npmScripts": {

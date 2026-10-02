@@ -5,6 +5,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 /**
  * An exclude naming a check this package no longer registers silences nothing:
@@ -13,6 +14,11 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
  */
 class DoesNotExcludeUnknownChecksCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
         // Read the file rather than the excludes a run honours: the fix rewrites
@@ -26,7 +32,7 @@ class DoesNotExcludeUnknownChecksCheck extends AbstractFixableCheck
 
         $known = array_map(
             fn (string $class): string => $class::name(),
-            CheckRegistry::all(),
+            CheckRegistry::for($this->profile()),
         );
 
         $live = [];

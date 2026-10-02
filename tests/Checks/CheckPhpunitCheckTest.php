@@ -2,6 +2,7 @@
 
 use Limenet\LaravelBaseline\Checks\Checks\CheckPhpunitCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 it('checkPhpunit fails when cobertura or junit or APP_KEY is missing', function (): void {
     bindFakeComposer([]);
@@ -230,4 +231,42 @@ it('checkPhpunit fails with error comment when phpunit.xml is empty', function (
     $check = makeCheck(CheckPhpunitCheck::class);
     expect($check->check())->toBe(CheckResult::FAIL);
     expect($check->getComments())->toContain('PHPUnit configuration invalid: Check phpunit.xml for XML syntax errors');
+});
+
+it('checkPhpunit warns outside Laravel when there is no test suite', function (Profile $profile): void {
+    $project = makeProject($profile, ['composer.json' => json_encode(['require-dev' => []])]);
+
+    expect(makeCheck(CheckPhpunitCheck::class, $project)->check())->toBe(CheckResult::WARN);
+})->with([Profile::Php, Profile::WordPress]);
+
+it('checkPhpunit fails outside Laravel when Pest is installed without phpunit.xml', function (): void {
+    $project = makeProject(Profile::Php, ['composer.json' => json_encode(['require-dev' => ['pestphp/pest' => '^4.0']])]);
+
+    expect(makeCheck(CheckPhpunitCheck::class, $project)->check())->toBe(CheckResult::FAIL);
+});
+
+it('checkPhpunit requires neither APP_KEY nor ./app outside Laravel', function (): void {
+    $project = makeProject(Profile::WordPress, ['phpunit.xml' => <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit>
+    <coverage><report><cobertura outputFile="cobertura.xml"/></report></coverage>
+    <logging><junit outputFile="report.xml"/></logging>
+    <source><include><directory suffix=".php">./inc</directory></include></source>
+</phpunit>
+XML]);
+
+    expect(makeCheck(CheckPhpunitCheck::class, $project)->check())->toBe(CheckResult::PASS);
+});
+
+it('checkPhpunit adds only the reports outside Laravel', function (): void {
+    $project = makeProject(Profile::Php, ['phpunit.xml' => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<phpunit>\n</phpunit>\n"]);
+
+    expect(makeCheck(CheckPhpunitCheck::class, $project)->fix())->toBe(CheckResult::PASS);
+
+    $xml = (string) file_get_contents($project->path('phpunit.xml'));
+
+    expect($xml)->toContain('cobertura.xml')
+        ->toContain('report.xml')
+        ->not->toContain('APP_KEY')
+        ->not->toContain('./app');
 });

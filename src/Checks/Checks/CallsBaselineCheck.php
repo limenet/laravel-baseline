@@ -4,12 +4,21 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 class CallsBaselineCheck extends AbstractFixableCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     public function fix(bool $dry = false): CheckResult
     {
-        if ($this->hasPostUpdateScript('limenet:laravel-baseline:check --fix')) {
+        $runner = 'baseline.runner.'.$this->profile()->runner();
+        $match = $this->policy()->string($runner.'.checkMatch');
+
+        if ($this->hasPostUpdateScript($match.' --fix')) {
             return CheckResult::PASS;
         }
 
@@ -27,7 +36,7 @@ class CallsBaselineCheck extends AbstractFixableCheck
         $scripts = $composerJson['scripts']['post-update-cmd'] ?? [];
 
         foreach ($scripts as $i => $script) {
-            if (str_contains($script, 'limenet:laravel-baseline:check') && !str_contains($script, '--fix')) {
+            if (str_contains($script, $match) && !str_contains($script, '--fix')) {
                 $composerJson['scripts']['post-update-cmd'][$i] = rtrim($script).' --fix';
                 $this->writeComposerJson($composerJson);
 
@@ -35,7 +44,7 @@ class CallsBaselineCheck extends AbstractFixableCheck
             }
         }
 
-        $this->addToComposerScript('post-update-cmd', '@php artisan limenet:laravel-baseline:check --fix');
+        $this->addToComposerScript('post-update-cmd', $this->policy()->string($runner.'.postUpdateScript'));
 
         return $this->fix(dry: true);
     }
