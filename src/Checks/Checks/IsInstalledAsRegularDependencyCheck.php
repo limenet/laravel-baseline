@@ -4,15 +4,14 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
-use Limenet\LaravelBaseline\Project\Profile;
 
+/**
+ * A Laravel app loads the package at runtime (its Spatie Health checks, the
+ * service provider), so it must survive `composer install --no-dev`. Outside
+ * Laravel it is pure tooling — see IsInstalledAsDevDependencyCheck.
+ */
 class IsInstalledAsRegularDependencyCheck extends AbstractFixableCheck
 {
-    public static function profiles(): array
-    {
-        return Profile::cases();
-    }
-
     public function fix(bool $dry = false): CheckResult
     {
         $composerJson = $this->getComposerJson();

@@ -57,7 +57,7 @@ jobs:
               "repositories": [
                   { "type": "path", "url": "$RUNNER_TEMP/package", "options": { "symlink": false } }
               ],
-              "require": { "limenet/laravel-baseline": "*" }
+              "require-dev": { "limenet/laravel-baseline": "*" }
           }
           JSON
           composer install --no-interaction --no-progress

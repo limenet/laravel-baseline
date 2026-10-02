@@ -78,7 +78,7 @@ composer scripts, PHPStan, Pint, plain Rector sets, DDEV, CI, editor and Claude 
 skips everything that needs artisan, `config/*.php` or a Laravel package.
 
 ```bash
-composer require limenet/laravel-baseline
+composer require --dev limenet/laravel-baseline
 ```
 
 ```bash
@@ -151,7 +151,7 @@ Every check below also runs in Laravel projects unless marked standalone-only.
 | `hasRectorConfigWithPreparedSets` | ✓ | ✓ | identical |
 | `hasTrivyConfig` | ✓ | ✓ | identical |
 | `isCiLintComplete` | ✓ | ✓ | identical |
-| `isInstalledAsRegularDependency` | ✓ | ✓ | identical |
+| `isInstalledAsDevDependency` | ✓ | ✓ | **standalone-only**: the package belongs in `require-dev`; the Laravel runner's `isInstalledAsRegularDependency` requires `require` instead, because a Laravel app loads it at runtime |
 | `nodeVersion` | ✓ | ✓ | identical |
 | `phpVersionMatchesCi` | ✓ | ✓ | identical |
 | `phpVersionMatchesDdev` | ✓ | ✓ | identical |
@@ -357,7 +357,8 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`doesNotExcludeUnknownChecks()`** - Fails when `config/baseline.php` excludes a name no registered check answers to: excludes are matched against the registry, so an entry left behind by a check this package renamed or removed silences nothing and only hides that the exclusion is no longer in force *(drops the dead entries, leaving the remaining excludes and the periodic state intact)*
 - **`doesNotCallPeriodicBaselineOnUpdate()`** - Fails if `php artisan limenet:laravel-baseline:periodic` is in the `post-update-cmd` scripts (it shouldn't be — periodic checks fail CI automatically when expired)
 - 🔧 **`doesNotHaveGuidelinesScript()`** - Fails if the removed `php artisan limenet:laravel-baseline:guidelines` command is still in `post-update-cmd` (removed in v2.1.0) *(removes the entry from composer.json)*
-- 🔧 **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`) *(moves from require-dev to require in composer.json)*
+- 🔧 **`isInstalledAsRegularDependency()`** - Validates `limenet/laravel-baseline` is in `require` (not `require-dev`), since a Laravel app loads it at runtime *(moves from require-dev to require in composer.json)*
+- 🔧 **`isInstalledAsDevDependency()`** - Validates `limenet/laravel-baseline` is in `require-dev` (not `require`): outside Laravel it is only a development tool, so a `--no-dev` deploy leaves it out *(php and wordpress profiles; moves from require to require-dev in composer.json)*
 - 🔧 **`usesLaravelLang()`** - Validates `laravel-lang/lang` dev dependency is installed with `lang:update` and pint in post-update scripts *(partial: adds post-update scripts if package in require-dev)*
 
 ## Testing

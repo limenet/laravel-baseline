@@ -54,6 +54,7 @@ use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSkipCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasTrivyConfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsCiLintCompleteCheck;
+use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsDevDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsInstalledAsRegularDependencyCheck;
 use Limenet\LaravelBaseline\Checks\Checks\IsLaravelVersionMaintainedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\LaravelBoostMcpUsesDdevCheck;
@@ -160,6 +161,7 @@ class CheckRegistry
         HasNpmScriptsCheck::class,
         HasTrivyConfigCheck::class,
         IsCiLintCompleteCheck::class,
+        IsInstalledAsDevDependencyCheck::class,
         IsInstalledAsRegularDependencyCheck::class,
         IsLaravelVersionMaintainedCheck::class,
         LaravelBoostMcpUsesDdevCheck::class,
