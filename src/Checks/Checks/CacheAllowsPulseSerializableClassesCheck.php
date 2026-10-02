@@ -38,7 +38,7 @@ class CacheAllowsPulseSerializableClassesCheck extends AbstractFixableCheck
             return CheckResult::WARN;
         }
 
-        $file = base_path(self::CONFIG_FILE);
+        $file = $this->path(self::CONFIG_FILE);
 
         // Without a published config the framework default applies, which has no
         // allow-list at all: unserialize() stays unrestricted and Pulse works.

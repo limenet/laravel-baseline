@@ -39,7 +39,7 @@ class DdevHasPcovPackageCheck extends AbstractFixableCheck
             }
         }
 
-        $customIniFile = base_path('.ddev/php/90-custom.ini');
+        $customIniFile = $this->path('.ddev/php/90-custom.ini');
         $iniContent = file_exists($customIniFile) ? (file_get_contents($customIniFile) ?: '') : '';
 
         if (!str_starts_with(trim($iniContent), '[PHP]')) {
@@ -61,7 +61,7 @@ class DdevHasPcovPackageCheck extends AbstractFixableCheck
         }
 
         // Apply fixes
-        $ddevConfigFile = base_path('.ddev/config.yaml');
+        $ddevConfigFile = $this->path('.ddev/config.yaml');
         $packages = is_array($extraPackages) ? $extraPackages : [];
 
         if (file_exists($ddevConfigFile) && !in_array($pcovPackage, $packages, true)) {

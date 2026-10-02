@@ -13,7 +13,7 @@ class UpdatesDdevAddonsCheck extends AbstractCheck
 
     public function check(): CheckResult
     {
-        $manifestFiles = glob(base_path('.ddev/addon-metadata/*/manifest.yaml')) ?: [];
+        $manifestFiles = glob($this->path('.ddev/addon-metadata/*/manifest.yaml')) ?: [];
 
         $result = CheckResult::PASS;
 

@@ -51,7 +51,7 @@ class DeniesEnvReadsInClaudeSettingsCheck extends AbstractClaudeSettingsCheck
         $entries = $this->policy()->strings('claude.deny.shared');
 
         $finder = (new Finder)
-            ->in(base_path())
+            ->in($this->path())
             ->ignoreDotFiles(false)
             ->name('.env.*.encrypted')
             ->depth('== 0');

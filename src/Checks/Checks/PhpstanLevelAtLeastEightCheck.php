@@ -10,7 +10,7 @@ class PhpstanLevelAtLeastEightCheck extends AbstractCheck
 {
     public function check(): CheckResult
     {
-        $phpstanConfigFile = base_path('phpstan.neon');
+        $phpstanConfigFile = $this->path('phpstan.neon');
 
         if (!file_exists($phpstanConfigFile)) {
             $this->addComment('PHPStan configuration missing: Create phpstan.neon in project root');

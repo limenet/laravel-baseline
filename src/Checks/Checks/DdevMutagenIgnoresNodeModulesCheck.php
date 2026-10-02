@@ -10,8 +10,8 @@ class DdevMutagenIgnoresNodeModulesCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $mutagenFile = base_path('.ddev/mutagen/mutagen.yml');
-        $ddevGitignore = base_path('.ddev/.gitignore');
+        $mutagenFile = $this->path('.ddev/mutagen/mutagen.yml');
+        $ddevGitignore = $this->path('.ddev/.gitignore');
 
         // Check / fix .ddev/.gitignore
         if (file_exists($ddevGitignore)) {

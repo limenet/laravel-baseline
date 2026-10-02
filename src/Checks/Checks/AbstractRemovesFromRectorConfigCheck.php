@@ -25,7 +25,7 @@ abstract class AbstractRemovesFromRectorConfigCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $rectorFile = base_path('rector.php');
+        $rectorFile = $this->path('rector.php');
 
         if (!file_exists($rectorFile)) {
             return CheckResult::PASS;

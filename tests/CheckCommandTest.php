@@ -5,6 +5,7 @@ use Limenet\LaravelBaseline\Checks\CheckInterface;
 use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Commands\CheckCommand;
+use Limenet\LaravelBaseline\Project\LaravelProject;
 
 it('registers all check classes that implement CheckInterface', function (): void {
     $registeredChecks = CheckRegistry::all();
@@ -46,7 +47,7 @@ it('has expected number of checks registered', function (): void {
 
 it('createAll returns check instances with shared comment collector', function (): void {
     $collector = new CommentCollector;
-    $checks = CheckRegistry::createAll($collector);
+    $checks = CheckRegistry::createAll($collector, new LaravelProject);
 
     expect($checks)->toHaveCount(93);
     expect($checks[0])->toBeInstanceOf(CheckInterface::class);

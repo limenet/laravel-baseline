@@ -56,7 +56,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
 
     protected function checkUsesCacheStore(string $class): bool
     {
-        $file = base_path('app/Providers/AppServiceProvider.php');
+        $file = $this->path('app/Providers/AppServiceProvider.php');
 
         if (!file_exists($file)) {
             return false;
@@ -80,7 +80,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
 
     protected function hasHealthChecksCacheStore(): bool
     {
-        $file = base_path('config/cache.php');
+        $file = $this->path('config/cache.php');
 
         if (!file_exists($file)) {
             return false;
@@ -136,7 +136,7 @@ abstract class AbstractUsesSpatieHealthCheckCacheStoreCheck extends AbstractChec
 
     private function resolveHealthChecksCacheStorePath(): ?string
     {
-        $file = base_path('config/cache.php');
+        $file = $this->path('config/cache.php');
 
         if (!file_exists($file)) {
             return null;

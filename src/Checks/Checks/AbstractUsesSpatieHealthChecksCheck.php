@@ -18,7 +18,7 @@ abstract class AbstractUsesSpatieHealthChecksCheck extends AbstractFixableCheck
             return CheckResult::WARN;
         }
 
-        $file = base_path('app/Providers/AppServiceProvider.php');
+        $file = $this->path('app/Providers/AppServiceProvider.php');
 
         if (!file_exists($file)) {
             $this->addComment($this->missingChecksComment());

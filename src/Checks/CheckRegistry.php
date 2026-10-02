@@ -95,6 +95,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckHorizonQueue
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckCacheStoreCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckHeartbeatCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthSetupCheck;
+use Limenet\LaravelBaseline\Project\Project;
 
 class CheckRegistry
 {
@@ -206,10 +207,10 @@ class CheckRegistry
      *
      * @return list<CheckInterface>
      */
-    public static function createAll(CommentCollector $collector): array
+    public static function createAll(CommentCollector $collector, Project $project): array
     {
         return array_map(
-            fn (string $class) => new $class($collector),
+            fn (string $class) => new $class($collector, $project),
             self::$checks,
         );
     }

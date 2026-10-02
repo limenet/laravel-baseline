@@ -6,7 +6,7 @@ abstract class AbstractClaudeSettingsCheck extends AbstractFixableCheck
 {
     protected function claudeSettingsFile(): string
     {
-        return base_path('.claude/settings.json');
+        return $this->path('.claude/settings.json');
     }
 
     /**
@@ -58,8 +58,8 @@ abstract class AbstractClaudeSettingsCheck extends AbstractFixableCheck
      */
     protected function writeClaudeSettings(array $settings): void
     {
-        if (!is_dir(base_path('.claude'))) {
-            mkdir(base_path('.claude'), 0755, true);
+        if (!is_dir($this->path('.claude'))) {
+            mkdir($this->path('.claude'), 0755, true);
         }
 
         file_put_contents(

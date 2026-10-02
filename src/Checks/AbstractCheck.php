@@ -4,11 +4,12 @@ namespace Limenet\LaravelBaseline\Checks;
 
 use Composer\Semver\Intervals;
 use Composer\Semver\VersionParser;
-use Illuminate\Support\Composer;
 use Limenet\LaravelBaseline\Backup\BackupConfigVisitor;
 use Limenet\LaravelBaseline\Concerns\CommentManagement;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Policy\Policy;
+use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Project\Project;
 use Limenet\LaravelBaseline\Support\CheckName;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
@@ -27,8 +28,10 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected const MIN_RECTOR_LARAVEL = '2.6.1';
 
-    public function __construct(CommentCollector $commentCollector)
-    {
+    public function __construct(
+        CommentCollector $commentCollector,
+        protected readonly Project $project,
+    ) {
         $this->commentCollector = $commentCollector;
     }
 
@@ -46,12 +49,20 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function policy(): Policy
     {
-        return app(Policy::class);
+        return $this->project->policy();
     }
 
-    protected function getComposer(): Composer
+    /**
+     * An absolute path inside the checked project ($this->path() semantics).
+     */
+    protected function path(string $relative = ''): string
     {
-        return app(Composer::class)->setWorkingPath(base_path());
+        return $this->project->path($relative);
+    }
+
+    protected function profile(): Profile
+    {
+        return $this->project->profile();
     }
 
     /**
@@ -59,13 +70,12 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function checkComposerPackages(string|array $packages): bool
     {
-        $composer = $this->getComposer();
         $packages = is_string($packages) ? [$packages] : $packages;
 
         $this->addComment('Composer check: '.implode(', ', $packages));
 
         foreach ($packages as $package) {
-            if (!$composer->hasPackage($package)) {
+            if (!$this->project->hasComposerPackage($package)) {
                 return false;
             }
         }
@@ -107,7 +117,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getComposerJson(): ?array
     {
-        $composerFile = base_path('composer.json');
+        $composerFile = $this->path('composer.json');
 
         if (!file_exists($composerFile)) {
             $this->addComment('Composer configuration missing: composer.json not found in project root');
@@ -260,7 +270,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getPackageJson(): ?array
     {
-        $packageFile = base_path('package.json');
+        $packageFile = $this->path('package.json');
 
         if (!file_exists($packageFile)) {
             $this->addComment('Package.json missing: Create package.json in project root');
@@ -296,7 +306,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getNvmrcNodeVersion(): ?string
     {
-        $nvmrcFile = base_path('.nvmrc');
+        $nvmrcFile = $this->path('.nvmrc');
 
         if (!file_exists($nvmrcFile)) {
             return null;
@@ -330,7 +340,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getNpmrc(): array
     {
-        $npmrcFile = base_path('.npmrc');
+        $npmrcFile = $this->path('.npmrc');
 
         if (!file_exists($npmrcFile)) {
             return [];
@@ -360,7 +370,7 @@ abstract class AbstractCheck implements CheckInterface
 
     protected function getPhpunitXml(): \SimpleXMLElement|false|null
     {
-        $xmlFile = base_path('/phpunit.xml');
+        $xmlFile = $this->path('/phpunit.xml');
 
         if (!file_exists($xmlFile)) {
             return null;
@@ -397,7 +407,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function loadYamlConfig(string $relativePath): ?array
     {
-        $file = base_path($relativePath);
+        $file = $this->path($relativePath);
         $path = ltrim($relativePath, '/');
 
         if (!file_exists($file)) {
@@ -516,7 +526,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function getReleaseItConfig(): ?array
     {
-        $releaseItFile = base_path('.release-it.json');
+        $releaseItFile = $this->path('.release-it.json');
 
         if (!file_exists($releaseItFile)) {
             $this->addComment('Release-it configuration missing: Create .release-it.json in project root');
@@ -536,7 +546,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function parsePhpConfigFile(string $relativePath): ?array
     {
-        $file = base_path($relativePath);
+        $file = $this->path($relativePath);
         $path = ltrim($relativePath, '/');
 
         if (!file_exists($file)) {
@@ -584,7 +594,7 @@ abstract class AbstractCheck implements CheckInterface
     protected function writeComposerJson(array $data): void
     {
         file_put_contents(
-            base_path('composer.json'),
+            $this->path('composer.json'),
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
         );
     }
@@ -595,7 +605,7 @@ abstract class AbstractCheck implements CheckInterface
     protected function writePackageJson(array $data): void
     {
         file_put_contents(
-            base_path('package.json'),
+            $this->path('package.json'),
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n",
         );
     }
@@ -692,7 +702,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function setPhpunitEnvVar(string $name, string $value): void
     {
-        $xmlFile = base_path('phpunit.xml');
+        $xmlFile = $this->path('phpunit.xml');
 
         if (!file_exists($xmlFile)) {
             return;
@@ -746,7 +756,7 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected function ensureGitignoreEntry(string $entry, string $reason, bool $dry): ?CheckResult
     {
-        $file = base_path('.gitignore');
+        $file = $this->path('.gitignore');
 
         if (!file_exists($file)) {
             $this->addComment("Missing .gitignore in project root: create it and add '{$entry}'");

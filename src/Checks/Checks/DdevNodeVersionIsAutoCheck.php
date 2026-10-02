@@ -25,7 +25,7 @@ class DdevNodeVersionIsAutoCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        $this->setYamlScalarKey(base_path('.ddev/config.yaml'), 'nodejs_version', 'auto');
+        $this->setYamlScalarKey($this->path('.ddev/config.yaml'), 'nodejs_version', 'auto');
 
         return $this->fix(dry: true);
     }

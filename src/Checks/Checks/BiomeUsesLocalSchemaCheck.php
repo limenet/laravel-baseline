@@ -31,7 +31,7 @@ class BiomeUsesLocalSchemaCheck extends AbstractFixableCheck
     public function fix(bool $dry = false): CheckResult
     {
         $configFile = $this->policy()->string('biome.configFile');
-        $file = base_path($configFile);
+        $file = $this->path($configFile);
 
         if (!file_exists($file)) {
             return CheckResult::PASS;

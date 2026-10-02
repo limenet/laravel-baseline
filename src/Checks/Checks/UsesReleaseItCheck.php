@@ -23,7 +23,7 @@ class UsesReleaseItCheck extends AbstractFixableCheck
                 return CheckResult::FAIL;
             }
 
-            $packageFile = base_path('package.json');
+            $packageFile = $this->path('package.json');
 
             if (file_exists($packageFile)) {
                 $packageJson = json_decode(file_get_contents($packageFile) ?: '{}', true, flags: JSON_THROW_ON_ERROR);
@@ -54,7 +54,7 @@ class UsesReleaseItCheck extends AbstractFixableCheck
         }
 
         // Apply .release-it.json fix only if needed
-        $releaseItFile = base_path('.release-it.json');
+        $releaseItFile = $this->path('.release-it.json');
         $config = file_exists($releaseItFile)
             ? (json_decode(file_get_contents($releaseItFile) ?: '{}', true, flags: JSON_THROW_ON_ERROR) ?? [])
             : [];

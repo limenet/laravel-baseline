@@ -87,7 +87,7 @@ class HasDailyLoggingCheck extends AbstractCheck
      */
     private function getLoggingConfig(): ?array
     {
-        $loggingFile = base_path('config/logging.php');
+        $loggingFile = $this->path('config/logging.php');
 
         if (!file_exists($loggingFile)) {
             $this->addComment('Logging configuration missing: config/logging.php not found');

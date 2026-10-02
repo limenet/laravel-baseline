@@ -13,7 +13,7 @@ class DoesNotHaveCopilotOrJunieAgentFilesCheck extends AbstractFixableCheck
         $present = [];
 
         foreach ($this->policy()->stringMap('agentFiles.forbidden') as $path => $reason) {
-            $absolute = base_path($path);
+            $absolute = $this->path($path);
 
             if (file_exists($absolute) || is_dir($absolute)) {
                 $present[$path] = $absolute;

@@ -114,7 +114,7 @@ class HardensNpmSupplyChainCheck extends AbstractFixableCheck
      */
     private function upsertNpmrc(array $entries): void
     {
-        $npmrcFile = base_path('.npmrc');
+        $npmrcFile = $this->path('.npmrc');
         $content = file_exists($npmrcFile) ? (file_get_contents($npmrcFile) ?: '') : '';
         $lines = $content === '' ? [] : explode("\n", rtrim($content, "\n"));
 

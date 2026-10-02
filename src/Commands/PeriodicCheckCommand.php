@@ -8,6 +8,7 @@ use Limenet\LaravelBaseline\Checks\CheckRegistry;
 use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Checks\PeriodicCheckInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\LaravelProject;
 use Limenet\LaravelBaseline\State\PeriodicStateManager;
 use Limenet\LaravelBaseline\Support\CheckName;
 
@@ -24,7 +25,7 @@ class PeriodicCheckCommand extends Command
     {
         $collector = new CommentCollector;
 
-        $expired = collect(CheckRegistry::createAll($collector))
+        $expired = collect(CheckRegistry::createAll($collector, new LaravelProject))
             ->filter(fn ($check) => $check instanceof PeriodicCheckInterface)
             ->filter(fn (PeriodicCheckInterface $check) => $check->isApplicable())
             ->filter(fn (PeriodicCheckInterface $check) => $check->check() === CheckResult::FAIL);

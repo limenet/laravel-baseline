@@ -9,7 +9,7 @@ class HasEditorconfigCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $editorconfigFile = base_path('.editorconfig');
+        $editorconfigFile = $this->path('.editorconfig');
 
         if (!file_exists($editorconfigFile)) {
             $this->addComment('Editorconfig missing: Create .editorconfig in project root');

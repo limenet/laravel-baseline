@@ -15,7 +15,7 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $rectorFile = base_path('rector.php');
+        $rectorFile = $this->path('rector.php');
 
         if (!file_exists($rectorFile)) {
             if ($dry) {
@@ -62,7 +62,7 @@ abstract class AbstractHasRectorConfigCheck extends AbstractFixableCheck
 
     protected function runVisitorOnRector(AbstractRectorVisitor $visitor): ?CheckResult
     {
-        $rectorConfigFile = base_path('rector.php');
+        $rectorConfigFile = $this->path('rector.php');
 
         if (!file_exists($rectorConfigFile)) {
             return CheckResult::FAIL;

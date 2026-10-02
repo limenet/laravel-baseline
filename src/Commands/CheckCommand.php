@@ -9,6 +9,7 @@ use Limenet\LaravelBaseline\Checks\CommentCollector;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Checks\PeriodicCheckInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\LaravelProject;
 use Limenet\LaravelBaseline\Support\CheckName;
 
 use function Laravel\Prompts\error;
@@ -28,7 +29,7 @@ class CheckCommand extends Command
         $collector = new CommentCollector;
         $fix = (bool) $this->option('fix');
 
-        $results = collect(CheckRegistry::createAll($collector))
+        $results = collect(CheckRegistry::createAll($collector, new LaravelProject))
             ->reject(fn (CheckInterface $check): bool => $this->isExcluded($check))
             ->reject(fn (CheckInterface $check): bool => $check instanceof PeriodicCheckInterface && !$check->isApplicable())
             ->map(fn (CheckInterface $check): CheckResult => $this->runCheck($check, $collector, $fix));

@@ -51,7 +51,7 @@ class UsesSpatieHealthSetupCheck extends AbstractCheck
 
     private function hasS3HealthDisk(): bool
     {
-        $file = base_path('config/filesystems.php');
+        $file = $this->path('config/filesystems.php');
 
         if (!file_exists($file)) {
             return false;
@@ -77,7 +77,7 @@ class UsesSpatieHealthSetupCheck extends AbstractCheck
 
     private function hasHealthResultStoreConfig(): bool
     {
-        $file = base_path('config/health.php');
+        $file = $this->path('config/health.php');
 
         if (!file_exists($file)) {
             return false;

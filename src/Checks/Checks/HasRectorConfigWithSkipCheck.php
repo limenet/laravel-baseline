@@ -52,7 +52,7 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
 
     public function fix(bool $dry = false): CheckResult
     {
-        $rectorFile = base_path('rector.php');
+        $rectorFile = $this->path('rector.php');
 
         if (!file_exists($rectorFile)) {
             if ($dry) {
@@ -120,7 +120,7 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
             $classes[] = 'TablePropertyToTableAttributeRector';
         }
 
-        if (file_exists(base_path('server.php'))) {
+        if (file_exists($this->path('server.php'))) {
             $classes[] = 'ServerVariableToRequestFacadeRector';
         }
 

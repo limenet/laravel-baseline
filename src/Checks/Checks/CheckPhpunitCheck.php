@@ -9,7 +9,7 @@ class CheckPhpunitCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $xmlFile = base_path('phpunit.xml');
+        $xmlFile = $this->path('phpunit.xml');
 
         if (!file_exists($xmlFile)) {
             $this->addComment('PHPUnit configuration missing: Create phpunit.xml in project root');

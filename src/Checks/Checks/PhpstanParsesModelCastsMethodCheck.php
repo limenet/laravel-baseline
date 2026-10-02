@@ -18,7 +18,7 @@ class PhpstanParsesModelCastsMethodCheck extends AbstractFixableCheck
 {
     public function fix(bool $dry = false): CheckResult
     {
-        $phpstanConfigFile = base_path('phpstan.neon');
+        $phpstanConfigFile = $this->path('phpstan.neon');
 
         if (!file_exists($phpstanConfigFile)) {
             $this->addComment('PHPStan configuration missing: Create phpstan.neon in project root');

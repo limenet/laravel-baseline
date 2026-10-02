@@ -12,7 +12,7 @@ class DdevHasRedisAddonCheck extends AbstractCheck
 
     public function check(): CheckResult
     {
-        $manifestFile = base_path('.ddev/addon-metadata/redis/manifest.yaml');
+        $manifestFile = $this->path('.ddev/addon-metadata/redis/manifest.yaml');
 
         if (!file_exists($manifestFile)) {
             $this->addComment('DDEV Redis addon not installed: Install with "ddev add-on get ddev/ddev-redis"');

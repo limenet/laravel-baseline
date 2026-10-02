@@ -23,7 +23,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
                 return $ciResult;
             }
 
-            $ciFile = base_path('.gitlab-ci.yml');
+            $ciFile = $this->path('.gitlab-ci.yml');
 
             if (file_exists($ciFile)) {
                 $ciData = $this->getGitlabCiData() ?? [];
@@ -68,7 +68,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
         }
 
         $configFile = $this->policy()->string('trivy.configFile');
-        $trivyFile = base_path($configFile);
+        $trivyFile = $this->path($configFile);
 
         if (!file_exists($trivyFile)) {
             if ($dry) {
@@ -229,7 +229,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 
     private function ensureFileExists(string $relative, string $defaultContent, bool $dry, string $missingComment): ?CheckResult
     {
-        $file = base_path($relative);
+        $file = $this->path($relative);
 
         if (file_exists($file)) {
             return null;

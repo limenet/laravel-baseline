@@ -11,7 +11,7 @@ class DoesNotUsePhpInsightsCheck extends AbstractFixableCheck
     {
         $packageClean = !$this->checkComposerPackages('nunomaduro/phpinsights');
         $scriptClean = !$this->checkComposerScript('ci-lint', 'insights');
-        $configFile = base_path('config/insights.php');
+        $configFile = $this->path('config/insights.php');
         $configClean = !file_exists($configFile);
 
         if ($packageClean && $scriptClean && $configClean) {

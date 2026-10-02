@@ -14,7 +14,7 @@ class DoesNotUseSailCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        if (!file_exists(base_path('docker-compose.yml'))) {
+        if (!file_exists($this->path('docker-compose.yml'))) {
             return CheckResult::PASS;
         }
 
@@ -24,7 +24,7 @@ class DoesNotUseSailCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
-        unlink(base_path('docker-compose.yml'));
+        unlink($this->path('docker-compose.yml'));
 
         return $this->fix(dry: true);
     }

@@ -92,7 +92,7 @@ class NodeVersionCheck extends AbstractFixableCheck
         }
 
         if ($nvmrc === null || $nvmrcTooLow) {
-            file_put_contents(base_path('.nvmrc'), $major."\n");
+            file_put_contents($this->path('.nvmrc'), $major."\n");
         }
 
         return $this->fix(dry: true);
