@@ -44,16 +44,26 @@ it('hasEditorconfig fix overwrites empty .editorconfig', function (): void {
     expect($content)->toContain('root = true');
 });
 
-it('hasEditorconfig fix overwrites incomplete .editorconfig', function (): void {
+it('hasEditorconfig fix completes an incomplete .editorconfig in place', function (): void {
     bindFakeComposer([]);
-    $this->withTempBasePath(['.editorconfig' => '[*]'."\n".'indent_style = space']);
+    $this->withTempBasePath(['.editorconfig' => '[*]'."\n".'indent_style = space'."\n\n".'[*.mjs]'."\n".'indent_size = 2']);
 
     $check = makeCheck(HasEditorconfigCheck::class);
     expect($check->fix())->toBe(CheckResult::PASS);
 
-    $content = file_get_contents(base_path('.editorconfig'));
-    expect($content)->toContain('root = true');
-    expect($content)->toContain('charset = utf-8');
+    expect(file_get_contents(base_path('.editorconfig')))->toBe(implode("\n", [
+        'root = true',
+        '',
+        '[*]',
+        'indent_style = space',
+        'charset = utf-8',
+        'end_of_line = lf',
+        'insert_final_newline = true',
+        'trim_trailing_whitespace = true',
+        '',
+        '[*.mjs]',
+        'indent_size = 2',
+    ])."\n");
 });
 
 it('hasEditorconfig fix is idempotent', function (): void {

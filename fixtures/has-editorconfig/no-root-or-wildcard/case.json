@@ -1,0 +1,13 @@
+{
+    "check": "hasEditorconfig",
+    "description": "adds root and a [*] section ahead of the project's sections on fix",
+    "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            ".editorconfig": "root = true\n\n[*]\ncharset = utf-8\nend_of_line = lf\nindent_style = space\ninsert_final_newline = true\ntrim_trailing_whitespace = true\n\n[*.md]\ntrim_trailing_whitespace = false\n"
+        }
+    }
+}

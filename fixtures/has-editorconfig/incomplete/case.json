@@ -1,11 +1,13 @@
 {
     "check": "hasEditorconfig",
-    "description": "fails when a required property is absent, and replaces the file on fix",
+    "description": "fails when a required property is absent, and adds the missing ones to [*] on fix",
     "engines": ["php", "js"],
     "profiles": ["laravel", "php", "wordpress"],
     "expect": "fail",
     "fix": {
         "expect": "pass",
-        "files": { ".editorconfig": "@template:editorconfig" }
+        "files": {
+            ".editorconfig": "root = true\n\n[*]\ncharset = utf-8\nend_of_line = lf\nindent_style = space\ninsert_final_newline = true\ntrim_trailing_whitespace = true\n"
+        }
     }
 }
