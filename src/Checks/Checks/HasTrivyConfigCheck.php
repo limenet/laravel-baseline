@@ -6,10 +6,19 @@ use Limenet\LaravelBaseline\Checks\AbstractCiJobCheck;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Support\YamlTextEditor;
 use Symfony\Component\Yaml\Yaml;
 
 class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
 {
+    /**
+     * The text edits matching each change made to the decoded trivy.yaml, so
+     * the file can be updated in place rather than re-dumped.
+     *
+     * @var list<callable(YamlTextEditor): void>
+     */
+    private array $yamlEdits = [];
+
     public static function profiles(): array
     {
         return Profile::cases();
@@ -84,6 +93,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
         }
 
         $changed = false;
+        $this->yamlEdits = [];
 
         foreach ($this->policy()->strings('trivy.forbiddenKeys') as $forbidden) {
             if (!array_key_exists($forbidden, $trivyConfig)) {
@@ -97,6 +107,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
             }
 
             unset($trivyConfig[$forbidden]);
+            $this->yamlEdits[] = fn (YamlTextEditor $editor) => $editor->remove([$forbidden]);
             $changed = true;
         }
 
@@ -117,7 +128,15 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
         }
 
         if ($changed) {
-            file_put_contents($trivyFile, Yaml::dump($trivyConfig, 4, 2));
+            $editor = new YamlTextEditor((string) file_get_contents($trivyFile));
+
+            foreach ($this->yamlEdits as $edit) {
+                $edit($editor);
+            }
+
+            // A layout the editor cannot follow falls back to a full dump, which
+            // loses the file's comments but never its data.
+            file_put_contents($trivyFile, $editor->matches($trivyConfig) ? $editor->contents() : Yaml::dump($trivyConfig, 4, 2));
         }
 
         return $this->fix(dry: true);
@@ -216,6 +235,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
         }
 
         $this->setByPath($config, $path, $expected);
+        $this->yamlEdits[] = fn (YamlTextEditor $editor) => $editor->set($path, $expected);
         $changed = true;
 
         return CheckResult::FAIL;
@@ -243,6 +263,7 @@ class HasTrivyConfigCheck extends AbstractCiJobCheck implements FixableInterface
         }
 
         $this->setByPath($config, $path, array_values(array_merge($currentList, $missing)));
+        $this->yamlEdits[] = fn (YamlTextEditor $editor) => $editor->append($path, $missing);
         $changed = true;
 
         return CheckResult::FAIL;

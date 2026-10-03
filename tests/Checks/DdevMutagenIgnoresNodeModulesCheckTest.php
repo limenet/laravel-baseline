@@ -358,3 +358,15 @@ TXT;
     $comments = $check->getComments();
     expect($comments)->toContain('DDEV .gitignore is ignoring itself: Remove "/.gitignore" from .ddev/.gitignore to track the gitignore file');
 });
+
+it('ddevMutagenIgnoresNodeModules fix appends /node_modules and keeps the rest of mutagen.yml', function (): void {
+    bindFakeComposer([]);
+    $this->withTempBasePath([
+        '.ddev/mutagen/mutagen.yml' => "# Keep vendor out of the sync\nsync:\n  defaults:\n    ignore:\n      paths:\n        - \"/.git\"\n        - \"/vendor\"\n",
+    ]);
+
+    expect(makeCheck(DdevMutagenIgnoresNodeModulesCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    expect(file_get_contents(base_path('.ddev/mutagen/mutagen.yml')))
+        ->toBe("# Keep vendor out of the sync\nsync:\n  defaults:\n    ignore:\n      paths:\n        - \"/.git\"\n        - \"/vendor\"\n        - /node_modules\n");
+});

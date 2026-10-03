@@ -338,3 +338,20 @@ it('hasTrivyConfig auto-fix removes a severity key', function (): void {
     $fixed = Yaml::parseFile(base_path('trivy.yaml'));
     expect($fixed)->not->toHaveKey('severity');
 });
+
+it('hasTrivyConfig fix keeps the comments and indent of an existing trivy.yaml', function (): void {
+    bindFakeComposer([]);
+    $canonical = Yaml::parse(canonicalTrivyYaml());
+    unset($canonical['scan']['disable-telemetry']);
+    $canonical['severity'] = ['HIGH'];
+    $trivyYaml = "# Project-specific Trivy settings\n".Yaml::dump($canonical, 4, 4);
+
+    $this->withTempBasePath(canonicalLayout(['trivy.yaml' => $trivyYaml]));
+
+    expect(makeCheck(HasTrivyConfigCheck::class)->fix())->toBe(CheckResult::PASS);
+
+    $written = (string) file_get_contents(base_path('trivy.yaml'));
+    expect($written)->toStartWith("# Project-specific Trivy settings\n");
+    expect($written)->toContain("\n    disable-telemetry: true\n");
+    expect($written)->not->toContain('severity');
+});

@@ -5,6 +5,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
 use Limenet\LaravelBaseline\Project\Profile;
+use Limenet\LaravelBaseline\Support\YamlTextEditor;
 use Symfony\Component\Yaml\Yaml;
 
 class DdevMutagenIgnoresNodeModulesCheck extends AbstractFixableCheck
@@ -112,7 +113,13 @@ class DdevMutagenIgnoresNodeModulesCheck extends AbstractFixableCheck
 
             $ignorePaths[] = '/node_modules';
             $mutagenConfig['sync']['defaults']['ignore']['paths'] = $ignorePaths;
-            file_put_contents($mutagenFile, Yaml::dump($mutagenConfig, 6, 2));
+
+            $editor = new YamlTextEditor((string) file_get_contents($mutagenFile));
+            $editor->append(['sync', 'defaults', 'ignore', 'paths'], ['/node_modules']);
+
+            // A layout the editor cannot follow falls back to a full dump, which
+            // loses the file's comments but never its data.
+            file_put_contents($mutagenFile, $editor->matches($mutagenConfig) ? $editor->contents() : Yaml::dump($mutagenConfig, 6, 2));
         }
 
         return $dry ? CheckResult::PASS : $this->fix(dry: true);
