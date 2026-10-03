@@ -1,6 +1,7 @@
 import { parse, parseDocument } from 'yaml'
 import { policy } from '../policy.js'
 import { CI_FILE, checkRequiredCiJobs, readCiJobs } from '../support/ci-jobs.js'
+import { yamlStyle } from '../support/yaml-style.js'
 import { type CheckResult, FixableCheck } from './check.js'
 
 type Requirement = [path: string[], expected: unknown]
@@ -155,7 +156,7 @@ export class HasTrivyConfigCheck extends FixableCheck {
         }
 
         if (changed) {
-            this.project.write(configFile, document.toString())
+            this.project.write(configFile, document.toString(yamlStyle(contents)))
         }
 
         return this.fix(true)
@@ -224,7 +225,7 @@ export class HasTrivyConfigCheck extends FixableCheck {
         }
 
         if (changed) {
-            this.project.write(CI_FILE, document.toString())
+            this.project.write(CI_FILE, document.toString(yamlStyle(contents)))
         }
     }
 

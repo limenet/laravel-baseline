@@ -1,5 +1,6 @@
 import { parseDocument } from 'yaml'
 import { policy } from '../policy.js'
+import { yamlStyle } from '../support/yaml-style.js'
 import { type CheckResult, FixableCheck } from './check.js'
 
 const CI_FILE = '.gitlab-ci.yml'
@@ -51,7 +52,7 @@ export class CiSetsNodeVersionCheck extends FixableCheck {
         // setIn on the parsed document rather than a re-dump, so comments and
         // formatting elsewhere in the pipeline survive.
         document.setIn(['variables', name], value)
-        this.project.write(CI_FILE, document.toString())
+        this.project.write(CI_FILE, document.toString(yamlStyle(contents)))
 
         return this.fix(true)
     }
