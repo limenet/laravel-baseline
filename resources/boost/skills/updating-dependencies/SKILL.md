@@ -161,9 +161,10 @@ Produce a written summary:
   package — do not assume a change is relevant or irrelevant without looking.
 - **Recommend, then apply approved.** Survey and recommend beyond-constraint bumps; apply only the
   ones the developer approves. Never cross a version constraint automatically.
-- **Keep Biome's `$schema` in sync.** If `biome` is installed and its version changed, update the
-  `$schema` URL in `biome.json` to match the new version (e.g.
-  `https://biomejs.dev/schemas/<new-version>/schema.json`). Skip this if there is no `biome.json` or
-  Biome was not bumped.
+- **Leave Biome's `$schema` alone.** `biome.json` points at
+  `./node_modules/@biomejs/biome/configuration_schema.json`, which always describes the installed
+  Biome, so a Biome bump needs no config edit. Do not switch it to a versioned
+  `https://biomejs.dev/schemas/<version>/schema.json` URL: the baseline's `biomeUsesLocalSchema`
+  check rejects that.
 - **Plain commit messages.** If asked to commit, write a plain, descriptive message in the
   imperative mood (this project does not use Conventional Commits).
