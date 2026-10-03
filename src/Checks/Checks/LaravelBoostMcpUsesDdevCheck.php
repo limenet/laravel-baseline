@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Support\JsonFile;
 
 class LaravelBoostMcpUsesDdevCheck extends AbstractFixableCheck
 {
@@ -34,7 +35,7 @@ class LaravelBoostMcpUsesDdevCheck extends AbstractFixableCheck
             }
 
             $mcp['mcpServers']['laravel-boost'] = self::EXPECTED_SERVER;
-            file_put_contents($mcpFile, json_encode($mcp, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+            JsonFile::write($mcpFile, $mcp, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
 
         return CheckResult::PASS;

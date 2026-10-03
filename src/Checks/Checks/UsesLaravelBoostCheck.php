@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\Checks\Checks;
 
 use Limenet\LaravelBaseline\Checks\AbstractFixableCheck;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Support\JsonFile;
 
 class UsesLaravelBoostCheck extends AbstractFixableCheck
 {
@@ -94,7 +95,7 @@ class UsesLaravelBoostCheck extends AbstractFixableCheck
             $boostConfig['guidelines'] = true;
             $boostConfig['mcp'] = true;
 
-            file_put_contents($boostJsonFile, json_encode($boostConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+            JsonFile::write($boostJsonFile, $boostConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
 
         return $this->fix(dry: true);

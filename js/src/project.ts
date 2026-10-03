@@ -2,6 +2,15 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import { dirname, join, resolve } from 'node:path'
 
 /**
+ * The indent unit of a JSON document: the leading whitespace of its first
+ * indented line, which in pretty-printed JSON is one level deep. Four spaces
+ * when there is nothing to go by.
+ */
+export function jsonIndent(contents: string | null): string {
+    return contents?.match(/^([ \t]+)\S/m)?.[1] ?? '    '
+}
+
+/**
  * The project under inspection. Every file access a check makes goes through
  * here, so checks never touch absolute paths and the whole runner can be pointed
  * at a temporary directory in tests.
@@ -61,12 +70,13 @@ export class Project {
     }
 
     /**
-     * Four-space indent plus a trailing newline, matching the PHP runner's
-     * writePackageJson() so the two never fight over formatting in a project
-     * that runs both.
+     * Keeps the indent the file already has, so a fix does not fight the
+     * project's formatter (Biome follows the editorconfig, which indents JSON by
+     * two). A new or single-line file gets four spaces. Either way a trailing
+     * newline, matching the PHP runner's JsonFile::write().
      */
     writeJson(relative: string, data: unknown): void {
-        this.write(relative, `${JSON.stringify(data, null, 4)}\n`)
+        this.write(relative, `${JSON.stringify(data, null, jsonIndent(this.read(relative)))}\n`)
     }
 
     remove(relative: string): void {

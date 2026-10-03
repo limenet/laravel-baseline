@@ -16,6 +16,28 @@ it('reads back JSON it wrote', () => {
     expect(project.readJson('package.json')).toStrictEqual({ name: 'app' })
 })
 
+it('writes a new JSON file with four spaces', () => {
+    const project = scratch()
+
+    project.writeJson('package.json', { scripts: { test: 'vitest' } })
+
+    expect(project.read('package.json')).toBe('{\n    "scripts": {\n        "test": "vitest"\n    }\n}\n')
+})
+
+it.each([
+    ['two spaces', '  '],
+    ['tabs', '\t'],
+])('keeps the indent of an existing JSON file: %s', (_name, indent) => {
+    const project = scratch()
+
+    project.write('package.json', `{\n${indent}"name": "app"\n}\n`)
+    project.writeJson('package.json', { name: 'app', scripts: { test: 'vitest' } })
+
+    expect(project.read('package.json')).toBe(
+        `{\n${indent}"name": "app",\n${indent}"scripts": {\n${indent}${indent}"test": "vitest"\n${indent}}\n}\n`,
+    )
+})
+
 it('returns null for a file that is not there', () => {
     expect(scratch().readJson('package.json')).toBeNull()
 })

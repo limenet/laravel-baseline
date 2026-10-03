@@ -17,7 +17,7 @@ export abstract class ClaudeSettingsCheck extends FixableCheck {
     }
 
     protected writeSettings(settings: ClaudeSettings): void {
-        this.project.write(CLAUDE_SETTINGS_FILE, `${JSON.stringify(settings, null, 4)}\n`)
+        this.project.writeJson(CLAUDE_SETTINGS_FILE, settings)
     }
 
     /** Append the required values that are absent, preserving existing entries and order. */

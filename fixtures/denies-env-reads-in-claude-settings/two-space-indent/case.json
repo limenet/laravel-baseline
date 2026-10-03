@@ -1,0 +1,16 @@
+{
+    "check": "deniesEnvReadsInClaudeSettings",
+    "description": "keeps the two-space indent of an existing settings file on fix",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            ".claude/settings.json": "{\n  \"permissions\": {\n    \"deny\": [\n      \"Read(./.env)\"\n    ]\n  }\n}\n"
+        }
+    }
+}

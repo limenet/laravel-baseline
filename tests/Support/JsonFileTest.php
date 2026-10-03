@@ -26,6 +26,20 @@ it('writes an emptied object back as {} rather than []', function (): void {
     ]);
 });
 
+it('keeps the indent of an existing file', function (string $indent): void {
+    $project = makeProject(Profile::Php, ['package.json' => "{\n{$indent}\"name\": \"app\"\n}\n"]);
+    $file = $project->path('package.json');
+
+    JsonFile::write($file, ['name' => 'app', 'scripts' => ['test' => 'vitest']]);
+
+    expect(file_get_contents($file))->toBe(
+        "{\n{$indent}\"name\": \"app\",\n{$indent}\"scripts\": {\n{$indent}{$indent}\"test\": \"vitest\"\n{$indent}}\n}\n",
+    );
+})->with([
+    'two spaces' => '  ',
+    'tabs' => "\t",
+]);
+
 it('writes a new file as given', function (): void {
     $file = makeProject(Profile::Php)->path('new.json');
 

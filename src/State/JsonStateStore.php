@@ -4,6 +4,7 @@ namespace Limenet\LaravelBaseline\State;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use Limenet\LaravelBaseline\Support\JsonFile;
 
 /**
  * .baseline.json — the same file and shape the npm runner uses, since a
@@ -86,9 +87,6 @@ final class JsonStateStore implements StateStore
      */
     private function write(array $state): void
     {
-        $json = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-
-        // json_encode pretty-prints with 4 spaces, matching js/src/project.ts writeJson().
-        file_put_contents($this->file, $json."\n");
+        JsonFile::write($this->file, $state);
     }
 }
