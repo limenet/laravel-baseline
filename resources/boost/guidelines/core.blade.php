@@ -42,6 +42,25 @@ npm run build
 npm run ci-lint
 ```
 
+### Switch Node with nvm before running npm
+
+Projects pin different Node versions, so the host's default `node` is often the wrong one. The
+project's version is pinned in `.nvmrc`; select it with `nvm use` (no argument — it reads
+`.nvmrc`) rather than guessing, installing Node another way, or editing `.nvmrc` or
+`engines.node` to fit whatever is active.
+
+Every shell command starts a fresh shell, so a `nvm use` run on its own is lost before the next
+command. Put it in the **same** command as the npm call — the one exception to running commands
+separately:
+
+```bash
+nvm use && npm install
+nvm use && npm run ci-lint
+```
+
+If `nvm use` reports the version is not installed, run `nvm install` (again without an argument)
+and retry.
+
 ### Use project-relative paths
 
 Commands run from the project root. Reference files with paths relative to the project root
