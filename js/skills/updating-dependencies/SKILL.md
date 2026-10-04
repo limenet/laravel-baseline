@@ -81,7 +81,9 @@ node -e "console.log(new Date().toISOString().slice(0, 10))"
 The updates above are often what makes those findings go away: a `cooldown:` entry expires once
 its fix is installable, and step 2 just installed it. If an expired entry's finding is still
 reported, handle it with the `ignoring-trivy-findings` skill — upgrade, or renew it deliberately
-with a new expiry and statement — rather than bumping the date. Leave the file in place even if it
+with a new expiry and statement — rather than bumping the date. Do not swap the ignore for an npm
+`overrides` entry that forces the fix in — least of all when the fix is only waiting out the
+cooldown. Leave the file in place even if it
 ends up empty.
 
 ### 6. Verify (always)
@@ -136,6 +138,10 @@ Produce a written summary:
   before finishing.
 - **Assess impact against real usage.** Judge changelog impact by how the project actually uses the
   package — do not assume a change is relevant or irrelevant without looking.
+- **Prefer Trivy ignores over npm `overrides`.** When a vulnerable transitive package cannot be
+  moved to its fix by a normal update — because of the cooldown or because its parent does not
+  allow the fixed version yet — record a dated entry in `.trivyignore.yaml` (see
+  `ignoring-trivy-findings`) rather than forcing the version with `overrides` in `package.json`.
 - **Recommend, then apply approved.** Survey and recommend beyond-constraint bumps; apply only the
   ones the developer approves. Never cross a version constraint automatically.
 - **Respect the install cooldown.** `.npmrc` sets `min-release-age`, so a version published within

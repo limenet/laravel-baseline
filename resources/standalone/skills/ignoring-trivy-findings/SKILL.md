@@ -92,6 +92,14 @@ For each finding, try the fix before reaching for an ignore:
   `min-release-age-exclude[]` in `.npmrc` are exempt from the cooldown and are never a cooldown
   case.
 
+Prefer an ignore over an npm `overrides` entry. When the vulnerable package is transitive and the
+dependency that pulls it in does not allow the fixed version yet, do not add an `overrides` entry to
+`package.json` to force it: an override pins a version its parent was never tested against, and
+unlike an ignore it never expires, so it outlives its reason without anyone being reminded. Add a
+**constraint** entry instead, naming the parent that has to release, and let the normal update pick
+up the fix once it does. Above all, never override a **cooldown** case — the fix arrives through the
+normal update within days, and the dated ignore covers exactly that window.
+
 Never lower `min-release-age`, add an exclude, or pass a flag that bypasses the cooldown just to
 install a fix sooner. The cooldown is the supply-chain protection; the ignore is how it coexists
 with a known vulnerability for a few days.
@@ -148,5 +156,7 @@ ddev composer run ci-lint
 - **Prune on every pass.** Expired entries are removed whenever this skill or
   `updating-dependencies` runs.
 - **Never weaken the cooldown** to get a fix in faster.
+- **Ignore, don't override.** Do not add npm `overrides` to force a fixed transitive version; a
+  dated ignore is the tool, and for a cooldown case the only one.
 - **Plain commit messages.** If asked to commit, write a plain, descriptive message in the
   imperative mood (this project does not use Conventional Commits).
