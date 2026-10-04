@@ -11,6 +11,7 @@
         "biome",
         "editorconfig",
         "agentFiles",
+        "envFiles",
         "claude",
         "ci",
         "ciLint",
@@ -146,6 +147,18 @@
                     "type": "object",
                     "description": "Project-relative path => reason it must not exist. Rendered as \"Remove {path} — {reason}\".",
                     "additionalProperties": { "type": "string" }
+                }
+            }
+        },
+        "envFiles": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["allowed"],
+            "properties": {
+                "allowed": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "fnmatch() patterns for the .env* files allowed at the project root; any other plaintext .env* file there is a stray copy of secrets."
                 }
             }
         },

@@ -1,0 +1,6 @@
+{
+    "check": "doesNotHaveStrayEnvFiles",
+    "description": "passes when only allowed env files exist",
+    "engines": ["php"],
+    "expect": "pass"
+}

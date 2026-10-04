@@ -1,0 +1,6 @@
+{
+    "check": "doesNotHaveStrayEnvFiles",
+    "description": "fails when a plaintext .env.production sits next to its encrypted copy",
+    "engines": ["php"],
+    "expect": "fail"
+}

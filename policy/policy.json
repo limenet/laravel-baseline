@@ -35,6 +35,9 @@
             ".github/skills": "it is the Copilot Boost agent's skills directory, which is no longer required"
         }
     },
+    "envFiles": {
+        "allowed": [".env", ".env.example", ".env.testing", ".env.*.encrypted"]
+    },
     "claude": {
         "allow": {
             "shared": [
