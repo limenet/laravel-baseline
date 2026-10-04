@@ -3,6 +3,23 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.16.0](https://github.com/limenet/laravel-baseline/compare/v2.15.1...v2.16.0) (2026-10-04)
+
+### Features
+
+* **php:** add doesNotHaveStrayEnvFiles check ([c8de0d0](https://github.com/limenet/laravel-baseline/commit/c8de0d08da1b5b76dc593bbacaaf0f066e6d0736))
+
+### Bug Fixes
+
+* complete an incomplete .editorconfig instead of replacing it ([66cd4cd](https://github.com/limenet/laravel-baseline/commit/66cd4cd2d2b9be013b7fa52c4157cbd8fad848e4))
+* **js:** write YAML back in the layout the file already has ([b62244b](https://github.com/limenet/laravel-baseline/commit/b62244b351aa65dddf593243a7551890ee98ed6f))
+* keep the existing indent when rewriting JSON files ([7f0a50d](https://github.com/limenet/laravel-baseline/commit/7f0a50d4d239b1abd372024ef7db5f5c3b7f743c))
+* **php:** edit trivy.yaml and mutagen.yml in place instead of re-dumping ([a0ecd06](https://github.com/limenet/laravel-baseline/commit/a0ecd069bd3709e8cef2a5d4a9f3b2dc30cc9239))
+* **php:** tell agents to switch Node with nvm before npm ([1395242](https://github.com/limenet/laravel-baseline/commit/1395242dbab48f4a51d866c60ef97b152a6750a2))
+* **skill:** prefer Trivy ignores over npm overrides ([e23c42a](https://github.com/limenet/laravel-baseline/commit/e23c42ad59eb5924eff66d0280513ab30dc865fb))
+* **skill:** settle release questions before waiting on CI, watch the tag pipeline ([a77358f](https://github.com/limenet/laravel-baseline/commit/a77358f08e31d85b9390b326a2f051181a0ca616))
+* **skill:** stop telling updating-dependencies to bump Biome's $schema ([843cf22](https://github.com/limenet/laravel-baseline/commit/843cf22f7669da46cd4c7b1abf357cb1c09e67e5))
+
 ## [2.15.1](https://github.com/limenet/laravel-baseline/compare/v2.15.0...v2.15.1) (2026-10-02)
 
 ### Bug Fixes
