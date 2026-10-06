@@ -5,6 +5,7 @@ namespace Limenet\LaravelBaseline\Checks;
 use Limenet\LaravelBaseline\Checks\Checks\AllowsToolingInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\AsksBeforeDestructiveDbCommandsInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\BiomeIgnoresCiArtifactsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\BiomeIgnoresLaravelLangFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\BiomeUsesLocalSchemaCheck;
 use Limenet\LaravelBaseline\Checks\Checks\BumpsComposerCheck;
 use Limenet\LaravelBaseline\Checks\Checks\CacheAllowsPulseSerializableClassesCheck;
@@ -114,6 +115,7 @@ class CheckRegistry
         AllowsToolingInClaudeSettingsCheck::class,
         AsksBeforeDestructiveDbCommandsInClaudeSettingsCheck::class,
         BiomeIgnoresCiArtifactsCheck::class,
+        BiomeIgnoresLaravelLangFilesCheck::class,
         BiomeUsesLocalSchemaCheck::class,
         BumpsComposerCheck::class,
         CacheAllowsPulseSerializableClassesCheck::class,

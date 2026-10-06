@@ -104,7 +104,7 @@
         "biome": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["configFile", "schema", "ciArtifacts"],
+            "required": ["configFile", "schema", "ciArtifacts", "laravelLangFiles"],
             "description": "Biome's config file, the $schema it must point at, and the CI runner files it must not check. The local path under node_modules always matches the installed Biome, so the file does not need editing on every Biome update — a versioned remote URL does.",
             "properties": {
                 "configFile": {
@@ -119,6 +119,11 @@
                     "type": "array",
                     "items": { "type": "string" },
                     "description": "Project-root files a CI runner writes next to the checkout, which files.includes must exclude. The GitLab runner extracts metadata.json (the cache key) whenever it restores a cache, so a `**` include fails `biome ci` only on runs that hit the cache."
+                },
+                "laravelLangFiles": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Globs for Laravel's JSON translation files, which files.includes must exclude in a Laravel project. Translation tooling maintains them, so Biome reformatting them only churns diffs. Each is probed with `en` in place of `*` and against the files it currently matches."
                 }
             }
         },

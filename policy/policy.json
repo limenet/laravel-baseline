@@ -15,7 +15,8 @@
     "biome": {
         "configFile": "biome.json",
         "schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-        "ciArtifacts": ["metadata.json"]
+        "ciArtifacts": ["metadata.json"],
+        "laravelLangFiles": ["lang/*.json", "resources/lang/*.json"]
     },
     "editorconfig": {
         "template": "editorconfig",

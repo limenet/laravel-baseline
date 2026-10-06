@@ -1,0 +1,6 @@
+{
+    "check": "biomeIgnoresLaravelLangFiles",
+    "description": "passes when files.includes excludes both lang locations after **",
+    "engines": ["php"],
+    "expect": "pass"
+}

@@ -1,0 +1,3 @@
+{
+  "files": { "includes": ["**", "!lang/*.json", "!resources/lang/*.json"] }
+}

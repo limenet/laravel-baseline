@@ -1,0 +1,6 @@
+{
+    "check": "biomeIgnoresLaravelLangFiles",
+    "description": "passes when the project does not use Biome",
+    "engines": ["php"],
+    "expect": "pass"
+}
