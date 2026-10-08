@@ -3,6 +3,16 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.17.0](https://github.com/limenet/laravel-baseline/compare/v2.16.0...v2.17.0) (2026-10-08)
+
+### Features
+
+* **php:** add biomeIgnoresLaravelLangFiles check ([b1aebbc](https://github.com/limenet/laravel-baseline/commit/b1aebbcc4a78d127f67c015bb1968900fa806ca0))
+
+### Bug Fixes
+
+* **policy:** allow .env.vite in doesNotHaveStrayEnvFiles ([5b332c3](https://github.com/limenet/laravel-baseline/commit/5b332c3758083a9ef3a52aec4e2c645e8233e193))
+
 ## [2.16.0](https://github.com/limenet/laravel-baseline/compare/v2.15.1...v2.16.0) (2026-10-04)
 
 ### Features
