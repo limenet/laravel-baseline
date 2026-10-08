@@ -8,6 +8,7 @@ it('doesNotHaveStrayEnvFiles passes when only allowed env files exist', function
         '.env' => 'APP_KEY=x',
         '.env.example' => 'APP_KEY=',
         '.env.testing' => 'APP_KEY=x',
+        '.env.vite' => 'VITE_APP_NAME=x',
         '.env.production.encrypted' => 'APP_KEY=eyJ',
     ]);
 

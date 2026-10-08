@@ -37,7 +37,7 @@
         }
     },
     "envFiles": {
-        "allowed": [".env", ".env.example", ".env.testing", ".env.*.encrypted"]
+        "allowed": [".env", ".env.example", ".env.testing", ".env.vite", ".env.*.encrypted"]
     },
     "claude": {
         "allow": {
