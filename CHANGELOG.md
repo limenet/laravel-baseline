@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.18.0](https://github.com/limenet/laravel-baseline/compare/v2.17.0...v2.18.0) (2026-10-15)
+
+### Features
+
+* **php:** add hasRectorConfigWithCache and phpstanHasTmpDir checks ([8a823e7](https://github.com/limenet/laravel-baseline/commit/8a823e78c02225f90ec0f9865804c199931033c7))
+
 ## [2.17.0](https://github.com/limenet/laravel-baseline/compare/v2.16.0...v2.17.0) (2026-10-08)
 
 ### Features
