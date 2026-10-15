@@ -180,5 +180,9 @@
     "phpFileCoverage": {
         "ignoredDirectories": ["vendor", "node_modules"],
         "exempt": ["rector.php"]
+    },
+    "toolCache": {
+        "rector": ".cache/rector",
+        "phpstan": ".cache/phpstan"
     }
 }

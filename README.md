@@ -146,6 +146,7 @@ Every check below also runs in Laravel projects unless marked standalone-only.
 | `hasEditorconfig` | ✓ | ✓ | identical |
 | `hasNpmScripts` | ✓ | ✓ | identical |
 | `hasRectorConfigWithAttributesSets` | ✓ | ✓ | identical |
+| `hasRectorConfigWithCache` | ✓ | ✓ | identical |
 | `hasRectorConfigWithImportNames` | ✓ | ✓ | identical |
 | `hasRectorConfigWithPestSet` | ✓ | ✓ | identical |
 | `hasRectorConfigWithPhpSets` | ✓ | ✓ | identical |
@@ -157,6 +158,7 @@ Every check below also runs in Laravel projects unless marked standalone-only.
 | `phpVersionMatchesCi` | ✓ | ✓ | identical |
 | `phpVersionMatchesDdev` | ✓ | ✓ | identical |
 | `phpstanCoversAllPhpFiles` | ✓ | ✓ | **standalone-only** |
+| `phpstanHasTmpDir` | ✓ | ✓ | identical |
 | `phpstanLevelAtLeastEight` | ✓ | ✓ | identical |
 | `rectorCoversAllPhpFiles` | ✓ | ✓ | **standalone-only** |
 | `releaseItBumpsWordpressThemeVersion` |  | ✓ | **standalone-only**, themes only |
@@ -257,11 +259,13 @@ This package validates your Laravel installation against the following checks:
 - **`usesPhpstanWordpress()`** - Validates `szepeviktor/phpstan-wordpress` is installed, so PHPStan knows WordPress's functions, classes and hooks *(wordpress profile only)*
 - **`phpstanCoversAllPhpFiles()`** - Validates PHPStan's `parameters.paths` cover every PHP file the project owns (outside `vendor/`, `node_modules/`, dot-directories and git-ignored paths); files listed in `excludePaths` count as deliberately skipped. `includes` are not followed *(php and wordpress profiles)*
 - **`phpstanLevelAtLeastEight()`** - Validates PHPStan is configured to at least level 8
+- 🔧 **`phpstanHasTmpDir()`** - Validates the PHPStan config sets `tmpDir: .cache/phpstan` and `.gitignore` ignores it, so CI can cache PHPStan's result between pipelines instead of losing it to the system temp directory *(sets the parameter and adds the `.gitignore` entry)*
 - 🔧 **`phpstanParsesModelCastsMethod()`** - Validates `phpstan.neon` sets `parseModelCastsMethod: true`: `ModelCastsPropertyToCastsMethodRector` rewrites `protected $casts = [...]` into a `casts(): array` method, and without this parameter Larastan reads only the generated `@return array<string, string>` — not a constant array — so every cast is lost and datetime attributes report as strings *(inserts the parameter into the `parameters` block)*
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*
 - 🔧 **`hasRectorConfigWithComposerBased()`** - Validates Rector `withComposerBased(phpunit, symfony, laravel)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithConfiguredRules()`** - Validates Rector `withConfiguredRule()` calls are present for `RouteActionCallableRector` and `WhereToWhereLikeRector` *(appends calls to rector.php)*
 - 🔧 **`hasRectorConfigWithPreparedSets()`** - Validates Rector `withPreparedSets(deadCode, codeQuality, codingStyle, typeDeclarations, privatization, instanceOf, earlyReturn)` is configured *(appends call to rector.php)*
+- 🔧 **`hasRectorConfigWithCache()`** - Validates Rector `withCache(cacheDirectory: __DIR__.'/.cache/rector')` is configured and `.gitignore` ignores it, so CI can cache Rector's result between pipelines instead of losing it to the system temp directory *(appends the call, or repoints an existing one; adds the `.gitignore` entry)*
 - 🔧 **`hasRectorConfigWithImportNames()`** - Validates Rector `withImportNames(importShortClasses: false)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithPhpSets()`** - Validates Rector `withPhpSets()` is called *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithAttributesSets()`** - Validates Rector `withAttributesSets()` is called *(appends call to rector.php)*

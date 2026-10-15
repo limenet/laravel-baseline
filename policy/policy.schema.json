@@ -20,7 +20,8 @@
         "npmScripts",
         "periodic",
         "wordpress",
-        "phpFileCoverage"
+        "phpFileCoverage",
+        "toolCache"
     ],
     "$defs": {
         "phpRunner": {
@@ -426,6 +427,22 @@
                     "type": "array",
                     "items": { "type": "string" },
                     "description": "Project-relative files that need not be analysed, e.g. the Rector config itself."
+                }
+            }
+        },
+        "toolCache": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rector", "phpstan"],
+            "description": "Project-relative cache directories for Rector (hasRectorConfigWithCache) and PHPStan (phpstanHasTmpDir). Inside the project rather than the system temp directory, so the CI templates can cache them between pipelines; each check also git-ignores its directory.",
+            "properties": {
+                "rector": {
+                    "type": "string",
+                    "description": "rector.php's withCache(cacheDirectory:), written as __DIR__.'/<value>'."
+                },
+                "phpstan": {
+                    "type": "string",
+                    "description": "The PHPStan config's parameters.tmpDir."
                 }
             }
         }

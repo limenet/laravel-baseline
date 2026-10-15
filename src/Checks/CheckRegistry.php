@@ -45,6 +45,7 @@ use Limenet\LaravelBaseline\Checks\Checks\HasEditorconfigCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasEncryptedEnvFileCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasNpmScriptsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithAttributesSetsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithCacheCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithComposerBasedCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithConfiguredRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithImportNamesCheck;
@@ -64,6 +65,7 @@ use Limenet\LaravelBaseline\Checks\Checks\LaravelBoostMcpUsesDdevCheck;
 use Limenet\LaravelBaseline\Checks\Checks\ModelShouldBeStrictCheck;
 use Limenet\LaravelBaseline\Checks\Checks\NodeVersionCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanCoversAllPhpFilesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\PhpstanHasTmpDirCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanLevelAtLeastEightCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpstanParsesModelCastsMethodCheck;
 use Limenet\LaravelBaseline\Checks\Checks\PhpVersionMatchesCiCheck;
@@ -155,6 +157,7 @@ class CheckRegistry
         HasEncryptedEnvFileCheck::class,
         HasNpmScriptsCheck::class,
         HasRectorConfigWithAttributesSetsCheck::class,
+        HasRectorConfigWithCacheCheck::class,
         HasRectorConfigWithComposerBasedCheck::class,
         HasRectorConfigWithConfiguredRulesCheck::class,
         HasRectorConfigWithImportNamesCheck::class,
@@ -174,6 +177,7 @@ class CheckRegistry
         ModelShouldBeStrictCheck::class,
         NodeVersionCheck::class,
         PhpstanCoversAllPhpFilesCheck::class,
+        PhpstanHasTmpDirCheck::class,
         PhpstanLevelAtLeastEightCheck::class,
         PhpstanParsesModelCastsMethodCheck::class,
         PhpVersionMatchesCiCheck::class,
