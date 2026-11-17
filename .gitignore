@@ -33,3 +33,6 @@ junit.xml
 
 # JS build output
 /js/dist
+
+# macOS
+.DS_Store
