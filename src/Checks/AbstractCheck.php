@@ -27,7 +27,7 @@ abstract class AbstractCheck implements CheckInterface
      * LaravelSetList::COMPOSER_BASED, and 2.6.1 is the first release requiring
      * the rector/rector ^2.6.4 that goes with it.
      */
-    protected const MIN_RECTOR_LARAVEL = '2.6.1';
+    protected const MIN_RECTOR_LARAVEL = '2.7.0';
 
     public function __construct(
         CommentCollector $commentCollector,

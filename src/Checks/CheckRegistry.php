@@ -28,6 +28,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveGuidelinesScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveStrayEnvFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotPinOldMailTemplateCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotSkipDeprecatedRectorRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseBothBaselineRunnersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
@@ -143,6 +144,7 @@ class CheckRegistry
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
         DoesNotHaveStrayEnvFilesCheck::class,
         DoesNotPinOldMailTemplateCheck::class,
+        DoesNotSkipDeprecatedRectorRulesCheck::class,
         DoesNotUseBothBaselineRunnersCheck::class,
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,

@@ -28,10 +28,10 @@ it('usesRector fails unless both rector packages installed and ci-lint script co
     expect($check->check())->toBe(CheckResult::PASS);
 });
 
-it('usesRector fails when the driftingly/rector-laravel constraint is below 2.6.1', function (): void {
+it('usesRector fails when the driftingly/rector-laravel constraint is below 2.7.0', function (): void {
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => true]);
     $composer = [
-        'require-dev' => ['driftingly/rector-laravel' => '^2.5'],
+        'require-dev' => ['driftingly/rector-laravel' => '^2.6.1'],
         'scripts' => ['ci-lint' => ['rector']],
     ];
     $this->withTempBasePath(['composer.json' => json_encode($composer)]);
@@ -44,7 +44,7 @@ it('usesRector fails when the driftingly/rector-laravel constraint is below 2.6.
 it('usesRector accepts a driftingly/rector-laravel constraint at the floor', function (): void {
     bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => true]);
     $composer = [
-        'require-dev' => ['driftingly/rector-laravel' => '^2.6.1'],
+        'require-dev' => ['driftingly/rector-laravel' => '^2.7'],
         'scripts' => ['ci-lint' => ['rector']],
     ];
     $this->withTempBasePath(['composer.json' => json_encode($composer)]);

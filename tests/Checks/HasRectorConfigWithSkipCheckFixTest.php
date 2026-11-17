@@ -6,7 +6,7 @@ use Limenet\LaravelBaseline\Enums\CheckResult;
 
 $composer = [
     'name' => 'tmp',
-    'require' => ['laravel/framework' => '^13.0', 'driftingly/rector-laravel' => '^2.6.1'],
+    'require' => ['laravel/framework' => '^13.0', 'driftingly/rector-laravel' => '^2.7'],
 ];
 
 it('hasRectorConfigWithSkip implements FixableInterface', function (): void {
@@ -23,10 +23,10 @@ it('hasRectorConfigWithSkip fix writes an imported withSkip when rector.php has 
 
     $written = (string) file_get_contents(base_path('rector.php'));
     expect($written)->toContain('withSkip(')
-        ->toContain('StringToClassConstantRector::class')
+        // deprecated in Rector 2.8, see doesNotSkipDeprecatedRectorRules
+        ->not->toContain('StringToClassConstantRector')
         ->toContain('AddGenericBuilderToScopesRector::class')
         ->toContain('TablePropertyToTableAttributeRector::class')
-        ->toContain('use Rector\Transform\Rector\String_\StringToClassConstantRector;')
         ->toContain('MigrateToSimplifiedAttributeRector::class')
         ->toContain('use RectorLaravel\Rector\ClassMethod\AddGenericBuilderToScopesRector;')
         ->toContain('use RectorLaravel\Rector\ClassMethod\MigrateToSimplifiedAttributeRector;')
@@ -56,8 +56,7 @@ PHP;
     expect($check->fix())->toBe(CheckResult::PASS);
 
     $written = (string) file_get_contents(base_path('rector.php'));
-    expect($written)->toContain('StringToClassConstantRector::class')
-        ->toContain('AddGenericBuilderToScopesRector::class')
+    expect($written)->toContain('AddGenericBuilderToScopesRector::class')
         ->toContain('MigrateToSimplifiedAttributeRector::class')
         ->toContain('TablePropertyToTableAttributeRector::class')
         // the entries that were already there survive, exactly once

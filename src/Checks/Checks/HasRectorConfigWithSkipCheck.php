@@ -20,10 +20,6 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
         'RedirectRouteToToRouteHelperRector',
         'NowFuncWithStartOfDayMethodCallToTodayFuncRector',
         'EloquentOrderByToLatestOrOldestRector',
-        // Maps the Laravel 5.2-era string events context-free, so any matching
-        // string literal is rewritten — 'auth.login' as a view name becomes
-        // Illuminate\Auth\Events\Login::class and the login page stops working.
-        'StringToClassConstantRector',
         // Shipped in LARAVEL_TYPE_DECLARATIONS from rector-laravel 2.6, and a
         // downgrade wherever it lands: it rewrites `Builder<$this>` — which
         // Larastan reads as the more precise generic — to `Builder<static>`.
@@ -46,7 +42,6 @@ class HasRectorConfigWithSkipCheck extends AbstractHasRectorConfigCheck
         'RedirectBackToBackHelperRector' => 'RectorLaravel\\Rector\\MethodCall\\RedirectBackToBackHelperRector',
         'RedirectRouteToToRouteHelperRector' => 'RectorLaravel\\Rector\\MethodCall\\RedirectRouteToToRouteHelperRector',
         'ServerVariableToRequestFacadeRector' => 'RectorLaravel\\Rector\\ArrayDimFetch\\ServerVariableToRequestFacadeRector',
-        'StringToClassConstantRector' => 'Rector\\Transform\\Rector\\String_\\StringToClassConstantRector',
         'TablePropertyToTableAttributeRector' => 'RectorLaravel\\Rector\\Class_\\TablePropertyToTableAttributeRector',
     ];
 

@@ -15,8 +15,8 @@ class UsesRectorCheck extends AbstractFixableCheck
 
     public function fix(bool $dry = false): CheckResult
     {
-        // rector-laravel and the floor its 2.6 API needs only concern the
-        // Laravel rector.php this package writes; elsewhere plain Rector is it.
+        // rector-laravel and its floor only concern the Laravel rector.php
+        // this package writes; elsewhere plain Rector is it.
         $isLaravel = $this->profile() === Profile::Laravel;
 
         if (!$this->checkComposerPackages($isLaravel ? ['rector/rector', 'driftingly/rector-laravel'] : ['rector/rector'])) {
@@ -24,7 +24,7 @@ class UsesRectorCheck extends AbstractFixableCheck
         }
 
         if ($isLaravel && $this->composerPackageAllowsBelow('driftingly/rector-laravel', self::MIN_RECTOR_LARAVEL)) {
-            $this->addComment('driftingly/rector-laravel constraint is too low: require "^'.self::MIN_RECTOR_LARAVEL.'" in composer.json — the rector.php this package writes targets the 2.6 API, where LaravelSetProvider is gone and its rules arrive through LaravelSetList::COMPOSER_BASED instead');
+            $this->addComment('driftingly/rector-laravel constraint is too low: require "^'.self::MIN_RECTOR_LARAVEL.'" in composer.json — the rector.php this package writes targets the 2.6 API, where LaravelSetProvider is gone and its rules arrive through LaravelSetList::COMPOSER_BASED instead, and 2.7 limits the legacy event-string upgrade to event dispatcher calls, so StringToClassConstantRector no longer has to be skipped');
 
             return CheckResult::FAIL;
         }

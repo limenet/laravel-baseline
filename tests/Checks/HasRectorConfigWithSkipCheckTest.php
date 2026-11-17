@@ -23,7 +23,6 @@ return static function (RectorConfig \$config): void {
             RedirectRouteToToRouteHelperRector::class,
             NowFuncWithStartOfDayMethodCallToTodayFuncRector::class,
             EloquentOrderByToLatestOrOldestRector::class,
-            StringToClassConstantRector::class,
             AddGenericBuilderToScopesRector::class,
             MigrateToSimplifiedAttributeRector::class,
 {$extraSkips}        ]);
@@ -59,29 +58,6 @@ PHP;
         ->toContain('CarbonToDateFacadeRector::class');
 });
 
-it('hasRectorConfigWithSkip requires StringToClassConstantRector', function () use ($laravel12Composer): void {
-    bindFakeComposer([]);
-    $rector = <<<'PHP'
-<?php
-use Rector\Config\RectorConfig;
-return static function (RectorConfig $config): void {
-    $config->withSkip([
-        CarbonToDateFacadeRector::class,
-        AppToResolveRector::class,
-        RedirectBackToBackHelperRector::class,
-        RedirectRouteToToRouteHelperRector::class,
-        NowFuncWithStartOfDayMethodCallToTodayFuncRector::class,
-        EloquentOrderByToLatestOrOldestRector::class,
-    ]);
-};
-PHP;
-    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode($laravel12Composer)]);
-
-    $check = makeCheck(HasRectorConfigWithSkipCheck::class);
-    expect($check->check())->toBe(CheckResult::FAIL);
-    expect($check->getComments()[0])->toContain('StringToClassConstantRector');
-});
-
 it('hasRectorConfigWithSkip fails when TablePropertyToTableAttributeRector is missing on Laravel 13', function () use ($laravel13Composer): void {
     bindFakeComposer([]);
     $this->withTempBasePath(['rector.php' => skipRector(), 'composer.json' => json_encode($laravel13Composer)]);
@@ -104,7 +80,6 @@ return static function (RectorConfig $config): void {
         RedirectRouteToToRouteHelperRector::class,
         NowFuncWithStartOfDayMethodCallToTodayFuncRector::class,
         EloquentOrderByToLatestOrOldestRector::class,
-        StringToClassConstantRector::class,
     ]);
 };
 PHP;
@@ -128,7 +103,6 @@ return static function (RectorConfig $config): void {
         RedirectRouteToToRouteHelperRector::class,
         NowFuncWithStartOfDayMethodCallToTodayFuncRector::class,
         EloquentOrderByToLatestOrOldestRector::class,
-        StringToClassConstantRector::class,
         AddGenericBuilderToScopesRector::class,
     ]);
 };
