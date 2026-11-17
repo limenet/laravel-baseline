@@ -51,18 +51,18 @@
     },
     "dependencies": {
         "jsonc-parser": "^3.3.1",
-        "semver": "^7.8.5",
+        "semver": "^7.8.6",
         "yaml": "^2.9.1"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.5.14",
+        "@biomejs/biome": "^2.6.8",
         "@release-it/bumper": "^8.0.1",
         "@release-it/conventional-changelog": "^12.0.2",
         "@types/node": "^24.10.1",
         "@types/semver": "^7.8.0",
-        "conventional-changelog-conventionalcommits": "^10.4.0",
-        "release-it": "^21.1.0",
+        "conventional-changelog-conventionalcommits": "^10.4.1",
+        "release-it": "^21.1.2",
         "typescript": "^7.0.2",
-        "vitest": "^5.0.2"
+        "vitest": "^5.1.0"
     }
 }
