@@ -329,6 +329,7 @@ they are not safe to call from an applicability guard whose comments a passing c
 - `loadYamlConfig(string $relativePath): ?array` - Parse a YAML file; a parse error becomes a comment and `null`, not a crash
 - `loadNeonConfig(string $relativePath): ?array` - Parse a PHPStan NEON file as YAML after normalising tab indentation and `%param%` / `@service` values; `includes` are not followed
 - `Support\Jsonc::parse(string $source): ?JsoncNode` - Read JSONC (comments, trailing commas) keeping each value's byte offsets, for fixes that edit a JSON file in place instead of re-encoding it (`biomeIgnoresCiArtifacts`). The npm runner uses `jsonc-parser`'s `parseTree()` for the same
+- `AbstractBiomeIgnoresCheck` (TS: `BiomeIgnoresCheck` in `js/src/checks/biome-ignores-check.ts`) - Keep a set of paths out of Biome through `files.includes`: declare `ignored()`, `describe()`, optionally `consequence()` and `probes()` (the concrete paths tested against the includes — `biomeIgnoresClaudeSkills` probes a file *inside* its directory so `!dir/**` counts). The fix appends `"!<pattern>"` as a text edit
 
 ### Schedule Checks (trait `InteractsWithLaravelSchedule`, Laravel-only checks)
 - `hasScheduleEntry(string $command): bool` - Check if a command is scheduled

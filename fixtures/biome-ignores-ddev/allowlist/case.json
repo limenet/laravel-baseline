@@ -1,0 +1,9 @@
+{
+    "check": "biomeIgnoresDdev",
+    "description": "passes when files.includes is an allowlist that never reaches .ddev",
+    "engines": [
+        "php"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}

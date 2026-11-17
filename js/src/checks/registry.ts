@@ -1,6 +1,7 @@
 import type { Project } from '../project.js'
 import { AllowsToolingInClaudeSettingsCheck } from './allows-tooling-in-claude-settings-check.js'
 import { BiomeIgnoresCiArtifactsCheck } from './biome-ignores-ci-artifacts-check.js'
+import { BiomeIgnoresClaudeSkillsCheck } from './biome-ignores-claude-skills-check.js'
 import { BiomeUsesLocalSchemaCheck } from './biome-uses-local-schema-check.js'
 import { CallsBaselineCheck } from './calls-baseline-check.js'
 import type { Check, CommentCollector } from './check.js'
@@ -41,6 +42,7 @@ function checks(): CheckConstructor[] {
     return [
         AllowsToolingInClaudeSettingsCheck,
         BiomeIgnoresCiArtifactsCheck,
+        BiomeIgnoresClaudeSkillsCheck,
         BiomeUsesLocalSchemaCheck,
         CallsBaselineCheck,
         CiSetsNodeVersionCheck,

@@ -105,7 +105,7 @@
         "biome": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["configFile", "schema", "ciArtifacts", "laravelLangFiles"],
+            "required": ["configFile", "schema", "ciArtifacts", "laravelLangFiles", "claudeSkills", "ddev"],
             "description": "Biome's config file, the $schema it must point at, and the CI runner files it must not check. The local path under node_modules always matches the installed Biome, so the file does not need editing on every Biome update — a versioned remote URL does.",
             "properties": {
                 "configFile": {
@@ -125,6 +125,16 @@
                     "type": "array",
                     "items": { "type": "string" },
                     "description": "Globs for Laravel's JSON translation files, which files.includes must exclude in a Laravel project. Translation tooling maintains them, so Biome reformatting them only churns diffs. Each is probed with `en` in place of `*` and against the files it currently matches."
+                },
+                "claudeSkills": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Directories holding installed Claude skills, which files.includes must exclude. The skills are copies the baseline installs, and Biome 2.6+ formats Markdown, inserting a blank line after the frontmatter's opening `---` that breaks them."
+                },
+                "ddev": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "DDEV's directory, which files.includes must exclude. DDEV writes and owns the files in it, and Biome 2.6+ formats YAML, re-indenting the add-on manifests DDEV generates."
                 }
             }
         },

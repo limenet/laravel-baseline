@@ -1,0 +1,23 @@
+{
+    "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+    "files": {
+        "includes": [
+            "**",
+            "!.ai/mcp/mcp.json",
+            "!boost.json",
+            "!lang/*.json",
+            "!metadata.json",
+            "!pint.json",
+            "!resources/lang/*.json"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "useEditorconfig": true
+    },
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    }
+}

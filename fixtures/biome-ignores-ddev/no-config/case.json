@@ -1,0 +1,9 @@
+{
+    "check": "biomeIgnoresDdev",
+    "description": "passes when the project does not use Biome",
+    "engines": [
+        "php"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}

@@ -1,0 +1,9 @@
+{
+    "check": "biomeIgnoresDdev",
+    "description": "passes when files.includes excludes .ddev after **",
+    "engines": [
+        "php"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}
