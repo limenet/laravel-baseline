@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.20.0](https://github.com/limenet/laravel-baseline/compare/v2.19.0...v2.20.0) (2026-11-17)
+
+### Features
+
+* **policy:** add biomeIgnoresClaudeMd check ([0d30d9e](https://github.com/limenet/laravel-baseline/commit/0d30d9edbac46b18e3098d1e98bd7861f6609dfb))
+
 ## [2.19.0](https://github.com/limenet/laravel-baseline/compare/v2.18.0...v2.19.0) (2026-11-17)
 
 ### Features
