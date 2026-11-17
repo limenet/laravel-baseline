@@ -1,0 +1,16 @@
+{
+    "check": "biomeIgnoresClaudeMd",
+    "description": "appends after the last exclusion of a typical consumer config, leaving the rest of the file alone",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "biome.json": "{\n    \"$schema\": \"./node_modules/@biomejs/biome/configuration_schema.json\",\n    \"files\": {\n        \"includes\": [\n            \"**\",\n            \"!.ai/mcp/mcp.json\",\n            \"!boost.json\",\n            \"!lang/*.json\",\n            \"!metadata.json\",\n            \"!pint.json\",\n            \"!resources/lang/*.json\",\n            \"!CLAUDE.md\"\n        ]\n    },\n    \"formatter\": {\n        \"enabled\": true,\n        \"useEditorconfig\": true\n    },\n    \"vcs\": {\n        \"enabled\": true,\n        \"clientKind\": \"git\",\n        \"useIgnoreFile\": true\n    }\n}\n"
+        }
+    }
+}

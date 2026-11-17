@@ -173,7 +173,9 @@ Produce a written summary:
   `https://biomejs.dev/schemas/<version>/schema.json` URL: the baseline's `biomeUsesLocalSchema`
   check rejects that.
 - **Keep Biome out of tool-managed files.** Biome 2.6+ formats Markdown and YAML, so do not drop
-  `!.claude/skills` and `!.ddev` from `files.includes` in `biome.json` when bumping it — otherwise it rewrites installed
-  skills and DDEV's files. The baseline's `biomeIgnoresClaudeSkills` and `biomeIgnoresDdev` re-add them if they go missing.
+  `!CLAUDE.md`, `!.claude/skills` or `!.ddev` from `files.includes` in `biome.json` when bumping
+  it — otherwise it rewrites generated guidelines, installed skills and DDEV's files. The
+  baseline's `biomeIgnoresClaudeMd`, `biomeIgnoresClaudeSkills` and `biomeIgnoresDdev` re-add them
+  if they go missing.
 - **Plain commit messages.** If asked to commit, write a plain, descriptive message in the
   imperative mood (this project does not use Conventional Commits).

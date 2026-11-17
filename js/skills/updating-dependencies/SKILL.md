@@ -153,8 +153,9 @@ Produce a written summary:
   Biome, so a Biome bump needs no config edit. Do not switch it to a versioned
   `https://biomejs.dev/schemas/<version>/schema.json` URL: the baseline's `biomeUsesLocalSchema`
   check rejects that.
-- **Keep Biome out of tool-managed files.** Biome 2.6+ formats Markdown and YAML, so do not drop
-  `!.claude/skills` from `files.includes` in `biome.json` when bumping it — otherwise it rewrites installed
-  skills and DDEV's files. The baseline's `biomeIgnoresClaudeSkills` re-adds it if they go missing.
+- **Keep Biome out of tool-managed files.** Biome 2.6+ formats Markdown, so do not drop
+  `!CLAUDE.md` or `!.claude/skills` from `files.includes` in `biome.json` when bumping it —
+  otherwise it rewrites the guidelines and installed skills. The baseline's `biomeIgnoresClaudeMd`
+  and `biomeIgnoresClaudeSkills` re-add them if they go missing.
 - **Plain commit messages.** If asked to commit, write a plain, descriptive message in the
   imperative mood (this project does not use Conventional Commits).

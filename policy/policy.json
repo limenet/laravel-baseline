@@ -18,6 +18,7 @@
         "ciArtifacts": ["metadata.json"],
         "laravelLangFiles": ["lang/*.json", "resources/lang/*.json"],
         "claudeSkills": [".claude/skills"],
+        "claudeMd": ["CLAUDE.md"],
         "ddev": [".ddev"]
     },
     "editorconfig": {

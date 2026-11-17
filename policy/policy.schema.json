@@ -105,7 +105,15 @@
         "biome": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["configFile", "schema", "ciArtifacts", "laravelLangFiles", "claudeSkills", "ddev"],
+            "required": [
+                "configFile",
+                "schema",
+                "ciArtifacts",
+                "laravelLangFiles",
+                "claudeSkills",
+                "claudeMd",
+                "ddev"
+            ],
             "description": "Biome's config file, the $schema it must point at, and the CI runner files it must not check. The local path under node_modules always matches the installed Biome, so the file does not need editing on every Biome update — a versioned remote URL does.",
             "properties": {
                 "configFile": {
@@ -130,6 +138,11 @@
                     "type": "array",
                     "items": { "type": "string" },
                     "description": "Directories holding installed Claude skills, which files.includes must exclude. The skills are copies the baseline installs, and Biome 2.6+ formats Markdown, inserting a blank line after the frontmatter's opening `---` that breaks them."
+                },
+                "claudeMd": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "The project's CLAUDE.md, which files.includes must exclude. Laravel Boost regenerates it on `boost:update`, and Biome 2.6+ formats Markdown, so Biome and the generator would rewrite each other's output."
                 },
                 "ddev": {
                     "type": "array",
