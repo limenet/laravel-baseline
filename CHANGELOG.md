@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.20.1](https://github.com/limenet/laravel-baseline/compare/v2.20.0...v2.20.1) (2026-11-17)
+
+### Bug Fixes
+
+* **php:** stop requiring the deprecated StringToClassConstantRector skip ([ca5093d](https://github.com/limenet/laravel-baseline/commit/ca5093d7aeba1a476e8a050c3f9ded5b217c7bc9))
+
 ## [2.20.0](https://github.com/limenet/laravel-baseline/compare/v2.19.0...v2.20.0) (2026-11-17)
 
 ### Features
