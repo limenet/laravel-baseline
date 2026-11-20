@@ -3,6 +3,12 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.21.0](https://github.com/limenet/laravel-baseline/compare/v2.20.1...v2.21.0) (2026-11-20)
+
+### Features
+
+* **policy:** add uploadsSboms check ([12c987a](https://github.com/limenet/laravel-baseline/commit/12c987af97fdfd432419594206dd4e45a068bbdc))
+
 ## [2.20.1](https://github.com/limenet/laravel-baseline/compare/v2.20.0...v2.20.1) (2026-11-17)
 
 ### Bug Fixes
