@@ -1,0 +1,7 @@
+{
+    "check": "uploadsSboms",
+    "description": "fails on a JS project that declares no PHP_VERSION, which names the image the SBOM jobs run on; not fixable, there is no version to pick",
+    "engines": ["js"],
+    "expect": "fail",
+    "fix": { "expect": "fail" }
+}

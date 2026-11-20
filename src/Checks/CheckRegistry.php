@@ -80,6 +80,7 @@ use Limenet\LaravelBaseline\Checks\Checks\RunsBoostUpdateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\RunsCiLintHookInClaudeSettingsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UpdatesDdevAddonsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UpdatesDependenciesCheck;
+use Limenet\LaravelBaseline\Checks\Checks\UploadsSbomsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesIdeHelpersCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLarastanCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesLaravelAdminerCheck;
@@ -196,6 +197,7 @@ class CheckRegistry
         RunsCiLintHookInClaudeSettingsCheck::class,
         UpdatesDdevAddonsCheck::class,
         UpdatesDependenciesCheck::class,
+        UploadsSbomsCheck::class,
         UsesIdeHelpersCheck::class,
         UsesLarastanCheck::class,
         UsesLaravelAdminerCheck::class,

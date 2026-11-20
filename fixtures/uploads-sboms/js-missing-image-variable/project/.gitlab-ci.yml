@@ -1,0 +1,20 @@
+include:
+  - project: limenet/ci-cd-templates
+    ref: master
+    file: node/deploy_netlify.yml
+  - project: limenet/ci-cd-templates
+    ref: master
+    file: laravel/sbom.yml
+
+stages:
+  - build
+  - deploy
+  - sbom
+
+deploy:
+  extends:
+    - .deploy_netlify
+
+sbom:npm:
+  extends:
+    - .sbom_npm

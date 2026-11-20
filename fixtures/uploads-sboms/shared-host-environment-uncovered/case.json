@@ -1,0 +1,7 @@
+{
+    "check": "uploadsSboms",
+    "description": "fails when one of two environments on the same DEPLOY_HOST has no server job, since they differ in environment-scoped variables",
+    "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail"
+}

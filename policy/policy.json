@@ -153,6 +153,41 @@
         "forbiddenKeys": ["severity"],
         "ciJob": { "security": ".lint_security" }
     },
+    "sbom": {
+        "include": { "project": "limenet/ci-cd-templates", "ref": "master", "file": "laravel/sbom.yml" },
+        "stage": "sbom",
+        "defaultStages": ["build", "test", "deploy"],
+        "jobs": { "sbom:php": ".sbom_php", "sbom:npm": ".sbom_npm" },
+        "jobManifests": { "sbom:php": "composer.json", "sbom:npm": "package.json" },
+        "imageVariable": "PHP_VERSION",
+        "server": {
+            "template": ".sbom_server",
+            "jobPrefix": "sbom:server_",
+            "nameVariable": "SBOM_SERVER_NAME",
+            "environmentAction": "prepare",
+            "connectionVariables": ["DEPLOY_HOST", "DEPLOY_USER", "DEPLOY_SSH_PORT"],
+            "deployTemplates": [
+                ".deploy",
+                ".deploy_tagged",
+                ".deploy_default_branch",
+                ".deploy_bedrock",
+                ".deploy_bedrock_tagged",
+                ".deploy_bedrock_default_branch",
+                ".deploy_sage",
+                ".deploy_sage_tagged",
+                ".deploy_sage_default_branch",
+                ".deploy_radicle",
+                ".deploy_radicle_tagged",
+                ".deploy_radicle_default_branch"
+            ],
+            "deployTemplateEnvironments": {
+                ".deploy_tagged": "production",
+                ".deploy_default_branch": "staging",
+                ".deploy_radicle_tagged": "production",
+                ".deploy_radicle_default_branch": "staging"
+            }
+        }
+    },
     "baseline": {
         "composerPackage": "limenet/laravel-baseline",
         "npmPackage": "@limenet-ch/baseline",

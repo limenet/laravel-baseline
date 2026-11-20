@@ -53,3 +53,28 @@ it('reports a result that does not parse to the expected data', function (): voi
     expect($editor->matches(['cache' => ['dir' => 'y']]))->toBeTrue();
     expect($editor->matches(['cache' => ['dir' => 'x']]))->toBeFalse();
 });
+
+it('addresses keys that contain a colon, as GitLab job names do', function (): void {
+    expect(editYaml("sbom:server:\n  extends:\n    - .sbom_server\n", fn (YamlTextEditor $e) => $e->set(['sbom:server', 'environment', 'name'], 'production')))
+        ->toBe("sbom:server:\n  extends:\n    - .sbom_server\n  environment:\n    name: production\n");
+});
+
+it('appends a mapping item quoted per key like its siblings', function (): void {
+    $before = "include:\n  - project: \"group/templates\"\n    ref: master\n    file: \"deploy.yml\"\n\nstages: [build]\n";
+
+    expect(editYaml($before, fn (YamlTextEditor $e) => $e->appendMapping(['include'], ['project' => 'group/templates', 'ref' => 'master', 'file' => 'sbom.yml'])))
+        ->toBe("include:\n  - project: \"group/templates\"\n    ref: master\n    file: \"deploy.yml\"\n  - project: \"group/templates\"\n    ref: master\n    file: \"sbom.yml\"\n\nstages: [build]\n");
+});
+
+it('creates a missing sequence for a mapping item', function (): void {
+    expect(editYaml("stages:\n  - build\n", fn (YamlTextEditor $e) => $e->appendMapping(['include'], ['local' => 'ci.yml'])))
+        ->toBe("stages:\n  - build\ninclude:\n  - local: ci.yml\n");
+});
+
+it('reports how a scalar is quoted', function (string $line, ?string $quote): void {
+    expect((new YamlTextEditor("job:\n  variables:\n    {$line}\n"))->quoteAt(['job', 'variables', 'HOST']))->toBe($quote);
+})->with([
+    ['HOST: "1.2.3.4"', '"'],
+    ["HOST: '1.2.3.4'", "'"],
+    ['HOST: 1.2.3.4', null],
+]);

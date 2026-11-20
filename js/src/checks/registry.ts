@@ -20,6 +20,7 @@ import { IsCiLintCompleteCheck } from './is-ci-lint-complete-check.js'
 import { NodeVersionCheck } from './node-version-check.js'
 import { RunsCiLintHookInClaudeSettingsCheck } from './runs-ci-lint-hook-in-claude-settings-check.js'
 import { UpdatesDependenciesCheck } from './updates-dependencies-check.js'
+import { UploadsSbomsCheck } from './uploads-sboms-check.js'
 import { UsesReleaseItCheck } from './uses-release-it-check.js'
 
 type CheckConstructor = (new (
@@ -61,6 +62,7 @@ function checks(): CheckConstructor[] {
         NodeVersionCheck,
         RunsCiLintHookInClaudeSettingsCheck,
         UpdatesDependenciesCheck,
+        UploadsSbomsCheck,
         UsesReleaseItCheck,
     ]
 }

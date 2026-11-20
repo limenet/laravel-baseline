@@ -1,0 +1,20 @@
+{
+    "check": "uploadsSboms",
+    "description": "fails when the server job does not run in the deploy environment; the fix adds it to the job named after it rather than a duplicate",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": [
+        "laravel",
+        "php",
+        "wordpress"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            ".gitlab-ci.yml": "include:\n  - project: \"limenet/ci-cd-templates\"\n    ref: master\n    file: \"laravel/deploy.yml\"\n  - project: \"limenet/ci-cd-templates\"\n    ref: master\n    file: \"laravel/sbom.yml\"\n\nstages:\n  - build\n  - deploy\n  - sbom\n\nvariables:\n  PHP_VERSION: \"8.5\"\n  DEPLOY_HOST: \"157.90.153.165\"\n\ndeploy:\n  extends:\n    - .deploy_default_branch\n  environment: production\n\nsbom:php:\n  extends:\n    - .sbom_php\n\nsbom:npm:\n  extends:\n    - .sbom_npm\n\nsbom:server:\n  extends:\n    - .sbom_server\n  variables:\n    SBOM_SERVER_NAME: production\n  environment:\n    name: production\n    action: prepare\n"
+        }
+    }
+}

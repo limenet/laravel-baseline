@@ -1,0 +1,35 @@
+include:
+  - project: "limenet/ci-cd-templates"
+    ref: master
+    file: "laravel/deploy.yml"
+  - project: "limenet/ci-cd-templates"
+    ref: master
+    file: "laravel/sbom.yml"
+
+stages:
+  - build
+  - deploy
+  - sbom
+
+variables:
+  PHP_VERSION: "8.5"
+  DEPLOY_HOST: "157.90.153.165"
+
+deploy:
+  extends:
+    - .deploy_default_branch
+  environment: production
+
+sbom:php:
+  extends:
+    - .sbom_php
+
+sbom:npm:
+  extends:
+    - .sbom_npm
+
+sbom:server:
+  extends:
+    - .sbom_server
+  variables:
+    SBOM_SERVER_NAME: production

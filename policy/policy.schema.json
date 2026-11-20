@@ -16,6 +16,7 @@
         "ci",
         "ciLint",
         "trivy",
+        "sbom",
         "baseline",
         "npmScripts",
         "periodic",
@@ -382,6 +383,90 @@
                     "description": "Top-level keys that must NOT be set, leaving Trivy's own default behaviour in place."
                 },
                 "ciJob": { "type": "object", "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" } }
+            }
+        },
+        "sbom": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "include",
+                "stage",
+                "defaultStages",
+                "jobs",
+                "jobManifests",
+                "imageVariable",
+                "server"
+            ],
+            "description": "CycloneDX SBOM uploads to Dependency-Track through limenet/ci-cd-templates' laravel/sbom.yml: the include, the stage its jobs run in, one job per dependency manifest, and one server job per SSH deploy environment.",
+            "properties": {
+                "include": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["project", "ref", "file"],
+                    "description": "The include entry. project and file identify it; ref is only what a fix writes.",
+                    "properties": {
+                        "project": { "type": "string" },
+                        "ref": { "type": "string" },
+                        "file": { "type": "string" }
+                    }
+                },
+                "stage": {
+                    "type": "string",
+                    "description": "The stage the template's jobs run in, which must be declared."
+                },
+                "defaultStages": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "GitLab's implicit stages, written ahead of the SBOM stage when a pipeline declares none, so declaring stages does not drop them."
+                },
+                "jobs": { "type": "object", "additionalProperties": { "$ref": "#/$defs/ciJobTemplates" } },
+                "jobManifests": {
+                    "type": "object",
+                    "additionalProperties": { "type": "string" },
+                    "description": "Per job in jobs, the file whose presence makes the job required."
+                },
+                "imageVariable": {
+                    "type": "string",
+                    "description": "The top-level variable the template's image is named after (laravel/$PHP_VERSION). A PHP project declares it anyway; the npm runner requires it, since a JS project otherwise would not."
+                },
+                "server": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "template",
+                        "jobPrefix",
+                        "nameVariable",
+                        "environmentAction",
+                        "connectionVariables",
+                        "deployTemplates",
+                        "deployTemplateEnvironments"
+                    ],
+                    "description": "One server SBOM job per deploy environment, running in that environment (for its scoped CI/CD variables) with an action that records no deployment.",
+                    "properties": {
+                        "template": { "type": "string" },
+                        "jobPrefix": {
+                            "type": "string",
+                            "description": "Prefix of the job name a fix writes, followed by the server name."
+                        },
+                        "nameVariable": { "type": "string" },
+                        "environmentAction": { "type": "string" },
+                        "connectionVariables": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "Variables a deploy job may set itself that its server job must repeat with the same value."
+                        },
+                        "deployTemplates": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "The templates that deploy over SSH to a server; a job extending one is a deploy job."
+                        },
+                        "deployTemplateEnvironments": {
+                            "type": "object",
+                            "additionalProperties": { "type": "string" },
+                            "description": "The environment a deploy template sets, for a deploy job that declares none itself."
+                        }
+                    }
+                }
             }
         },
         "baseline": {

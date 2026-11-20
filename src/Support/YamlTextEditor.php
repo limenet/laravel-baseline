@@ -131,6 +131,73 @@ final class YamlTextEditor
     }
 
     /**
+     * Appends one mapping item to the sequence at $path, at the dash width its
+     * existing items use, creating the key when it is absent. Each string value
+     * is quoted the way the same key already is in an earlier item. A flow or
+     * scalar value at $path is left alone, so callers check the shape first.
+     *
+     * @param  list<string>  $path
+     * @param  non-empty-array<string, scalar>  $mapping
+     */
+    public function appendMapping(array $path, array $mapping): void
+    {
+        $hit = $this->find($path);
+
+        $item = function (string $dashPad) use ($mapping, $hit): array {
+            $lines = [];
+
+            foreach ($mapping as $key => $value) {
+                $quote = $hit === null ? null : $this->quoteOf($key, ...$hit);
+                $rendered = is_string($value) && $quote !== null && !str_contains($value, $quote) && !str_contains($value, '\\')
+                    ? $quote.$value.$quote
+                    : Yaml::dump($value);
+
+                $lines[] = ($lines === [] ? "{$dashPad}- " : "{$dashPad}  ").self::renderKey($key).': '.$rendered;
+            }
+
+            return $lines;
+        };
+
+        if ($hit === null) {
+            $this->insert($path, fn (string $pad, string $key): array => [
+                "{$pad}{$key}:",
+                ...$item($pad.str_repeat(' ', $this->seqOffset)),
+            ]);
+
+            return;
+        }
+
+        [$line, $end] = $hit;
+        $last = $this->lastSignificant($line, $end);
+
+        if ($last === $line) {
+            return;
+        }
+
+        $dashWidth = $this->width($this->lines[$this->firstSignificant($line, $end)]);
+        array_splice($this->lines, $last + 1, 0, $item(str_repeat(' ', $dashWidth)));
+    }
+
+    /**
+     * The quote character the scalar at $path is wrapped in, or null when it is
+     * plain or absent, so a value copied elsewhere can keep its style.
+     *
+     * @param  list<string>  $path
+     */
+    public function quoteAt(array $path): ?string
+    {
+        $hit = $this->find($path);
+
+        if ($hit === null) {
+            return null;
+        }
+
+        $first = ltrim($this->splitKeyLine($this->lines[$hit[0]])[1])[0] ?? '';
+
+        return $first === '"' || $first === "'" ? $first : null;
+    }
+
+    /**
      * Removes the key at $path together with its nested block.
      *
      * @param  list<string>  $path
@@ -248,6 +315,23 @@ final class YamlTextEditor
         array_splice($this->lines, $at, 0, [...$new, ...$leaf(str_repeat(' ', $width), self::renderKey($last))]);
     }
 
+    /**
+     * The quote character the first `key:` inside the block on ($line, $end)
+     * wraps its value in, or null when that value is plain or there is none.
+     */
+    private function quoteOf(string $key, int $line, int $end): ?string
+    {
+        for ($i = $line + 1; $i < $end; $i++) {
+            if (preg_match('/^\s*(?:-\s+)?'.preg_quote($key, '/').'\s*:\s*(\S)?/', $this->lines[$i], $matches) === 1) {
+                $first = $matches[1] ?? '';
+
+                return $first === '"' || $first === "'" ? $first : null;
+            }
+        }
+
+        return null;
+    }
+
     /** Where the block under the key on $line ends (exclusive). */
     private function blockEnd(int $line): int
     {
@@ -349,13 +433,15 @@ final class YamlTextEditor
     }
 
     /**
-     * The key part of a mapping line (indent, key and colon) and the rest.
+     * The key part of a mapping line (indent, key and colon) and the rest. A
+     * plain key may itself contain a colon not followed by a space, as GitLab
+     * job names such as `sbom:php` do.
      *
      * @return array{0: string, 1: string}
      */
     private function splitKeyLine(string $line): array
     {
-        if (preg_match('/^(\s*(?:"[^"]*"|\'[^\']*\'|[^\s#\'"][^:#]*?)\s*:)(.*)$/', $line, $matches) !== 1) {
+        if (preg_match('/^(\s*(?:"[^"]*"|\'[^\']*\'|[^\s#\'"](?:[^:#]|:(?=\S))*?)\s*:)(?=\s|$)(.*)$/', $line, $matches) !== 1) {
             return [$line, ''];
         }
 
@@ -364,7 +450,7 @@ final class YamlTextEditor
 
     private function keyOf(string $line): ?string
     {
-        if (preg_match('/^\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s#\'"][^:#]*?))\s*:(?:\s|$)/', $line, $matches) !== 1) {
+        if (preg_match('/^\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s#\'"](?:[^:#]|:(?=\S))*?))\s*:(?:\s|$)/', $line, $matches) !== 1) {
             return null;
         }
 

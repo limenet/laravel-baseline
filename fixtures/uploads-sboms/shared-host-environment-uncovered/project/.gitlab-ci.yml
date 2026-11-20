@@ -1,0 +1,39 @@
+include:
+  - project: 'limenet/ci-cd-templates'
+    ref: master
+    file: 'laravel/sbom.yml'
+
+stages:
+  - deploy
+  - sbom
+
+variables:
+  PHP_VERSION: '8.5'
+  DEPLOY_HOST: '46.224.33.130'
+
+deploy_w2:
+  extends:
+    - .deploy_tagged
+  environment: w2
+
+deploy_w3:
+  extends:
+    - .deploy_tagged
+  environment: w3
+
+sbom:php:
+  extends:
+    - .sbom_php
+
+sbom:npm:
+  extends:
+    - .sbom_npm
+
+sbom:server_w2:
+  extends:
+    - .sbom_server
+  environment:
+    name: w2
+    action: prepare
+  variables:
+    SBOM_SERVER_NAME: w2

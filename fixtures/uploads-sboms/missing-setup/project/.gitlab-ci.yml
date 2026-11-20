@@ -1,0 +1,23 @@
+include:
+  - project: "limenet/ci-cd-templates"
+    ref: master
+    file: "laravel/deploy.yml"
+
+stages:
+  - build
+  - deploy
+
+variables:
+  PHP_VERSION: "8.5"
+  DEPLOY_HOST: "207.154.226.19"
+
+# Staging lives on its own server.
+deploy_stage:
+  extends:
+    - .deploy_default_branch
+  variables:
+    DEPLOY_HOST: "46.224.38.140"
+
+deploy:
+  extends:
+    - .deploy_tagged

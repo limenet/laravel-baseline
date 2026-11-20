@@ -1,0 +1,7 @@
+{
+    "check": "uploadsSboms",
+    "description": "passes on a pipeline with the include, the stage, both app jobs and a server job in the deploy environment",
+    "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "pass"
+}

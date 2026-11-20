@@ -1,0 +1,6 @@
+{
+    "check": "uploadsSboms",
+    "description": "passes on a JS project with only the npm job: no composer.json means no php job, and a Netlify deploy needs no server SBOM",
+    "engines": ["js"],
+    "expect": "pass"
+}

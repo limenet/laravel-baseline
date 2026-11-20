@@ -1,0 +1,13 @@
+{
+    "check": "uploadsSboms",
+    "description": "fails without any SBOM setup; the fix adds the include, the stage, both app jobs and a server job per deploy environment",
+    "engines": ["php", "js"],
+    "profiles": ["laravel", "php", "wordpress"],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            ".gitlab-ci.yml": "include:\n  - project: \"limenet/ci-cd-templates\"\n    ref: master\n    file: \"laravel/deploy.yml\"\n  - project: \"limenet/ci-cd-templates\"\n    ref: master\n    file: \"laravel/sbom.yml\"\n\nstages:\n  - build\n  - deploy\n  - sbom\n\nvariables:\n  PHP_VERSION: \"8.5\"\n  DEPLOY_HOST: \"207.154.226.19\"\n\n# Staging lives on its own server.\ndeploy_stage:\n  extends:\n    - .deploy_default_branch\n  variables:\n    DEPLOY_HOST: \"46.224.38.140\"\n\ndeploy:\n  extends:\n    - .deploy_tagged\n\nsbom:php:\n  extends:\n    - .sbom_php\n\nsbom:npm:\n  extends:\n    - .sbom_npm\n\nsbom:server_staging:\n  extends:\n    - .sbom_server\n  environment:\n    name: staging\n    action: prepare\n  variables:\n    DEPLOY_HOST: \"46.224.38.140\"\n    SBOM_SERVER_NAME: staging\n\nsbom:server_production:\n  extends:\n    - .sbom_server\n  environment:\n    name: production\n    action: prepare\n  variables:\n    SBOM_SERVER_NAME: production\n"
+        }
+    }
+}

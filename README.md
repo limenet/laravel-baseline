@@ -168,6 +168,7 @@ Every check below also runs in Laravel projects unless marked standalone-only.
 | `runsCiLintHookInClaudeSettings` | ✓ | ✓ | identical |
 | `updatesDdevAddons` | ✓ | ✓ | identical |
 | `updatesDependencies` | ✓ | ✓ | identical (periodic, every 30 days); recorded in `.baseline.json` |
+| `uploadsSboms` | ✓ | ✓ | identical; `sbom:npm` only once there is a `package.json`, and a server job for the bedrock, sage and radicle deploys too |
 | `usesPest` | ✓ | ✓ | warns until `pestphp/pest` is installed; does not require `pest-plugin-laravel` |
 | `usesPestPhpstanPlugin` | ✓ | ✓ | identical |
 | `usesPestRectorPlugin` | ✓ | ✓ | identical |
@@ -244,6 +245,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `callsBaseline` | hooks the `ci-lint` npm script, since npm has no `post-update-cmd` |
 | `doesNotExcludeUnknownChecks` | identical, against this runner's smaller registry: a name only the Laravel runner knows is as dead here as one that exists nowhere |
 | `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
+| `uploadsSboms` | requires only `sbom:npm` (no `composer.json`, no `sbom:php`); the node deploy templates are not SSH deploys, so no server job; additionally requires a top-level `PHP_VERSION`, which names the image the SBOM jobs run on |
 
 Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
 the DDEV checks (`ddevNodeVersionIsAuto`, `ddevMutagenIgnoresNodeModules`, …); and
@@ -333,6 +335,7 @@ This package validates your Laravel installation against the following checks:
 - **`hasCiJobs()`** - Validates GitLab CI pipeline jobs are properly configured (the `test` job may extend either `.test` or `.test_db`)
 - 🔧 **`hasTrivyConfig()`** - Validates Trivy security scanning CI job, `trivy.yaml` (scanners, skip-files, skip-dirs, ignorefile, cache.dir, telemetry/VEX/dependency-tree flags, and `pkg.include-dev-deps` so development dependencies are reported instead of silently skipped), presence of `.trivyignore.yaml`, and `.trivycache/` in `.gitignore` *(creates/merges trivy.yaml, creates an empty .trivyignore.yaml, appends to .gitignore, and adds CI job)*
 - **`callsSentryHook()`** - Warns if Sentry error tracking is missing (optional)
+- 🔧 **`uploadsSboms()`** - Validates CycloneDX SBOMs are uploaded to Dependency-Track through `limenet/ci-cd-templates`' `laravel/sbom.yml`: the include, the `sbom` stage, `sbom:php` / `sbom:npm` for each manifest present, and for every environment an SSH deploy job deploys to (its own `environment`, else the template's — `.deploy_tagged` is `production`), a job extending `.sbom_server` running in that environment with `action: prepare` (for the environment-scoped `SSH_KNOWN_HOSTS`, without recording a deployment), a valid `SBOM_SERVER_NAME`, and the deploy job's own `DEPLOY_HOST` / `DEPLOY_USER` / `DEPLOY_SSH_PORT` *(appends the include, stage, and missing jobs as text, so comments and `!reference` tags survive; adds the environment to a server job named after it; leaves a mismatched variable or server name to you)*
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline
 - 🔧 **`doesNotSkipDeprecatedRectorRules()`** - Fails while `rector.php` still lists a rule in `withSkip()` that Rector has deprecated: `StringToClassConstantRector` was skipped because rector-laravel's legacy event sets rewrote any matching string (`view('auth.login')` became `Login::class`), but rector-laravel 2.7 replaced it with a rule scoped to event dispatcher calls and Rector 2.8 deprecated it — the skip now only warns, and breaks the config once Rector deletes the class *(removes the entry, and the call once nothing is left in it; the orphaned import is left to Pint/Rector)*
