@@ -22,7 +22,8 @@
         "periodic",
         "wordpress",
         "phpFileCoverage",
-        "toolCache"
+        "toolCache",
+        "publishedAssets"
     ],
     "$defs": {
         "phpRunner": {
@@ -551,6 +552,18 @@
                 "phpstan": {
                     "type": "string",
                     "description": "The PHPStan config's parameters.tmpDir."
+                }
+            }
+        },
+        "publishedAssets": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["inlinedSince"],
+            "properties": {
+                "inlinedSince": {
+                    "type": "object",
+                    "description": "Composer package => first version that inlines its dashboard assets instead of serving them from public/vendor/<name>. From that version on (or once the package is gone from composer.lock), a public/vendor/<name> directory is stale (doesNotHaveStalePublishedAssets).",
+                    "additionalProperties": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
                 }
             }
         }

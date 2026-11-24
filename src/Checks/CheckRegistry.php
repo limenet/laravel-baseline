@@ -26,6 +26,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotExcludeUnknownChecksCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveCopilotOrJunieAgentFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveGuidelinesScriptCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveLaravelSimplifierInClaudeSettingsCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveStalePublishedAssetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveStrayEnvFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotPinOldMailTemplateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotSkipDeprecatedRectorRulesCheck;
@@ -143,6 +144,7 @@ class CheckRegistry
         DoesNotHaveCopilotOrJunieAgentFilesCheck::class,
         DoesNotHaveGuidelinesScriptCheck::class,
         DoesNotHaveLaravelSimplifierInClaudeSettingsCheck::class,
+        DoesNotHaveStalePublishedAssetsCheck::class,
         DoesNotHaveStrayEnvFilesCheck::class,
         DoesNotPinOldMailTemplateCheck::class,
         DoesNotSkipDeprecatedRectorRulesCheck::class,

@@ -222,5 +222,11 @@
     "toolCache": {
         "rector": ".cache/rector",
         "phpstan": ".cache/phpstan"
+    },
+    "publishedAssets": {
+        "inlinedSince": {
+            "laravel/horizon": "5.25.0",
+            "laravel/telescope": "5.10.0"
+        }
     }
 }
