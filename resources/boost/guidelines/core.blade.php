@@ -118,6 +118,23 @@ ddev artisan ide-helper:meta
 - Do **not** use Conventional Commits. Write plain, descriptive commit messages in the imperative
   mood (e.g. "Add invoice export", not "feat: add invoice export").
 
+### Solo projects under `limenet`
+
+A project in the `limenet` namespace has a single developer. You can tell by the `name` in
+`composer.json` (`limenet/…`), the `name` in `package.json` (`@limenet-ch/…`), or a git remote
+under the `limenet` organisation. In such a project, assume there's no team:
+
+- Merge requests are optional. The developer opens them now and then, mostly for bigger
+  features or to review a change before it lands. Use a branch and a merge request when the
+  task asks for one; otherwise commit straight to `main`/`master` (and push when asked). In
+  either case, nobody else is there to assign as a reviewer, @-mention, or wait on for approval.
+- Don't keep backwards-compatibility shims, deprecation paths, or migration notes for internal
+  code because "someone else might depend on it". Change the call sites and delete the old code.
+  Published packages are the exception: their consumers are still real.
+- Don't ask who else is affected by a change, or write handoff notes for other people.
+
+Projects outside the namespace may have other contributors. The defaults above don't apply there.
+
 ### Modern Laravel idioms
 
 Prefer the current framework idioms — they keep static analysis clean and read more clearly.
