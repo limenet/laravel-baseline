@@ -50,7 +50,8 @@
                 "Bash(npm ls:*)",
                 "Bash(npm outdated:*)",
                 "Skill(code-review)",
-                "Skill(code-review:*)"
+                "Skill(code-review:*)",
+                "mcp__plugin_ai-architect-testing_playwright"
             ],
             "composer": [
                 "Bash(ddev composer run ci-lint:*)",

@@ -28,6 +28,7 @@ $requiredAllow = [
     'Bash(npm outdated:*)',
     'Skill(code-review)',
     'Skill(code-review:*)',
+    'mcp__plugin_ai-architect-testing_playwright',
 ];
 
 it('allowsToolingInClaudeSettings implements FixableInterface', function (): void {
