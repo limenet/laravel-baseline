@@ -15,7 +15,7 @@ return static function (RectorConfig $config): void {
     $config
         ->withPaths([__DIR__.'/app', __DIR__.'/database', __DIR__.'/routes', __DIR__.'/tests'])
         ->withComposerBased(phpunit: true, symfony: true, laravel: true)
-        ->withPreparedSets(deadCode: true, codeQuality: true, codingStyle: true, typeDeclarations: true, privatization: true, instanceOf: true, earlyReturn: true)
+        ->withPreparedSets(deadCode: true, codeQuality: true, codingStyle: true, typeDeclarations: true, privatization: true)
         ->withPhpSets()
         ->withAttributesSets()
         ->withImportNames(importShortClasses: false)

@@ -15,6 +15,8 @@ use PhpParser\NodeVisitorAbstract;
  *
  * Both argument shapes are handled: a first argument that is an array is
  * filtered item by item, anything else is filtered argument by argument.
+ * Named arguments can be removed by name as well — `instanceOf: true` from
+ * `->withPreparedSets(...)` — whatever value they pass.
  */
 class RectorRemovalVisitor extends NodeVisitorAbstract
 {
@@ -25,10 +27,12 @@ class RectorRemovalVisitor extends NodeVisitorAbstract
 
     /**
      * @param  list<string>  $classShortNames
+     * @param  list<string>  $argumentNames
      */
     public function __construct(
         private readonly string $methodName,
         private readonly array $classShortNames,
+        private readonly array $argumentNames = [],
     ) {}
 
     public function hasRemoved(): bool
@@ -88,7 +92,7 @@ class RectorRemovalVisitor extends NodeVisitorAbstract
     {
         $kept = array_values(array_filter(
             $node->args,
-            fn (Node $arg): bool => !$arg instanceof Node\Arg || !$this->matches($arg->value),
+            fn (Node $arg): bool => !$arg instanceof Node\Arg || (!$this->matches($arg->value) && !$this->namedForRemoval($arg)),
         ));
 
         if (count($kept) === count($node->args)) {
@@ -117,6 +121,12 @@ class RectorRemovalVisitor extends NodeVisitorAbstract
         }
 
         return $node->var;
+    }
+
+    private function namedForRemoval(Node\Arg $arg): bool
+    {
+        return $arg->name instanceof Node\Identifier
+            && in_array($arg->name->toString(), $this->argumentNames, true);
     }
 
     private function matches(?Node $node): bool

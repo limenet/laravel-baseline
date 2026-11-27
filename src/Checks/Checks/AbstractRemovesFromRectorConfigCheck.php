@@ -38,7 +38,7 @@ abstract class AbstractRemovesFromRectorConfigCheck extends AbstractFixableCheck
             return CheckResult::PASS;
         }
 
-        $visitor = new RectorRemovalVisitor($this->methodName(), $this->classShortNames());
+        $visitor = new RectorRemovalVisitor($this->methodName(), $this->classShortNames(), $this->argumentNames());
 
         /** @var Node\Stmt[] $stmts */
         $stmts = (new NodeTraverser($visitor))->traverse($writer->stmts);
@@ -72,4 +72,14 @@ abstract class AbstractRemovesFromRectorConfigCheck extends AbstractFixableCheck
     abstract protected function classShortNames(): array;
 
     abstract protected function removalComment(): string;
+
+    /**
+     * Named arguments to remove from that call, whatever value they pass.
+     *
+     * @return list<string>
+     */
+    protected function argumentNames(): array
+    {
+        return [];
+    }
 }

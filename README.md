@@ -141,6 +141,7 @@ Every check below also runs in Laravel projects unless marked standalone-only.
 | `doesNotExcludeUnknownChecks` | ✓ | ✓ | reads `.baseline.json`, against this profile’s checks |
 | `doesNotHaveCopilotOrJunieAgentFiles` | ✓ | ✓ | identical |
 | `doesNotUseBothBaselineRunners` | ✓ | ✓ | identical |
+| `doesNotUseDeprecatedRectorPreparedSets` | ✓ | ✓ | identical |
 | `doesNotUseGreaterThanOrEqualConstraints` | ✓ | ✓ | identical |
 | `doesNotUsePhpCsFixer` | ✓ | ✓ | identical |
 | `doesNotUsePhpInsights` | ✓ | ✓ | identical |
@@ -271,7 +272,7 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`checkPhpunit()`** - Validates PHPUnit configuration with coverage reports *(adds missing XML nodes and APP_KEY)*
 - 🔧 **`hasRectorConfigWithComposerBased()`** - Validates Rector `withComposerBased(phpunit, symfony, laravel)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithConfiguredRules()`** - Validates Rector `withConfiguredRule()` calls are present for `RouteActionCallableRector` and `WhereToWhereLikeRector` *(appends calls to rector.php)*
-- 🔧 **`hasRectorConfigWithPreparedSets()`** - Validates Rector `withPreparedSets(deadCode, codeQuality, codingStyle, typeDeclarations, privatization, instanceOf, earlyReturn)` is configured *(appends call to rector.php)*
+- 🔧 **`hasRectorConfigWithPreparedSets()`** - Validates Rector `withPreparedSets(deadCode, codeQuality, codingStyle, typeDeclarations, privatization)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithCache()`** - Validates Rector `withCache(cacheDirectory: __DIR__.'/.cache/rector')` is configured and `.gitignore` ignores it, so CI can cache Rector's result between pipelines instead of losing it to the system temp directory *(appends the call, or repoints an existing one; adds the `.gitignore` entry)*
 - 🔧 **`hasRectorConfigWithImportNames()`** - Validates Rector `withImportNames(importShortClasses: false)` is configured *(appends call to rector.php)*
 - 🔧 **`hasRectorConfigWithPhpSets()`** - Validates Rector `withPhpSets()` is called *(appends call to rector.php)*
@@ -340,6 +341,7 @@ This package validates your Laravel installation against the following checks:
 - **`phpVersionMatchesCi()`** - Validates PHP version consistency with CI configuration
 - **`isCiLintComplete()`** - Validates complete linting pipeline
 - 🔧 **`doesNotSkipDeprecatedRectorRules()`** - Fails while `rector.php` still lists a rule in `withSkip()` that Rector has deprecated: `StringToClassConstantRector` was skipped because rector-laravel's legacy event sets rewrote any matching string (`view('auth.login')` became `Login::class`), but rector-laravel 2.7 replaced it with a rule scoped to event dispatcher calls and Rector 2.8 deprecated it — the skip now only warns, and breaks the config once Rector deletes the class *(removes the entry, and the call once nothing is left in it; the orphaned import is left to Pint/Rector)*
+- 🔧 **`doesNotUseDeprecatedRectorPreparedSets()`** - Fails while `rector.php` passes `instanceOf`, `earlyReturn`, `if` or `naming` to `withPreparedSets()`: Rector 2.9 no longer applies them and warns on every run, and their rules moved into `codeQuality` and `codingStyle`, which `hasRectorConfigWithPreparedSets()` already requires *(removes the arguments, and the call once nothing is left in it)*
 - 🔧 **`doesNotUseRectorSetProviders()`** - Fails while `rector.php` still passes `LaravelSetProvider` to `withSetProviders()`: `driftingly/rector-laravel` 2.6.0 deleted the class, so Rector aborts before doing any work, and `withComposerBased(laravel: true)` already loads the rules it used to provide *(removes the argument, and the call once nothing is left in it; the orphaned import is left to Pint/Rector)*
 - 🔧 **`doesNotDuplicateRectorSetRules()`** - Fails while `rector.php` lists `AddGenericReturnTypeToRelationsRector` in `withRules()`: it already ships in `LaravelSetList::LARAVEL_TYPE_DECLARATIONS`, which `hasRectorConfigWithSets()` mandates, and Rector 2.6 warns about the duplicate *(removes the entry; the orphaned import is left to Pint/Rector)*
 - **`doesNotUseIgnition()`** - Validates Ignition debugger is NOT installed

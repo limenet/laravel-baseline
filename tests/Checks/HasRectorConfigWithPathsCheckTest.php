@@ -14,7 +14,7 @@ return static function (RectorConfig $config): void {
     $config
         ->withPaths([__DIR__.'/app', __DIR__.'/database', __DIR__.'/routes', __DIR__.'/tests'])
         ->withComposerBased(phpunit: true, symfony: true, laravel: true)
-        ->withPreparedSets(deadCode: true, codeQuality: true, codingStyle: true, typeDeclarations: true, privatization: true, instanceOf: true, earlyReturn: true)
+        ->withPreparedSets(deadCode: true, codeQuality: true, codingStyle: true, typeDeclarations: true, privatization: true)
         ->withPhpSets()
         ->withAttributesSets()
         ->withImportNames(importShortClasses: false)
@@ -44,7 +44,7 @@ use RectorLaravel\Rector\Class_\TablePropertyToTableAttributeRector;
 return static function (RectorConfig $config): void {
     $config
         ->withComposerBased(phpunit: true, symfony: true, laravel: true)
-        ->withPreparedSets(deadCode: true, codeQuality: true, codingStyle: true, typeDeclarations: true, privatization: true, instanceOf: true, earlyReturn: true)
+        ->withPreparedSets(deadCode: true, codeQuality: true, codingStyle: true, typeDeclarations: true, privatization: true)
         ->withPhpSets()->withAttributesSets()->withImportNames(importShortClasses: false)
         ->withSetProviders(LaravelSetProvider::class)->withRules([AddGenericReturnTypeToRelationsRector::class])
         ->withSets([LaravelBaselineSetList::REMOVE_DEFAULT_DOCBLOCKS])->withSkip([TablePropertyToTableAttributeRector::class]);

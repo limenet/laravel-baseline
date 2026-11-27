@@ -31,6 +31,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotHaveStrayEnvFilesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotPinOldMailTemplateCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotSkipDeprecatedRectorRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseBothBaselineRunnersCheck;
+use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseDeprecatedRectorPreparedSetsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseGreaterThanOrEqualConstraintsCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseHorizonWatcherCheck;
 use Limenet\LaravelBaseline\Checks\Checks\DoesNotUseIgnitionCheck;
@@ -149,6 +150,7 @@ class CheckRegistry
         DoesNotPinOldMailTemplateCheck::class,
         DoesNotSkipDeprecatedRectorRulesCheck::class,
         DoesNotUseBothBaselineRunnersCheck::class,
+        DoesNotUseDeprecatedRectorPreparedSetsCheck::class,
         DoesNotUseGreaterThanOrEqualConstraintsCheck::class,
         DoesNotUseHorizonWatcherCheck::class,
         DoesNotUseIgnitionCheck::class,

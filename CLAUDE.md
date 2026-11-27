@@ -358,7 +358,9 @@ mandates usually needs both:
   already ran the old fix still carries the call, so the removal has to be active. Declare
   `methodName()`, `classShortNames()` and `removalComment()`; `RectorRemovalVisitor` strips the
   matching `X::class` arguments (direct or inside the first array argument), drops the call once
-  nothing is left in it, and removes the bare `$config;` statement that can leave behind.
+  nothing is left in it, and removes the bare `$config;` statement that can leave behind. A
+  deprecated *named* argument goes the same way: override `argumentNames()` and the argument is
+  removed whatever value it passes (`doesNotUseDeprecatedRectorPreparedSets`).
 
 Do **not** gate a removal on the consumer's declared constraint for the extension. `^2.5` resolves
 to 2.6.1, so the project whose config is actually broken is the one the gate would silence — it
