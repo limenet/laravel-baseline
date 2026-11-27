@@ -4,6 +4,7 @@ use Limenet\LaravelBaseline\Checks\Checks\DoesNotSkipDeprecatedRectorRulesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\HasRectorConfigWithSkipCheck;
 use Limenet\LaravelBaseline\Checks\FixableInterface;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Project\Profile;
 
 $modern = ['name' => 'tmp', 'require' => ['laravel/framework' => '^12.0', 'driftingly/rector-laravel' => '^2.7']];
 
@@ -135,3 +136,54 @@ it('doesNotSkipDeprecatedRectorRules fix is idempotent', function () use ($writt
     expect($check->fix())->toBe(CheckResult::PASS);
     expect((string) file_get_contents(base_path('rector.php')))->toBe($first);
 });
+
+it('doesNotSkipDeprecatedRectorRules fix removes FlipTypeControlToUseExclusiveTypeRector, plain and keyed by paths', function () use ($modern): void {
+    bindFakeComposer([]);
+    $rector = <<<'PHP'
+<?php
+
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\Config\RectorConfig;
+use RectorLaravel\Rector\FuncCall\AppToResolveRector;
+
+return RectorConfig::configure()
+    ->withSkip([
+        FlipTypeControlToUseExclusiveTypeRector::class,
+        AppToResolveRector::class,
+    ])
+    ->withSkip([
+        FlipTypeControlToUseExclusiveTypeRector::class => [__DIR__ . '/app/Legacy'],
+    ]);
+PHP;
+    $this->withTempBasePath(['rector.php' => $rector, 'composer.json' => json_encode($modern)]);
+
+    $check = makeCheck(DoesNotSkipDeprecatedRectorRulesCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect($check->getComments()[0])->toContain('FlipTypeControlToUseExclusiveTypeRector');
+
+    expect($check->fix())->toBe(CheckResult::PASS);
+
+    $result = (string) file_get_contents(base_path('rector.php'));
+    expect($result)->not->toContain('FlipTypeControlToUseExclusiveTypeRector::class')
+        ->not->toContain('app/Legacy')
+        ->toContain('AppToResolveRector::class');
+});
+
+it('doesNotSkipDeprecatedRectorRules runs outside Laravel', function (Profile $profile): void {
+    $project = makeProject($profile, ['rector.php' => <<<'PHP'
+<?php
+
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\Config\RectorConfig;
+
+return RectorConfig::configure()
+    ->withPaths([__DIR__ . '/src'])
+    ->withSkip([FlipTypeControlToUseExclusiveTypeRector::class]);
+PHP]);
+
+    expect(makeCheck(DoesNotSkipDeprecatedRectorRulesCheck::class, $project)->check())->toBe(CheckResult::FAIL);
+    expect(makeCheck(DoesNotSkipDeprecatedRectorRulesCheck::class, $project)->fix())->toBe(CheckResult::PASS);
+    expect((string) file_get_contents($project->path('rector.php')))
+        ->not->toContain('withSkip')
+        ->toContain('withPaths');
+})->with([Profile::Php, Profile::WordPress]);

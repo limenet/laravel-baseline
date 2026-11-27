@@ -2,8 +2,15 @@
 
 namespace Limenet\LaravelBaseline\Checks\Checks;
 
+use Limenet\LaravelBaseline\Project\Profile;
+
 class DoesNotSkipDeprecatedRectorRulesCheck extends AbstractRemovesFromRectorConfigCheck
 {
+    public static function profiles(): array
+    {
+        return Profile::cases();
+    }
+
     protected function methodName(): string
     {
         return 'withSkip';
@@ -11,11 +18,11 @@ class DoesNotSkipDeprecatedRectorRulesCheck extends AbstractRemovesFromRectorCon
 
     protected function classShortNames(): array
     {
-        return ['StringToClassConstantRector'];
+        return ['StringToClassConstantRector', 'FlipTypeControlToUseExclusiveTypeRector'];
     }
 
     protected function removalComment(): string
     {
-        return 'Remove StringToClassConstantRector from withSkip() in rector.php: Rector 2.8 deprecated it, and driftingly/rector-laravel 2.7 replaced it in the legacy event sets with EventStringToClassConstantRector, which only rewrites event dispatcher calls. The skip guards against nothing any more, makes Rector print a deprecation warning on every run, and breaks the config once Rector deletes the class';
+        return 'Remove StringToClassConstantRector and FlipTypeControlToUseExclusiveTypeRector from withSkip() in rector.php: Rector 2.9 deleted both classes, so naming them in withSkip() breaks the config. StringToClassConstantRector was only skipped because rector-laravel\'s legacy event sets rewrote any matching string, and driftingly/rector-laravel 2.7 replaced it there with EventStringToClassConstantRector, which only rewrites event dispatcher calls';
     }
 }
