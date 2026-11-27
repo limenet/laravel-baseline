@@ -3,6 +3,18 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.22.0](https://github.com/limenet/laravel-baseline/compare/v2.21.0...v2.22.0) (2026-11-27)
+
+### Features
+
+* **php:** add doesNotHaveStalePublishedAssets check ([866a6d4](https://github.com/limenet/laravel-baseline/commit/866a6d462e03d0748aca30ff97da70f4d5d51752)), references [laravel/telescope#1598](https://github.com/laravel/telescope/issues/1598)
+* **php:** add doesNotUseDeprecatedRectorPreparedSets check ([fd4281b](https://github.com/limenet/laravel-baseline/commit/fd4281b920eaccf64be31e6b0365f7676083dc6b))
+
+### Bug Fixes
+
+* **php:** require rector/rector ^2.9.0 ([22a50f2](https://github.com/limenet/laravel-baseline/commit/22a50f263f26c621740951158b6809ce2276ef95))
+* **php:** strip Rector 2.9-deleted rules from withSkip in any profile ([d7f81a5](https://github.com/limenet/laravel-baseline/commit/d7f81a5f7117d59f2d810122ac0e8b5cfa9dc559))
+
 ## [2.21.0](https://github.com/limenet/laravel-baseline/compare/v2.20.1...v2.21.0) (2026-11-20)
 
 ### Features
