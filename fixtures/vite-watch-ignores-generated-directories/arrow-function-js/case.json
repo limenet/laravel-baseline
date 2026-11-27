@@ -1,0 +1,14 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "follows an arrow function that returns the object directly",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "vite.config.mjs": "import { defineConfig } from 'vite'\n\nexport default defineConfig(({ mode }) => ({\n    base: mode === 'production' ? '/app/' : '/',\n    server: {\n        watch: {\n            ignored: [\n                '**/coverage/**',\n                '**/playwright-report/**',\n                '**/.trivycache/**',\n            ],\n        },\n    },\n}))\n"
+        }
+    }
+}

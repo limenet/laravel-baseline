@@ -113,6 +113,7 @@ use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthQueueCheckHorizonQueue
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckCacheStoreCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthScheduleCheckHeartbeatCheck;
 use Limenet\LaravelBaseline\Checks\Checks\UsesSpatieHealthSetupCheck;
+use Limenet\LaravelBaseline\Checks\Checks\ViteWatchIgnoresGeneratedDirectoriesCheck;
 use Limenet\LaravelBaseline\Checks\Checks\WordpressThemeVersionMatchesComposerCheck;
 use Limenet\LaravelBaseline\Project\Profile;
 use Limenet\LaravelBaseline\Project\Project;
@@ -232,6 +233,7 @@ class CheckRegistry
         UsesSpatieHealthScheduleCheckCacheStoreCheck::class,
         UsesSpatieHealthScheduleCheckHeartbeatCheck::class,
         UsesSpatieHealthSetupCheck::class,
+        ViteWatchIgnoresGeneratedDirectoriesCheck::class,
         WordpressThemeVersionMatchesComposerCheck::class,
     ];
 

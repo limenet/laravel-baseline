@@ -22,6 +22,7 @@ import { RunsCiLintHookInClaudeSettingsCheck } from './runs-ci-lint-hook-in-clau
 import { UpdatesDependenciesCheck } from './updates-dependencies-check.js'
 import { UploadsSbomsCheck } from './uploads-sboms-check.js'
 import { UsesReleaseItCheck } from './uses-release-it-check.js'
+import { ViteWatchIgnoresGeneratedDirectoriesCheck } from './vite-watch-ignores-generated-directories-check.js'
 
 type CheckConstructor = (new (
     project: Project,
@@ -64,6 +65,7 @@ function checks(): CheckConstructor[] {
         UpdatesDependenciesCheck,
         UploadsSbomsCheck,
         UsesReleaseItCheck,
+        ViteWatchIgnoresGeneratedDirectoriesCheck,
     ]
 }
 

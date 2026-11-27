@@ -23,7 +23,8 @@
         "wordpress",
         "phpFileCoverage",
         "toolCache",
-        "publishedAssets"
+        "publishedAssets",
+        "vite"
     ],
     "$defs": {
         "phpRunner": {
@@ -564,6 +565,42 @@
                     "type": "object",
                     "description": "Composer package => first version that inlines its dashboard assets instead of serving them from public/vendor/<name>. From that version on (or once the package is gone from composer.lock), a public/vendor/<name> directory is stale (doesNotHaveStalePublishedAssets).",
                     "additionalProperties": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+                }
+            }
+        },
+        "vite": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["configFiles", "watchIgnored"],
+            "properties": {
+                "configFiles": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1,
+                    "description": "The file names Vite loads its config from, in Vite's own resolution order. The first one that exists is the one viteWatchIgnoresGeneratedDirectories reads; a project with none passes."
+                },
+                "watchIgnored": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["shared", "composer", "laravel"],
+                    "description": "Globs server.watch.ignored must list (viteWatchIgnoresGeneratedDirectories), on top of what Vite skips by itself (.git, node_modules, test-results, cacheDir, build.outDir). Vite matches them against absolute paths, so each one is a directory name between two double-star segments and cannot be anchored to the project root.",
+                    "properties": {
+                        "shared": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "Required in every project, by both runners."
+                        },
+                        "composer": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "Additionally required in every PHP profile."
+                        },
+                        "laravel": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "description": "Additionally required in Laravel projects."
+                        }
+                    }
                 }
             }
         }

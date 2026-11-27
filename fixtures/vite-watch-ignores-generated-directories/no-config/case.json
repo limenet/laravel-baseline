@@ -1,0 +1,14 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "passes when the project has no Vite config",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": [
+        "laravel",
+        "php",
+        "wordpress"
+    ],
+    "expect": "pass"
+}

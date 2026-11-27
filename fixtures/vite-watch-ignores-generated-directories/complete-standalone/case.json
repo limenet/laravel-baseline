@@ -1,0 +1,12 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "passes outside Laravel without the Laravel directories",
+    "engines": [
+        "php"
+    ],
+    "profiles": [
+        "php",
+        "wordpress"
+    ],
+    "expect": "pass"
+}

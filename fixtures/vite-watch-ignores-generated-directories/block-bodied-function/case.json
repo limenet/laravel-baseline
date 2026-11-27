@@ -1,0 +1,20 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "reports a config returned from a function body and leaves the file alone",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": [
+        "laravel",
+        "php",
+        "wordpress"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "fail",
+        "files": {
+            "vite.config.js": "import { defineConfig, loadEnv } from 'vite';\n\nexport default defineConfig(({ mode }) => {\n    const env = loadEnv(mode, process.cwd(), '');\n\n    return {\n        server: {\n            host: env.VITE_HOST,\n        },\n    };\n});\n"
+        }
+    }
+}

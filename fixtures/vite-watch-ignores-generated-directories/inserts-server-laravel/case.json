@@ -1,0 +1,17 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "adds a server block after the last member of a stock Laravel config",
+    "engines": [
+        "php"
+    ],
+    "profiles": [
+        "laravel"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "vite.config.js": "import { defineConfig } from 'vite';\nimport laravel from 'laravel-vite-plugin';\n\nexport default defineConfig({\n    plugins: [\n        laravel({\n            input: ['resources/css/app.css', 'resources/js/app.js'],\n            refresh: true,\n        }),\n    ],\n    server: {\n        watch: {\n            ignored: [\n                '**/coverage/**',\n                '**/playwright-report/**',\n                '**/.trivycache/**',\n                '**/vendor/**',\n                '**/.cache/**',\n                '**/.phpunit.cache/**',\n                '**/.ddev/**',\n                '**/storage/**',\n                '**/bootstrap/cache/**',\n            ],\n        },\n    },\n});\n"
+        }
+    }
+}

@@ -178,6 +178,7 @@ Every check below also runs in Laravel projects unless marked standalone-only.
 | `usesPhpstanWordpress` |  | ✓ | **standalone-only** |
 | `usesRector` | ✓ | ✓ | requires `rector/rector` only, not `driftingly/rector-laravel` |
 | `usesReleaseIt` | ✓ | ✓ | identical |
+| `viteWatchIgnoresGeneratedDirectories` | ✓ | ✓ | requires the shared and composer directories, not Laravel's `storage` and `bootstrap/cache` |
 | `wordpressThemeVersionMatchesComposer` |  | ✓ | **standalone-only**, themes only |
 
 Deliberately not run outside Laravel: everything artisan-, `config/*.php`-, schedule- or
@@ -248,6 +249,7 @@ State lives in `.baseline.json` at the project root (a JS project has no `config
 | `doesNotExcludeUnknownChecks` | identical, against this runner's smaller registry: a name only the Laravel runner knows is as dead here as one that exists nowhere |
 | `usesReleaseIt` | **inverted**: fails if `@release-it/bumper` is configured, because `package.json` is already release-it's source of truth |
 | `uploadsSboms` | requires only `sbom:npm` (no `composer.json`, no `sbom:php`); the node deploy templates are not SSH deploys, so no server job; additionally requires a top-level `PHP_VERSION`, which names the image the SBOM jobs run on |
+| `viteWatchIgnoresGeneratedDirectories` | requires only the shared directories (`coverage`, `playwright-report`, `.trivycache`), not `vendor`, the PHP tool caches or Laravel's `storage` |
 
 Deliberately not ported: everything composer-, artisan-, Rector-, PHPStan- or Spatie-Health-shaped;
 the DDEV checks (`ddevNodeVersionIsAuto`, `ddevMutagenIgnoresNodeModules`, …); and
@@ -375,6 +377,7 @@ class.
 - 🔧 **`biomeIgnoresDdev()`** - Validates that `biome.json`, when the project has one, keeps Biome away from `.ddev`, whose files DDEV writes and owns; Biome 2.6+ formats YAML and re-indents the add-on manifests DDEV generates. Evaluates `files.includes` like `biomeIgnoresCiArtifacts()`, probing `.ddev/config.yaml`, so `!.ddev/**` or `!**/.ddev` count as well. *(appends `"!.ddev"` to the end of `files.includes` as a targeted text edit; a config without `files.includes` is only reported)*
 - 🔧 **`biomeIgnoresLaravelLangFiles()`** - Validates that `biome.json`, when the project has one, keeps Biome away from Laravel's JSON translation files (`lang/*.json`, `resources/lang/*.json`), which translation tooling maintains and Biome's formatter would otherwise churn. Evaluates `files.includes` like `biomeIgnoresCiArtifacts()`, probing each pattern with `en` and with every lang file the project has, so excluding only some locales still fails. *(appends `"!lang/*.json"` / `"!resources/lang/*.json"` to the end of `files.includes` as a targeted text edit; a config without `files.includes` is only reported)*
 - 🔧 **`biomeUsesLocalSchema()`** - Validates that `biome.json`, when the project has one, points `$schema` at `./node_modules/@biomejs/biome/configuration_schema.json` rather than a version-pinned remote URL, so the schema follows the installed Biome instead of needing a manual bump on every update. Passes when the project does not use Biome. *(rewrites or inserts the `$schema` line as a targeted text edit, leaving the rest of the file — comments included — byte-identical, since Biome formats `biome.json` itself)*
+- 🔧 **`viteWatchIgnoresGeneratedDirectories()`** - Validates that `vite.config.*`, when the project has one, lists the generated directories in `server.watch.ignored`, so the dev server does not hold file watches on them or reload when a test run or a cache write touches them. Vite itself only skips `.git`, `node_modules`, `test-results`, its cache and its build output. Required everywhere: `**/coverage/**`, `**/playwright-report/**`, `**/.trivycache/**`; in every PHP profile also `**/vendor/**`, `**/.cache/**`, `**/.phpunit.cache/**`, `**/.ddev/**`; in Laravel also `**/storage/**`, `**/bootstrap/cache/**` (all from `policy/policy.json`). Vite matches these globs against absolute paths, so they cannot be anchored to the project root: `**/vendor/**` also covers `resources/views/vendor`, `lang/vendor` and `public/vendor`. Passes when the project has no Vite config. *(appends the missing entries to an existing `ignored` array, or inserts the missing `server` / `watch` / `ignored` level into the exported object literal, as a targeted text edit in the file's own indentation and quoting; a config that is not a plain object literal — a function with a body, a variable, a spread — is only reported)*
 
 ### Security & Configuration
 - 🔧 **`modelShouldBeStrict()`** - Validates `Model::shouldBeStrict()` is called in AppServiceProvider with `true`, no argument, or a dynamic expression (not `false`) *(adds `Model::shouldBeStrict(! app()->isProduction())` to boot())*

@@ -1,0 +1,20 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "reports a server block built from a spread, which may already set watch, and leaves the file alone",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": [
+        "laravel",
+        "php",
+        "wordpress"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "fail",
+        "files": {
+            "vite.config.ts": "import { defineConfig } from 'vite';\nimport { devServer } from './build/server.js';\n\nexport default defineConfig({\n    server: {\n        ...devServer,\n        port: 5173,\n    },\n});\n"
+        }
+    }
+}

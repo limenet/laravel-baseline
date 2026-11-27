@@ -1,0 +1,14 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "adds a server block in the file's own style: two spaces, double quotes, no trailing commas",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "vite.config.ts": "import { defineConfig } from \"vite\"\n\nexport default defineConfig({\n  build: {\n    sourcemap: true\n  },\n  server: {\n    watch: {\n      ignored: [\n        \"**/coverage/**\",\n        \"**/playwright-report/**\",\n        \"**/.trivycache/**\"\n      ]\n    }\n  }\n})\n"
+        }
+    }
+}

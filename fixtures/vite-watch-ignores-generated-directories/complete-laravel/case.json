@@ -1,0 +1,11 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "passes when a Laravel config lists the shared, composer and Laravel directories",
+    "engines": [
+        "php"
+    ],
+    "profiles": [
+        "laravel"
+    ],
+    "expect": "pass"
+}

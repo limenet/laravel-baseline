@@ -1,0 +1,14 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "does not count a glob that only appears in a comment or in another array",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "vite.config.js": "// server.watch.ignored: ['**/coverage/**', '**/playwright-report/**', '**/.trivycache/**']\nconst generated = ['**/coverage/**', '**/playwright-report/**', '**/.trivycache/**'];\nconst pattern = /['\"]\\/coverage\\//;\n\nexport default {\n    plugins: [],\n    server: {\n        watch: {\n            ignored: [\n                '**/coverage/**',\n                '**/playwright-report/**',\n                '**/.trivycache/**',\n            ],\n        },\n    },\n};\n"
+        }
+    }
+}

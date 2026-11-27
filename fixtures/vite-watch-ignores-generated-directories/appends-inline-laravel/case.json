@@ -1,0 +1,17 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "appends inline to a single-line array",
+    "engines": [
+        "php"
+    ],
+    "profiles": [
+        "laravel"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "vite.config.js": "import { defineConfig } from 'vite';\nimport laravel from 'laravel-vite-plugin';\n\nexport default defineConfig({\n    plugins: [\n        laravel({\n            input: ['resources/css/app.css', 'resources/js/app.js'],\n            refresh: true,\n        }),\n    ],\n    server: { watch: { ignored: ['**/vendor/**', '**/storage/**', '**/coverage/**', '**/playwright-report/**', '**/.trivycache/**', '**/.cache/**', '**/.phpunit.cache/**', '**/.ddev/**', '**/bootstrap/cache/**'] } },\n});\n"
+        }
+    }
+}

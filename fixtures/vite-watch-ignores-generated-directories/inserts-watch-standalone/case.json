@@ -1,0 +1,18 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "adds watch to an existing server block, below the comment on its last member",
+    "engines": [
+        "php"
+    ],
+    "profiles": [
+        "php",
+        "wordpress"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "vite.config.js": "import { defineConfig } from 'vite';\n\nexport default defineConfig({\n    server: {\n        host: '0.0.0.0',\n        hmr: { host: 'theme.ddev.site' }, // the DDEV router\n        watch: {\n            ignored: [\n                '**/coverage/**',\n                '**/playwright-report/**',\n                '**/.trivycache/**',\n                '**/vendor/**',\n                '**/.cache/**',\n                '**/.phpunit.cache/**',\n                '**/.ddev/**',\n            ],\n        },\n    },\n    build: {\n        outDir: 'dist',\n    },\n});\n"
+        }
+    }
+}

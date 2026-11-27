@@ -229,5 +229,20 @@
             "laravel/horizon": "5.25.0",
             "laravel/telescope": "5.10.0"
         }
+    },
+    "vite": {
+        "configFiles": [
+            "vite.config.js",
+            "vite.config.mjs",
+            "vite.config.ts",
+            "vite.config.cjs",
+            "vite.config.mts",
+            "vite.config.cts"
+        ],
+        "watchIgnored": {
+            "shared": ["**/coverage/**", "**/playwright-report/**", "**/.trivycache/**"],
+            "composer": ["**/vendor/**", "**/.cache/**", "**/.phpunit.cache/**", "**/.ddev/**"],
+            "laravel": ["**/storage/**", "**/bootstrap/cache/**"]
+        }
     }
 }

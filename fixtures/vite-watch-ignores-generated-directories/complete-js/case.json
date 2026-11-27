@@ -1,0 +1,8 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "passes when a JS project lists the shared directories",
+    "engines": [
+        "js"
+    ],
+    "expect": "pass"
+}

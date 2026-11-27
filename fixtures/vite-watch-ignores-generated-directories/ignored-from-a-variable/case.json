@@ -1,0 +1,20 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "reports an ignored list that is not an array literal and leaves the file alone",
+    "engines": [
+        "php",
+        "js"
+    ],
+    "profiles": [
+        "laravel",
+        "php",
+        "wordpress"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "fail",
+        "files": {
+            "vite.config.js": "import { defineConfig } from 'vite';\nimport { generated } from './build/paths.js';\n\nexport default defineConfig({\n    server: {\n        watch: {\n            ignored: generated,\n        },\n    },\n});\n"
+        }
+    }
+}

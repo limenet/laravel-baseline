@@ -1,0 +1,14 @@
+{
+    "check": "viteWatchIgnoresGeneratedDirectories",
+    "description": "appends the missing entries to an existing array, keeping its entries and comments",
+    "engines": [
+        "js"
+    ],
+    "expect": "fail",
+    "fix": {
+        "expect": "pass",
+        "files": {
+            "vite.config.js": "export default {\n    server: {\n        watch: {\n            usePolling: true,\n            ignored: [\n                '**/coverage/**',\n                '**/fixtures/**', // written by the seed script\n                '**/playwright-report/**',\n                '**/.trivycache/**',\n            ],\n        },\n    },\n}\n"
+        }
+    }
+}
