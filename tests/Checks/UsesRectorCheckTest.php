@@ -52,9 +52,33 @@ it('usesRector accepts a driftingly/rector-laravel constraint at the floor', fun
     expect(makeCheck(UsesRectorCheck::class)->check())->toBe(CheckResult::PASS);
 });
 
+it('usesRector fails when the rector/rector constraint is below 2.9.0', function (Profile $profile): void {
+    $project = makeProject($profile, ['composer.json' => json_encode([
+        'require-dev' => ['rector/rector' => '^2.6'],
+        'scripts' => ['ci-lint' => ['./vendor/bin/rector']],
+    ])]);
+
+    $check = makeCheck(UsesRectorCheck::class, $project);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect(implode("\n", $check->getComments()))->toContain('rector/rector constraint is too low')->toContain('^2.9.0');
+})->with([Profile::Php, Profile::WordPress]);
+
+it('usesRector fails a Laravel project when the rector/rector constraint is below 2.9.0', function (): void {
+    bindFakeComposer(['rector/rector' => true, 'driftingly/rector-laravel' => true]);
+    $composer = [
+        'require-dev' => ['rector/rector' => '^2.5.8', 'driftingly/rector-laravel' => '^2.7'],
+        'scripts' => ['ci-lint' => ['rector']],
+    ];
+    $this->withTempBasePath(['composer.json' => json_encode($composer)]);
+
+    $check = makeCheck(UsesRectorCheck::class);
+    expect($check->check())->toBe(CheckResult::FAIL);
+    expect(implode("\n", $check->getComments()))->toContain('rector/rector constraint is too low');
+});
+
 it('usesRector does not require rector-laravel outside Laravel', function (Profile $profile): void {
     $project = makeProject($profile, ['composer.json' => json_encode([
-        'require-dev' => ['rector/rector' => '^2.0'],
+        'require-dev' => ['rector/rector' => '^2.9'],
         'scripts' => ['ci-lint' => ['./vendor/bin/rector']],
     ])]);
 
@@ -63,7 +87,7 @@ it('usesRector does not require rector-laravel outside Laravel', function (Profi
 
 it('usesRector adds rector to ci-lint outside Laravel', function (): void {
     $project = makeProject(Profile::Php, ['composer.json' => json_encode([
-        'require-dev' => ['rector/rector' => '^2.0'],
+        'require-dev' => ['rector/rector' => '^2.9'],
         'scripts' => ['ci-lint' => ['phpstan']],
     ])]);
 

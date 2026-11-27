@@ -29,6 +29,15 @@ abstract class AbstractCheck implements CheckInterface
      */
     protected const MIN_RECTOR_LARAVEL = '2.7.0';
 
+    /**
+     * The lowest rector/rector the rector.php this package writes is valid
+     * against: 2.9.0 folded the instanceOf and earlyReturn prepared sets into
+     * codeQuality and codingStyle — below it, the withPreparedSets() call this
+     * package mandates would leave those rules out — and deleted the rules
+     * doesNotSkipDeprecatedRectorRules strips from withSkip().
+     */
+    protected const MIN_RECTOR = '2.9.0';
+
     public function __construct(
         CommentCollector $commentCollector,
         protected readonly Project $project,

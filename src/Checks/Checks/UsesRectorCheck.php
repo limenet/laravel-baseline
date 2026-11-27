@@ -23,6 +23,12 @@ class UsesRectorCheck extends AbstractFixableCheck
             return CheckResult::FAIL;
         }
 
+        if ($this->composerPackageAllowsBelow('rector/rector', self::MIN_RECTOR)) {
+            $this->addComment('rector/rector constraint is too low: require "^'.self::MIN_RECTOR.'" in composer.json — 2.9 moved the instanceOf and earlyReturn prepared sets into codeQuality and codingStyle, so below it the withPreparedSets() call this package requires leaves those rules out');
+
+            return CheckResult::FAIL;
+        }
+
         if ($isLaravel && $this->composerPackageAllowsBelow('driftingly/rector-laravel', self::MIN_RECTOR_LARAVEL)) {
             $this->addComment('driftingly/rector-laravel constraint is too low: require "^'.self::MIN_RECTOR_LARAVEL.'" in composer.json — the rector.php this package writes targets the 2.6 API, where LaravelSetProvider is gone and its rules arrive through LaravelSetList::COMPOSER_BASED instead, and 2.7 limits the legacy event-string upgrade to event dispatcher calls, so StringToClassConstantRector no longer has to be skipped');
 
