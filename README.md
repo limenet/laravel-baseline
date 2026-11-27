@@ -323,6 +323,12 @@ This package validates your Laravel installation against the following checks:
 - 🔧 **`usesSpatieHealthScheduleCheckHeartbeat()`** - Validates ScheduleCheck is configured with `heartbeatMaxAgeInMinutes(2)` to prevent false positives *(appends the call to ScheduleCheck in AppServiceProvider)*
 - **`usesSpatieBackup()`** - Validates Spatie Backup database backups with comprehensive config validation
 
+The schedule entries these checks require are read from the booted application. An entry that is
+only registered in some environments — inside `if (app()->isProduction())`, `App::environment(...)`
+or a `config('app.env')` comparison — is found by parsing `routes/console.php`, `bootstrap/app.php`
+and `app/Console/Kernel.php` instead, as long as it schedules the command by name rather than by
+class.
+
 ### Infrastructure & Dependencies
 - **`usesPredis()`** - Validates Predis Redis client is installed
 - **`isLaravelVersionMaintained()`** - Validates Laravel 11+ is used

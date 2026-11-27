@@ -4,10 +4,15 @@ namespace Limenet\LaravelBaseline\Concerns;
 
 use Illuminate\Support\Facades\Schedule;
 use Limenet\LaravelBaseline\Enums\CheckResult;
+use Limenet\LaravelBaseline\Schedule\EnvironmentGuardedScheduleFinder;
 
 /**
  * Reads the booted application's console schedule, so only checks that run
  * inside Laravel may use it — the standalone runner has no application.
+ *
+ * An entry the current environment does not register (wrapped in
+ * `if (app()->isProduction())` and the like) is found by parsing the scheduler
+ * sources instead; see EnvironmentGuardedScheduleFinder.
  */
 trait InteractsWithLaravelSchedule
 {
@@ -21,7 +26,14 @@ trait InteractsWithLaravelSchedule
             }
         }
 
-        return false;
+        return (new EnvironmentGuardedScheduleFinder)->contains(
+            [
+                $this->path('routes/console.php'),
+                $this->path('bootstrap/app.php'),
+                $this->path('app/Console/Kernel.php'),
+            ],
+            $command,
+        );
     }
 
     /**

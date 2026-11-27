@@ -882,6 +882,97 @@ PHP;
     expect($check->check())->toBe(CheckResult::PASS);
 });
 
+it('usesSpatieBackup passes when the schedule is only registered in production', function (): void {
+    bindFakeComposer(['spatie/laravel-backup' => true]);
+
+    $config = <<<'PHP'
+<?php
+return [
+    'backup' => [
+        'name' => env('APP_URL', 'my-app'),
+        'source' => [
+            'files' => [
+                'follow_links' => true,
+                'relative_path' => base_path(),
+                'exclude' => [
+                    base_path('.git'),
+                    base_path('vendor'),
+                    base_path('node_modules'),
+                    storage_path('framework'),
+                ],
+            ],
+            'databases' => [env('DB_CONNECTION', 'mysql')],
+        ],
+        'destination' => ['disks' => ['local']],
+        'verify_backup' => true,
+        'database_dump_file_timestamp_format' => 'Y-m-d-H-i-s',
+    ],
+    'notifications' => [
+        'mail' => [
+            'to' => 'test@inbound.postmarkapp.com',
+            'from' => ['address' => config('mail.from.address'), 'name' => config('mail.from.name')],
+        ],
+    ],
+    'monitor_backups' => [
+        ['name' => env('APP_URL', 'my-app'), 'disks' => ['local']],
+    ],
+    'cleanup' => [
+        'default_strategy' => [
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
+            'delete_oldest_backups_when_using_more_megabytes_than' => null,
+        ],
+    ],
+];
+PHP;
+
+    $databaseConfig = <<<'PHP'
+<?php
+return [
+    'default' => env('DB_CONNECTION', 'mysql'),
+];
+PHP;
+
+    $this->withTempBasePath([
+        'composer.json' => json_encode(['name' => 'tmp']),
+        'config/backup.php' => $config,
+        'config/database.php' => $databaseConfig,
+        'bootstrap/app.php' => <<<'PHP'
+<?php
+
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Application;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withSchedule(function (Schedule $schedule): void {
+        if (app()->isProduction()) {
+            $schedule
+                ->command('backup:run')
+                ->dailyAt('01:07')
+                ->runInBackground();
+
+            $schedule
+                ->command('backup:run --only-db')
+                ->hourlyAt('37')
+                ->runInBackground();
+
+            $schedule
+                ->command('backup:clean')
+                ->dailyAt('01:25')
+                ->runInBackground();
+        }
+    })
+    ->create();
+PHP,
+    ]);
+
+    $check = makeCheck(UsesSpatieBackupCheck::class);
+    expect($check->check())->toBe(CheckResult::PASS);
+});
+
 it('usesSpatieBackup passes with valid APP_NAME configuration', function (): void {
     bindFakeComposer(['spatie/laravel-backup' => true]);
 
