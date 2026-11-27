@@ -1,6 +1,6 @@
 ---
 name: ignoring-trivy-findings
-description: Add, renew, or prune entries in .trivyignore.yaml — either short-lived because the fixed version is still inside the npm install cooldown, or longer-lived because the upgrade is blocked by a project constraint. Use when the Trivy `security` CI job fails on a vulnerability, when asked to ignore or suppress a Trivy finding, or when reviewing existing Trivy ignores.
+description: Add, renew, or prune entries in .trivyignore.yaml — either because the fixed version is still inside the npm install cooldown, or because the upgrade is blocked by a project constraint. Entries are dated at least three weeks out unless the finding is CRITICAL. Use when the Trivy `security` CI job fails on a vulnerability, when asked to ignore or suppress a Trivy finding, or when reviewing existing Trivy ignores.
 ---
 
 # Ignoring Trivy findings
@@ -15,8 +15,13 @@ There are exactly two reasons to ignore a vulnerability, and they get different 
 
 | Kind | Why it cannot be fixed now | `expired_at` |
 | --- | --- | --- |
-| **cooldown** | The fixed version exists but was published less than `min-release-age` days ago, so `.npmrc` deliberately refuses to install it yet. | Aligned to the day the fix becomes installable. |
-| **constraint** | The fix needs an upgrade this project cannot take in the near future (a blocked major, a Node or platform pin, an upstream that has not released a fix). | At most 90 days out, then re-evaluate. |
+| **cooldown** | The fixed version exists but was published less than `min-release-age` days ago, so `.npmrc` deliberately refuses to install it yet. | The day the fix becomes installable, but at least 21 days out unless the finding is CRITICAL. |
+| **constraint** | The fix needs an upgrade this project cannot take in the near future (a blocked major, a Node or platform pin, an upstream that has not released a fix). | 21 to 90 days out, then re-evaluate; sooner is allowed for a CRITICAL finding. |
+
+An entry for a finding that is not CRITICAL is valid for **at least 21 days**: an ignore that lapses
+before the next dependency update only turns the `security` job red again over a finding nobody has
+had the chance to act on. A **CRITICAL** finding is the exception — it gets the shortest expiry its
+kind allows, so it comes back the moment it can be fixed.
 
 Anything else is not an ignore — it is an upgrade.
 
@@ -50,6 +55,11 @@ whatever those entries were hiding (step 2 shows the findings again):
   deliberate decision, not a date bump.
 - **Finding no longer reported** — nothing to do; the entry was stale anyway.
 
+Then read the entries that have **not** expired. Because of the 21-day minimum (step 4) an entry
+usually outlives its reason, so the statement, not `expired_at`, says when the fix can go in. If
+that point has been reached — a cooldown entry past its "installable from" date, a constraint entry
+whose blocker is gone — upgrade now (step 3) and delete the entry instead of letting it run out.
+
 If a section ends up empty, remove its key. Leave `.trivyignore.yaml` itself in place even when it
 is empty — the `hasTrivyConfig` baseline check requires the file to exist.
 
@@ -63,8 +73,8 @@ trivy fs .
 ```
 
 Otherwise read the findings from the failed `security` job log in GitLab CI. For each
-vulnerability, note the ID (`CVE-…` or `GHSA-…`), the package, the installed version and the
-**fixed version**.
+vulnerability, note the ID (`CVE-…` or `GHSA-…`), the package, the installed version, the
+**fixed version** and the **severity** (it decides the minimum expiry in step 4).
 
 To see which ignore entries are still matching something, add `--show-suppressed`; an entry whose
 finding is absent from that output is stale and can be removed too.
@@ -95,11 +105,11 @@ dependency that pulls it in does not allow the fixed version yet, do not add an 
 unlike an ignore it never expires, so it outlives its reason without anyone being reminded. Add a
 **constraint** entry instead, naming the parent that has to release, and let the normal update pick
 up the fix once it does. Above all, never override a **cooldown** case — the fix arrives through the
-normal update within days, and the dated ignore covers exactly that window.
+normal update once the cooldown has passed, and the dated ignore covers that window.
 
 Never lower `min-release-age`, add an exclude, or pass a flag that bypasses the cooldown just to
 install a fix sooner. The cooldown is the supply-chain protection; the ignore is how it coexists
-with a known vulnerability for a few days.
+with a known vulnerability until the fix can be installed.
 
 ### 4. Add the entry
 
@@ -107,21 +117,40 @@ Add one entry per vulnerability ID under `vulnerabilities:`, creating the key if
 Every entry has `id`, `expired_at` (`YYYY-MM-DD`) and `statement`; the statement starts with the
 kind so the next prune can tell them apart.
 
-**Cooldown** — align `expired_at` with the cooldown: the fixed version's publish date plus
+The expiry depends on the kind and on the severity Trivy reports. Unless the finding is
+**CRITICAL**, no entry expires sooner than 21 days from today:
+
+```bash
+node -e "console.log(new Date(Date.now() + 21 * 864e5).toISOString().slice(0, 10))"
+```
+
+**Cooldown** — first work out the day the cooldown ends: the fixed version's publish date plus
 `min-release-age` days, plus **one more day**. `expired_at` is a date, so it expires at the start of
 that day; without the extra day the entry would lapse a few hours before `npm` will install the
 fix. Example: fixed version published 2026-10-03T14:20Z, `min-release-age=7` → installable from
-2026-10-10T14:20Z → `expired_at: 2026-10-11`.
+2026-10-10T14:20Z → cooldown ends 2026-10-11. Then:
 
-**Constraint** — set `expired_at` no more than 90 days out, sooner if the blocker has a known end
-(a planned upgrade, an announced upstream release). The statement names the blocker and what would
-unblock it.
+- **CRITICAL** — `expired_at` is the day the cooldown ends.
+- **Anything else** — `expired_at` is the day the cooldown ends or 21 days from today, whichever is
+  later. The entry then usually outlives the cooldown; the statement records the installable date,
+  and the prune in step 1 removes the entry once the fix is in.
+
+**Constraint** — set `expired_at` between 21 and 90 days out, toward the short end if the blocker
+has a known end (a planned upgrade, an announced upstream release). For a **CRITICAL** finding the
+21-day minimum does not apply: pick the earliest date the blocker could be gone, still no more than
+90 days out. The statement names the blocker and what would unblock it.
+
+When the finding is CRITICAL, say so right after the kind (`cooldown: CRITICAL, …`), so a later
+reader can tell why the expiry is short. The entries below were all added on 2026-10-05:
 
 ```yaml
 vulnerabilities:
   - id: CVE-2026-12345
-    expired_at: 2026-10-11
+    expired_at: 2026-10-26
     statement: "cooldown: example-pkg 3.4.2 fixes it, published 2026-10-03; installable from 2026-10-10 (min-release-age=7)"
+  - id: CVE-2026-23456
+    expired_at: 2026-10-11
+    statement: "cooldown: CRITICAL, parser-pkg 2.1.9 fixes it, published 2026-10-03; installable from 2026-10-10 (min-release-age=7)"
   - id: GHSA-abcd-efgh-ijkl
     expired_at: 2026-12-31
     statement: "constraint: other-pkg fixed in 5.0, which needs Node 26; unblocked by the Node 26 upgrade"
@@ -143,13 +172,16 @@ npm run ci-lint
 
 - **Pruned** — each removed entry, and what happened to its finding (upgraded, renewed, or gone).
 - **Fixed** — vulnerabilities resolved by upgrading, each as `package old → new`.
-- **Ignored** — each new or renewed entry: ID, package, kind, `expired_at`, and the reason.
+- **Ignored** — each new or renewed entry: ID, package, severity, kind, `expired_at`, and the
+  reason.
 
 ## Conventions
 
 - **Upgrade first, ignore second.** An ignore is only for a fix that cannot be installed yet.
-- **Every entry expires.** Cooldown entries expire when the fix becomes installable; constraint
-  entries within 90 days.
+- **Every entry expires.** No sooner than 21 days out unless the finding is CRITICAL, and never
+  more than 90 days out for a constraint entry.
+- **An ignore is not a reason to wait.** Upgrade and delete the entry as soon as the fix can be
+  installed, whatever its `expired_at` says.
 - **Prune on every pass.** Expired entries are removed whenever this skill or
   `updating-dependencies` runs.
 - **Never weaken the cooldown** to get a fix in faster.

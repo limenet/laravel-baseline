@@ -78,8 +78,10 @@ stops applying it at that point anyway). Get today's date:
 node -e "console.log(new Date().toISOString().slice(0, 10))"
 ```
 
-The updates above are often what makes those findings go away: a `cooldown:` entry expires once
-its fix is installable, and step 2 just installed it. If an expired entry's finding is still
+The updates above are often what makes those findings go away: a `cooldown:` entry covers a
+fix that was waiting out the npm cooldown, and step 2 may just have installed it. Delete an entry
+whose fix is now installed even when its `expired_at` is still ahead — entries are dated at least
+21 days out unless the finding is CRITICAL, so they usually outlive their reason. If an expired entry's finding is still
 reported, handle it with the `ignoring-trivy-findings` skill — upgrade, or renew it deliberately
 with a new expiry and statement — rather than bumping the date. Do not swap the ignore for an npm
 `overrides` entry that forces the fix in — least of all when the fix is only waiting out the
