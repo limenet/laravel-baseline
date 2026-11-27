@@ -3,6 +3,14 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.24.0](https://github.com/limenet/laravel-baseline/compare/v2.23.0...v2.24.0) (2026-11-27)
+
+### Features
+
+* **php:** tell Boost agents to split method chains and long signatures one item per line ([2df6068](https://github.com/limenet/laravel-baseline/commit/2df60688127c748c0457cef80e7c16b17041caff))
+* **php:** treat limenet-namespace projects as solo projects in the guideline ([8f5b7c9](https://github.com/limenet/laravel-baseline/commit/8f5b7c903a0ee2583ca5fb8fb033759629f55b83))
+* **policy:** keep non-critical Trivy ignores valid for at least three weeks ([0af710c](https://github.com/limenet/laravel-baseline/commit/0af710c81c1624df3c41bae0ef5574c713e0fcaf))
+
 ## [2.23.0](https://github.com/limenet/laravel-baseline/compare/v2.21.0...v2.23.0) (2026-11-27)
 
 ### Features
