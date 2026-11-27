@@ -3,6 +3,16 @@
 All notable changes to `laravel-baseline` will be documented in this file.
 
 
+## [2.25.0](https://github.com/limenet/laravel-baseline/compare/v2.24.0...v2.25.0) (2026-11-27)
+
+### Features
+
+* **policy:** allow the Playwright MCP server in Claude settings ([6ef856a](https://github.com/limenet/laravel-baseline/commit/6ef856a23fbed375c2ca86206c122da6dbb48d13))
+
+### Bug Fixes
+
+* **php:** count schedule entries behind environment guards as present ([3d4abad](https://github.com/limenet/laravel-baseline/commit/3d4abad600b584ec95cca2c82f1dad649717d10c))
+
 ## [2.24.0](https://github.com/limenet/laravel-baseline/compare/v2.23.0...v2.24.0) (2026-11-27)
 
 ### Features
