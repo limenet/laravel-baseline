@@ -170,6 +170,48 @@ It takes an optional fourth callback that runs when the primary one doesn't — 
 missing or invalid value without throwing. The method lives on `InteractsWithData`, so it is
 available on `Request`, form requests, and anything else using that trait.
 
+### One call per line in method chains
+
+When a chain has two or more method calls — a static call such as `Course::query()` counts as one —
+put each `->` / `?->` link on its own line, indented one level under the start of the chain. This
+applies to Eloquent queries, collections, and any other fluent API:
+
+```php
+Course::query()
+    ->with(['people'])
+    ->lazyById();
+
+collect($items)
+    ->filter()
+    ->values();
+
+// not: Course::query()->with(['people'])->lazyById()
+```
+
+A single call stays on one line: `now()->addDay()`, `$query->where('active', true)`. Pint fixes
+the indentation of a chain that is already split, but it won't split one for you.
+
+### One parameter per line in long signatures
+
+When a method, function, constructor or closure takes three or more parameters, or its signature
+would run past roughly 100 characters, put each parameter on its own line with a trailing comma, and
+the closing parenthesis and return type on a line of their own:
+
+```php
+public function store(
+    StoreOrderRequest $request,
+    Customer $customer,
+    PriceCalculator $calculator,
+): RedirectResponse {
+    // ...
+}
+
+// not: public function store(StoreOrderRequest $request, Customer $customer, PriceCalculator $calculator): RedirectResponse
+```
+
+Pint keeps a signature that is already split fully multiline, but it won't split a one-line
+signature for you.
+
 ### Best practices
 
 - Follow the code style enforced by Laravel Pint.
